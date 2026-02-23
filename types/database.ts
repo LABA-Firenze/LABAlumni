@@ -46,6 +46,12 @@ export interface Company {
   website_url: string | null
   logo_url: string | null
   industry: string | null
+  partita_iva: string | null
+  address: string | null
+  city: string | null
+  cap: string | null
+  province: string | null
+  country: string | null
   created_at: string
   updated_at: string
 }

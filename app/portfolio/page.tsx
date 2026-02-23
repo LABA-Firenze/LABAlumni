@@ -19,7 +19,7 @@ export default function PortfolioPage() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push('/login')
+      router.push('/accedi')
       return
     }
 
@@ -84,7 +84,7 @@ export default function PortfolioPage() {
             <h1 className="text-3xl font-bold text-gray-900">Il Mio Portfolio</h1>
             <p className="text-gray-600 mt-2">Mostra i tuoi migliori lavori e progetti</p>
           </div>
-          <Link href="/portfolio/new">
+          <Link href="/portfolio/nuovo">
             <Button variant="primary">
               <Plus className="w-5 h-5 mr-2" />
               Aggiungi Lavoro
@@ -98,7 +98,7 @@ export default function PortfolioPage() {
             <ImageIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold mb-2">Il tuo portfolio è vuoto</h3>
             <p className="text-gray-600 mb-6">Inizia a condividere i tuoi lavori e progetti!</p>
-            <Link href="/portfolio/new">
+            <Link href="/portfolio/nuovo">
               <Button variant="primary">Aggiungi il Primo Lavoro</Button>
             </Link>
           </Card>
@@ -115,7 +115,7 @@ export default function PortfolioPage() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Link href={`/portfolio/${item.id}/edit`}>
+                      <Link href={`/portfolio/${item.id}/modifica`}>
                         <button className="bg-white p-2 rounded-full shadow-lg hover:bg-gray-50">
                           <Edit className="w-4 h-4 text-gray-700" />
                         </button>

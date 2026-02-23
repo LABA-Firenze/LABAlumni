@@ -90,13 +90,13 @@ export default function Home() {
               </div>
 
               <div className="flex gap-4 animate-slide-up" style={{ animationDelay: '0.4s' }}>
-                <Link href="/register">
+                <Link href="/registrati">
                   <Button variant="secondary" size="lg" className="bg-white text-primary-600 hover:bg-white/90 hover:scale-105 transition-transform flex items-center">
                     <span>Inizia Gratis</span>
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Button>
                 </Link>
-                <Link href="/login">
+                <Link href="/accedi">
                   <Button variant="outline" size="lg" className="border-2 border-white text-white hover:bg-white/10">
                     Accedi
                   </Button>
@@ -215,7 +215,7 @@ export default function Home() {
           <p className="text-xl mb-8 opacity-90">
             Unisciti alla community oggi
           </p>
-          <Link href="/register">
+          <Link href="/registrati">
             <Button variant="secondary" size="lg">Registrati Gratis</Button>
           </Link>
         </div>

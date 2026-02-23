@@ -32,32 +32,32 @@ export function Navbar() {
     <>
       {userRole === 'student' || !userRole ? (
         <>
-          <Link href="/dashboard/student" className="flex items-center gap-2 hover:text-primary-600 transition-colors">
+          <Link href="/pannello/studente" className="flex items-center gap-2 hover:text-primary-600 transition-colors">
             <Briefcase className="w-5 h-5 shrink-0" />
             <span>Dashboard</span>
           </Link>
-          <Link href="/jobs" className="flex items-center gap-2 hover:text-primary-600 transition-colors">
+          <Link href="/annunci" className="flex items-center gap-2 hover:text-primary-600 transition-colors">
             <Briefcase className="w-5 h-5 shrink-0" />
             <span>Annunci</span>
           </Link>
         </>
       ) : (
         <>
-          <Link href="/dashboard/company" className="flex items-center gap-2 hover:text-primary-600 transition-colors">
+          <Link href="/pannello/azienda" className="flex items-center gap-2 hover:text-primary-600 transition-colors">
             <Users className="w-5 h-5 shrink-0" />
             <span>Dashboard</span>
           </Link>
-          <Link href="/jobs/manage" className="flex items-center gap-2 hover:text-primary-600 transition-colors">
+          <Link href="/annunci/gestisci" className="flex items-center gap-2 hover:text-primary-600 transition-colors">
             <Briefcase className="w-5 h-5 shrink-0" />
             <span>Gestisci Annunci</span>
           </Link>
         </>
       )}
-      <Link href="/community" className="flex items-center gap-2 hover:text-primary-600 transition-colors">
+      <Link href="/bacheca" className="flex items-center gap-2 hover:text-primary-600 transition-colors">
         <Newspaper className="w-5 h-5 shrink-0" />
         <span>Bacheca</span>
       </Link>
-      <Link href="/messages" className="flex items-center gap-2 hover:text-primary-600 transition-colors">
+      <Link href="/messaggi" className="flex items-center gap-2 hover:text-primary-600 transition-colors">
         <User className="w-5 h-5 shrink-0" />
         <span>Messaggi</span>
       </Link>
@@ -66,7 +66,7 @@ export function Navbar() {
 
   // Determine logo href based on auth status
   const logoHref = user 
-    ? (userRole === 'company' ? '/dashboard/company' : '/dashboard/student')
+    ? (userRole === 'company' ? '/pannello/azienda' : '/pannello/studente')
     : '/'
 
   return (
@@ -83,7 +83,7 @@ export function Navbar() {
                 {navLinks}
                 {user ? (
                   <div className="flex items-center gap-4">
-                    <Link href="/profile" className="flex items-center gap-2 text-gray-700 hover:text-primary-600">
+                    <Link href="/profilo" className="flex items-center gap-2 text-gray-700 hover:text-primary-600">
                       <User className="w-5 h-5 shrink-0" />
                       <span>Profilo</span>
                     </Link>
@@ -94,10 +94,10 @@ export function Navbar() {
                   </div>
                 ) : (
                   <div className="flex items-center gap-3">
-                    <Link href="/login">
+                    <Link href="/accedi">
                       <Button variant="ghost" size="sm">Accedi</Button>
                     </Link>
-                    <Link href="/register">
+                    <Link href="/registrati">
                       <Button variant="primary" size="sm">Registrati</Button>
                     </Link>
                   </div>

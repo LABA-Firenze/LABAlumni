@@ -136,7 +136,7 @@ export default function PortfolioItemDetailPage() {
               </div>
               {isOwner && (
                 <div className="flex gap-2">
-                  <Link href={`/portfolio/${item.id}/edit`}>
+                  <Link href={`/portfolio/${item.id}/modifica`}>
                     <Button variant="outline" size="sm">
                       <Edit className="w-4 h-4 mr-2" />
                       Modifica
