@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
 import { Select } from '@/components/ui/Select'
-import { Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react'
+import { Plus, Edit, Trash2, Eye, EyeOff, Briefcase } from 'lucide-react'
 import Link from 'next/link'
 import type { JobPost, CourseType } from '@/types/database'
 import { COURSE_CONFIG } from '@/types/database'
@@ -74,7 +74,7 @@ export default function ManageJobsPage() {
   }
 
   const handleDelete = async (jobId: string) => {
-    if (!confirm('Sei sicuro di voler eliminare questo annuncio?')) return
+    if (!confirm('Sei sicuro di voler eliminare questa offerta?')) return
 
     await supabase
       .from('job_posts')
@@ -175,13 +175,16 @@ export default function ManageJobsPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Gestisci Annunci</h1>
-            <p className="text-gray-600 mt-2">Crea e modifica i tuoi annunci di lavoro</p>
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+              <Briefcase className="w-8 h-8 text-primary-600" />
+              Tirocini e Stage
+            </h1>
+            <p className="text-gray-600 mt-2">Crea e gestisci le tue offerte di tirocinio e stage</p>
           </div>
           {!showForm && (
             <Button variant="primary" onClick={() => setShowForm(true)}>
               <Plus className="w-5 h-5 mr-2" />
-              Nuovo Annuncio
+              Nuova Offerta
             </Button>
           )}
         </div>
@@ -189,7 +192,7 @@ export default function ManageJobsPage() {
         {showForm && (
           <Card variant="elevated" className="mb-6">
             <h2 className="text-xl font-semibold mb-6">
-              {editingJob ? 'Modifica Annuncio' : 'Nuovo Annuncio'}
+              {editingJob ? 'Modifica Offerta' : 'Nuova Offerta'}
             </h2>
             
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -277,13 +280,13 @@ export default function ManageJobsPage() {
                     onChange={(e) => setActive(e.target.checked)}
                     className="w-4 h-4"
                   />
-                  <span className="text-sm font-medium">Annuncio attivo</span>
+                  <span className="text-sm font-medium">Offerta attiva</span>
                 </label>
               </div>
 
               <div className="flex gap-3 pt-4">
                 <Button type="submit" variant="primary" disabled={saving}>
-                  {saving ? 'Salvataggio...' : editingJob ? 'Salva Modifiche' : 'Crea Annuncio'}
+                  {saving ? 'Salvataggio...' : editingJob ? 'Salva Modifiche' : 'Crea Offerta'}
                 </Button>
                 <Button type="button" variant="outline" onClick={handleCancel}>
                   Annulla
@@ -297,7 +300,7 @@ export default function ManageJobsPage() {
         <div className="space-y-4">
           {jobs.length === 0 ? (
             <Card variant="elevated" className="text-center py-12">
-              <p className="text-gray-600">Non hai ancora creato annunci</p>
+              <p className="text-gray-600">Non hai ancora creato offerte</p>
             </Card>
           ) : (
             jobs.map((job) => (

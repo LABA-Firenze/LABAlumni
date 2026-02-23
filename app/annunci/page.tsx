@@ -93,7 +93,10 @@ export default function JobsPage() {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Annunci di Lavoro</h1>
+          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+            <Briefcase className="w-8 h-8 text-primary-600" />
+            Tirocini e Stage
+          </h1>
           <p className="text-gray-600 mt-2">Trova le opportunità giuste per te</p>
         </div>
 
@@ -101,7 +104,7 @@ export default function JobsPage() {
         <Card variant="elevated" className="mb-6">
           <div className="grid md:grid-cols-2 gap-4">
             <Input
-              placeholder="Cerca annunci..."
+              placeholder="Cerca tirocini e stage..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -124,9 +127,10 @@ export default function JobsPage() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
           </div>
         ) : filteredJobs.length === 0 ? (
-          <Card variant="elevated" className="text-center py-12">
-            <Briefcase className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 text-lg">Nessun annuncio trovato</p>
+          <Card variant="elevated" className="text-center py-16">
+            <Briefcase className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold mb-2">Nessun tirocinio o stage trovato</h3>
+            <p className="text-gray-600">Prova a modificare i filtri o controlla più tardi</p>
           </Card>
         ) : (
           <div className="space-y-4">

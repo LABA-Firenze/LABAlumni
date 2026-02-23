@@ -137,7 +137,7 @@ export default function Home() {
               <Briefcase className="w-12 h-12 text-primary-600 mb-4" />
               <h3 className="text-xl font-semibold mb-2">Trova Opportunità</h3>
               <p className="text-gray-600">
-                Annunci di lavoro e tirocini mirati per il tuo corso
+                Tirocini e stage mirati per il tuo corso
               </p>
             </Card>
             
@@ -189,7 +189,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-semibold mb-2">Esplora</h3>
               <p className="text-gray-600">
-                Trova annunci e connettiti con le aziende
+                Trova tirocini e stage e connettiti con le aziende
               </p>
             </div>
             

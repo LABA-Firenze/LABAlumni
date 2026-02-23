@@ -216,7 +216,10 @@ export default function MessagesPage() {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Messaggi</h1>
+          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+            <Mail className="w-8 h-8 text-primary-600" />
+            Messaggi
+          </h1>
           {userRole === 'student' && (
             <p className="text-gray-600 mt-1">
               Puoi rispondere qui quando un&apos;azienda ti contatta. Solo le aziende possono avviare nuove conversazioni.

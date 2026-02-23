@@ -259,7 +259,7 @@ export default function StudentDashboard() {
                 <h3 className="text-xl font-semibold mb-2">Il tuo feed è vuoto</h3>
                 <p className="text-gray-600 mb-6">Inizia a seguire aziende e studenti per vedere i loro post!</p>
                 <Link href="/annunci">
-                  <Button variant="primary">Esplora Annunci</Button>
+                  <Button variant="primary">Esplora Tirocini e Stage</Button>
                 </Link>
               </Card>
             ) : (
@@ -334,7 +334,7 @@ export default function StudentDashboard() {
                 </Link>
                 <Link href="/annunci" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
                   <Briefcase className="w-5 h-5 shrink-0" />
-                  <span>Annunci Lavoro</span>
+                  <span>Tirocini e Stage</span>
                 </Link>
               </div>
             </Card>

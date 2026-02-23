@@ -76,7 +76,7 @@ export default function ApplicationsPage() {
             <Briefcase className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-600 text-lg mb-4">Non hai ancora inviato candidature</p>
             <Link href="/annunci">
-              <Button variant="primary">Cerca Annunci</Button>
+              <Button variant="primary">Cerca Tirocini e Stage</Button>
             </Link>
           </Card>
         ) : (
@@ -119,7 +119,7 @@ export default function ApplicationsPage() {
                     </div>
 
                     <Link href={`/annunci/${app.job_post.id}`}>
-                      <Button variant="outline" size="sm">Vedi Annuncio</Button>
+                      <Button variant="outline" size="sm">Vedi Offerta</Button>
                     </Link>
                   </div>
                 </Card>

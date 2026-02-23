@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
-import { Plus, Building2, Clock } from 'lucide-react'
+import { Plus, Building2, Newspaper } from 'lucide-react'
 import Link from 'next/link'
 import type { CommunityPost } from '@/types/database'
 
@@ -91,7 +91,10 @@ export default function CommunityPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Bacheca Comunitaria</h1>
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+              <Newspaper className="w-8 h-8 text-primary-600" />
+              Bacheca Comunitaria
+            </h1>
             <p className="text-gray-600 mt-2">Notizie e aggiornamenti dalle aziende</p>
           </div>
           {isCompany && (
@@ -148,8 +151,10 @@ export default function CommunityPage() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
           </div>
         ) : posts.length === 0 ? (
-          <Card variant="elevated" className="text-center py-12">
-            <p className="text-gray-600">Nessun post pubblicato ancora</p>
+          <Card variant="elevated" className="text-center py-16">
+            <Newspaper className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold mb-2">Nessun post pubblicato ancora</h3>
+            <p className="text-gray-600">Le aziende potranno condividere notizie e aggiornamenti qui</p>
           </Card>
         ) : (
           <div className="space-y-6">

@@ -429,7 +429,7 @@ export default function ProfilePage() {
                   </Link>
                   <Link href="/annunci" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
                     <Briefcase className="w-5 h-5 shrink-0" />
-                    <span>Annunci Lavoro</span>
+                    <span>Tirocini e Stage</span>
                   </Link>
                 </div>
               </Card>

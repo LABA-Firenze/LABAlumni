@@ -96,9 +96,9 @@ export default function JobDetailPage() {
         <Navbar />
         <div className="max-w-4xl mx-auto px-4 py-16">
           <Card variant="elevated" className="text-center py-12">
-            <p className="text-gray-600 text-lg">Annuncio non trovato</p>
+            <p className="text-gray-600 text-lg">Offerta non trovata</p>
             <Link href="/annunci">
-              <Button variant="primary" className="mt-4">Torna agli annunci</Button>
+              <Button variant="primary" className="mt-4">Torna a Tirocini e Stage</Button>
             </Link>
           </Card>
         </div>
@@ -112,7 +112,7 @@ export default function JobDetailPage() {
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Link href="/annunci">
-          <Button variant="ghost" size="sm" className="mb-6">← Torna agli annunci</Button>
+          <Button variant="ghost" size="sm" className="mb-6">← Torna a Tirocini e Stage</Button>
         </Link>
 
         <Card variant="elevated" className="mb-6">

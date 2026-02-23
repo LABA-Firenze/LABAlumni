@@ -15,7 +15,6 @@ export interface Post {
   request_from?: 'student' | 'company' | null
   available_days?: string | null
   available_hours_total?: number | null
-  portfolio_item_id?: string | null
   work_hours?: number | null
   interested_days?: string | null
   likes_count: number

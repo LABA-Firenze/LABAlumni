@@ -89,7 +89,7 @@ export function Navbar() {
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                Annunci
+                Tirocini e Stage
               </Link>
             </div>
           )}
