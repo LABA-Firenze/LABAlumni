@@ -57,7 +57,7 @@ export function Navbar() {
         <div className="flex justify-between items-center h-14">
           <Link href={user ? dashboardHref : '/'} className="flex items-center gap-2 shrink-0">
             <img src="/logoSito.svg" alt="LABA" className="h-8 w-auto" />
-            <span className="text-xl font-bold text-primary-600">Alumni</span>
+            <span className="text-xl font-bold" style={{ color: '#104a96' }}>Alumni</span>
           </Link>
 
           {!loading && user && (
