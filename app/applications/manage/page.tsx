@@ -7,9 +7,10 @@ import { supabase } from '@/lib/supabase'
 import { Navbar } from '@/components/Navbar'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { CheckCircle, Clock, XCircle, User, Mail } from 'lucide-react'
+import { CheckCircle, XCircle, User, Mail } from 'lucide-react'
 import Link from 'next/link'
-import type { Application, JobPost, Student, Profile } from '@/types/database'
+import { APPLICATION_STATUS_CONFIG } from '@/lib/application-status'
+import type { Application, JobPost, Student } from '@/types/database'
 import { COURSE_CONFIG } from '@/types/database'
 
 export default function ManageApplicationsPage() {
@@ -120,12 +121,6 @@ export default function ManageApplicationsPage() {
     }
   }
 
-  const statusConfig = {
-    pending: { icon: Clock, color: 'text-yellow-600', bg: 'bg-yellow-50', label: 'In attesa' },
-    accepted: { icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-50', label: 'Accettata' },
-    rejected: { icon: XCircle, color: 'text-red-600', bg: 'bg-red-50', label: 'Rifiutata' },
-  }
-
   const filteredApplications = filter === 'all' 
     ? applications 
     : applications.filter(app => app.status === filter)
@@ -161,7 +156,7 @@ export default function ManageApplicationsPage() {
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                {f === 'all' ? 'Tutte' : statusConfig[f].label}
+                {f === 'all' ? 'Tutte' : APPLICATION_STATUS_CONFIG[f].label}
               </button>
             ))}
           </div>
@@ -174,14 +169,15 @@ export default function ManageApplicationsPage() {
             <p className="text-gray-600 text-lg">
               {filter === 'all' 
                 ? 'Nessuna candidatura ricevuta' 
-                : `Nessuna candidatura ${statusConfig[filter].label.toLowerCase()}`
+                : `Nessuna candidatura ${APPLICATION_STATUS_CONFIG[filter].label.toLowerCase()}`
               }
             </p>
           </Card>
         ) : (
           <div className="space-y-4">
             {filteredApplications.map((app) => {
-              const StatusIcon = statusConfig[app.status].icon
+              const config = APPLICATION_STATUS_CONFIG[app.status as keyof typeof APPLICATION_STATUS_CONFIG]
+              const StatusIcon = config.icon
               return (
                 <Card key={app.id}>
                   <div className="flex justify-between items-start">
@@ -196,11 +192,9 @@ export default function ManageApplicationsPage() {
                           </h2>
                           <p className="text-gray-600 text-sm">{app.student.profile?.email}</p>
                         </div>
-                        <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${statusConfig[app.status].bg}`}>
-                          <StatusIcon className={`w-4 h-4 ${statusConfig[app.status].color}`} />
-                          <span className={`text-sm font-medium ${statusConfig[app.status].color}`}>
-                            {statusConfig[app.status].label}
-                          </span>
+                        <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${config.bg}`}>
+                          <StatusIcon className={`w-4 h-4 shrink-0 ${config.color}`} />
+                          <span className={`text-sm font-medium ${config.color}`}>{config.label}</span>
                         </div>
                       </div>
 
@@ -257,7 +251,7 @@ export default function ManageApplicationsPage() {
                           size="sm"
                           onClick={() => handleStatusChange(app.id, 'accepted')}
                         >
-                          <CheckCircle className="w-4 h-4 mr-2" />
+                          <CheckCircle className="w-4 h-4 shrink-0" />
                           Accetta
                         </Button>
                         <Button
@@ -265,12 +259,12 @@ export default function ManageApplicationsPage() {
                           size="sm"
                           onClick={() => handleStatusChange(app.id, 'rejected')}
                         >
-                          <XCircle className="w-4 h-4 mr-2" />
+                          <XCircle className="w-4 h-4 shrink-0" />
                           Rifiuta
                         </Button>
                         <Link href={`/messages?user=${app.student.id}`}>
                           <Button variant="ghost" size="sm" className="w-full">
-                            <Mail className="w-4 h-4 mr-2" />
+                            <Mail className="w-4 h-4 shrink-0" />
                             Contatta
                           </Button>
                         </Link>

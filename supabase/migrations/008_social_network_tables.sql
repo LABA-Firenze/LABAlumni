@@ -273,3 +273,4 @@ CREATE TRIGGER update_thesis_proposals_updated_at
   BEFORE UPDATE ON public.thesis_proposals
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 
+

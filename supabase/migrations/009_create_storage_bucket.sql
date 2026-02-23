@@ -37,3 +37,4 @@
 
 -- Note: These policies should be created via Supabase Dashboard > Storage > posts > Policies
 
+

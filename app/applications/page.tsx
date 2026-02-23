@@ -7,8 +7,9 @@ import { supabase } from '@/lib/supabase'
 import { Navbar } from '@/components/Navbar'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { CheckCircle, Clock, XCircle, Briefcase } from 'lucide-react'
+import { Briefcase } from 'lucide-react'
 import Link from 'next/link'
+import { APPLICATION_STATUS_CONFIG } from '@/lib/application-status'
 import type { Application, JobPost } from '@/types/database'
 
 export default function ApplicationsPage() {
@@ -52,12 +53,6 @@ export default function ApplicationsPage() {
     }
   }
 
-  const statusConfig = {
-    pending: { icon: Clock, color: 'text-yellow-600', bg: 'bg-yellow-50', label: 'In attesa' },
-    accepted: { icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-50', label: 'Accettata' },
-    rejected: { icon: XCircle, color: 'text-red-600', bg: 'bg-red-50', label: 'Rifiutata' },
-  }
-
   if (loading || authLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -87,18 +82,17 @@ export default function ApplicationsPage() {
         ) : (
           <div className="space-y-4">
             {applications.map((app) => {
-              const StatusIcon = statusConfig[app.status].icon
+              const config = APPLICATION_STATUS_CONFIG[app.status as keyof typeof APPLICATION_STATUS_CONFIG]
+              const StatusIcon = config.icon
               return (
                 <Card key={app.id} className="hover:shadow-lg transition-shadow">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
+                      <div className="flex items-center gap-3 mb-2 flex-wrap">
                         <h2 className="text-xl font-semibold">{app.job_post.title}</h2>
-                        <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${statusConfig[app.status].bg}`}>
-                          <StatusIcon className={`w-4 h-4 ${statusConfig[app.status].color}`} />
-                          <span className={`text-sm font-medium ${statusConfig[app.status].color}`}>
-                            {statusConfig[app.status].label}
-                          </span>
+                        <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${config.bg}`}>
+                          <StatusIcon className={`w-4 h-4 shrink-0 ${config.color}`} />
+                          <span className={`text-sm font-medium ${config.color}`}>{config.label}</span>
                         </div>
                       </div>
 
@@ -137,5 +131,6 @@ export default function ApplicationsPage() {
     </div>
   )
 }
+
 
 

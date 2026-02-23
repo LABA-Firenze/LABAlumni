@@ -34,3 +34,4 @@ Esegui i file nell'ordine indicato.
 
 La service role key è più potente e bypassa RLS. **NON** usarla nel frontend - è solo per operazioni server-side o amministrative. Per l'app Next.js usa solo la **anon key**.
 
+

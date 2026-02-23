@@ -10,3 +10,4 @@ ALTER TABLE public.students
 -- Add index on matricola for faster lookups
 CREATE INDEX IF NOT EXISTS idx_students_matricola ON public.students(matricola);
 
+

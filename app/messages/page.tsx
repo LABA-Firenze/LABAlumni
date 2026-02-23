@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/components/AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { Navbar } from '@/components/Navbar'
@@ -16,10 +16,14 @@ import type { Message, Profile } from '@/types/database'
 export default function MessagesPage() {
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const preselectedUserId = searchParams.get('user')
+
   const [messages, setMessages] = useState<(Message & { sender: Profile; recipient: Profile })[]>([])
   const [conversations, setConversations] = useState<Map<string, any>>(new Map())
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null)
   const [recipients, setRecipients] = useState<Profile[]>([])
+  const [userRole, setUserRole] = useState<'student' | 'company' | null>(null)
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
   const [newMessage, setNewMessage] = useState({ recipient_id: '', subject: '', content: '' })
@@ -100,21 +104,28 @@ export default function MessagesPage() {
     if (!user) return
 
     try {
-      // Get user role
       const { data: profile } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', user.id)
         .single()
 
-      // Get all other users (students if company, companies if student)
-      const { data } = await supabase
-        .from('profiles')
-        .select('*')
-        .neq('id', user.id)
-        .eq('role', profile?.role === 'student' ? 'company' : 'student')
+      const role = (profile?.role || 'student') as 'student' | 'company'
+      setUserRole(role)
 
-      setRecipients(data || [])
+      // Solo le aziende possono avviare nuove conversazioni; caricare solo studenti come destinatari
+      if (role === 'company') {
+        const { data } = await supabase
+          .from('profiles')
+          .select('*')
+          .neq('id', user.id)
+          .eq('role', 'student')
+        setRecipients(data || [])
+
+        if (preselectedUserId) {
+          setNewMessage((prev) => ({ ...prev, recipient_id: preselectedUserId }))
+        }
+      }
     } catch (error) {
       console.error('Error loading recipients:', error)
     }
@@ -177,11 +188,15 @@ export default function MessagesPage() {
     : []
 
   const conversationList = Array.from(conversations.values())
-    .filter((conv) =>
-      searchTerm === '' ||
-      conv.user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      conv.user.email?.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    .filter((conv) => {
+      // Studenti: solo conversazioni con aziende
+      if (userRole === 'student' && conv.user.role !== 'company') return false
+      if (searchTerm === '') return true
+      return (
+        conv.user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        conv.user.email?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    })
     .sort((a, b) =>
       new Date(b.lastMessage?.created_at || 0).getTime() -
       new Date(a.lastMessage?.created_at || 0).getTime()
@@ -200,7 +215,14 @@ export default function MessagesPage() {
       <Navbar />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Messaggi</h1>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Messaggi</h1>
+          {userRole === 'student' && (
+            <p className="text-gray-600 mt-1">
+              Puoi rispondere qui quando un&apos;azienda ti contatta. Solo le aziende possono avviare nuove conversazioni.
+            </p>
+          )}
+        </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Conversations list */}
@@ -325,7 +347,7 @@ export default function MessagesPage() {
                     required
                   />
                   <Button type="submit" variant="primary" disabled={sending}>
-                    <Send className="w-4 h-4 mr-2" />
+                    <Send className="w-4 h-4 shrink-0" />
                     {sending ? 'Invio...' : 'Invia'}
                   </Button>
                 </form>
@@ -333,12 +355,16 @@ export default function MessagesPage() {
             ) : (
               <Card className="text-center py-16">
                 <Mail className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">Seleziona una conversazione per iniziare</p>
+                <p className="text-gray-600">
+                  {userRole === 'student'
+                    ? 'Le aziende interessate ai tuoi contenuti e portfolio possono contattarti qui. Quando riceverai un messaggio, potrai rispondere in questa sezione.'
+                    : 'Seleziona una conversazione o invia un nuovo messaggio a uno studente'}
+                </p>
               </Card>
             )}
 
-            {/* New message form */}
-            {!selectedConversation && (
+            {/* Nuovo messaggio: solo per aziende */}
+            {!selectedConversation && userRole === 'company' && (
               <Card className="mt-6">
                 <h2 className="text-xl font-semibold mb-4">Nuovo Messaggio</h2>
                 <form onSubmit={handleSendMessage} className="space-y-4">
@@ -372,7 +398,7 @@ export default function MessagesPage() {
                   />
 
                   <Button type="submit" variant="primary" disabled={sending}>
-                    <Send className="w-4 h-4 mr-2" />
+                    <Send className="w-4 h-4 shrink-0" />
                     {sending ? 'Invio...' : 'Invia Messaggio'}
                   </Button>
                 </form>

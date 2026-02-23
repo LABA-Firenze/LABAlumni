@@ -46,3 +46,4 @@ railway up
 - Il start command è: `npm start`
 - Railway usa la porta definita nella variabile `PORT` (default: 3000)
 
+

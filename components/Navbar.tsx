@@ -33,32 +33,32 @@ export function Navbar() {
       {userRole === 'student' || !userRole ? (
         <>
           <Link href="/dashboard/student" className="flex items-center gap-2 hover:text-primary-600 transition-colors">
-            <Briefcase className="w-5 h-5" />
+            <Briefcase className="w-5 h-5 shrink-0" />
             <span>Dashboard</span>
           </Link>
           <Link href="/jobs" className="flex items-center gap-2 hover:text-primary-600 transition-colors">
-            <Briefcase className="w-5 h-5" />
+            <Briefcase className="w-5 h-5 shrink-0" />
             <span>Annunci</span>
           </Link>
         </>
       ) : (
         <>
           <Link href="/dashboard/company" className="flex items-center gap-2 hover:text-primary-600 transition-colors">
-            <Users className="w-5 h-5" />
+            <Users className="w-5 h-5 shrink-0" />
             <span>Dashboard</span>
           </Link>
           <Link href="/jobs/manage" className="flex items-center gap-2 hover:text-primary-600 transition-colors">
-            <Briefcase className="w-5 h-5" />
+            <Briefcase className="w-5 h-5 shrink-0" />
             <span>Gestisci Annunci</span>
           </Link>
         </>
       )}
       <Link href="/community" className="flex items-center gap-2 hover:text-primary-600 transition-colors">
-        <Newspaper className="w-5 h-5" />
+        <Newspaper className="w-5 h-5 shrink-0" />
         <span>Bacheca</span>
       </Link>
       <Link href="/messages" className="flex items-center gap-2 hover:text-primary-600 transition-colors">
-        <User className="w-5 h-5" />
+        <User className="w-5 h-5 shrink-0" />
         <span>Messaggi</span>
       </Link>
     </>
@@ -84,11 +84,11 @@ export function Navbar() {
                 {user ? (
                   <div className="flex items-center gap-4">
                     <Link href="/profile" className="flex items-center gap-2 text-gray-700 hover:text-primary-600">
-                      <User className="w-5 h-5" />
+                      <User className="w-5 h-5 shrink-0" />
                       <span>Profilo</span>
                     </Link>
                     <Button variant="ghost" size="sm" onClick={signOut}>
-                      <LogOut className="w-4 h-4 mr-2" />
+                      <LogOut className="w-4 h-4 shrink-0" />
                       Esci
                     </Button>
                   </div>

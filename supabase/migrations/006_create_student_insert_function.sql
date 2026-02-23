@@ -61,3 +61,4 @@ CREATE POLICY "Students can insert own profile"
   ON public.students FOR INSERT
   WITH CHECK (auth.uid() = id);
 
+

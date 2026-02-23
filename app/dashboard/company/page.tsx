@@ -7,8 +7,9 @@ import { supabase } from '@/lib/supabase'
 import { Navbar } from '@/components/Navbar'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { Briefcase, Users, FileText, Plus, CheckCircle, Clock, XCircle, TrendingUp, Sparkles } from 'lucide-react'
+import { Briefcase, Users, User, Plus, TrendingUp, Sparkles } from 'lucide-react'
 import Link from 'next/link'
+import { APPLICATION_STATUS_CONFIG } from '@/lib/application-status'
 import type { Company, JobPost, Application } from '@/types/database'
 import type { Post } from '@/types/social'
 import { PostCard } from '@/components/PostCard'
@@ -136,12 +137,6 @@ export default function CompanyDashboard() {
     )
   }
 
-  const statusConfig = {
-    pending: { icon: Clock, color: 'text-yellow-600', bg: 'bg-yellow-50', label: 'In attesa' },
-    accepted: { icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-50', label: 'Accettata' },
-    rejected: { icon: XCircle, color: 'text-red-600', bg: 'bg-red-50', label: 'Rifiutata' },
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -166,14 +161,14 @@ export default function CompanyDashboard() {
               
               <div className="space-y-2">
                 <Link href="/profile" className="block">
-                  <Button variant="outline" className="w-full" size="sm">
-                    <FileText className="w-4 h-4 mr-2" />
+                  <Button variant="outline" className="w-full justify-start" size="sm">
+                    <User className="w-4 h-4 shrink-0" />
                     Visualizza Profilo
                   </Button>
                 </Link>
                 <Link href="/jobs/manage" className="block">
-                  <Button variant="primary" className="w-full" size="sm">
-                    <Briefcase className="w-4 h-4 mr-2" />
+                  <Button variant="primary" className="w-full justify-start" size="sm">
+                    <Briefcase className="w-4 h-4 shrink-0" />
                     Gestisci Annunci
                   </Button>
                 </Link>
@@ -197,23 +192,23 @@ export default function CompanyDashboard() {
 
             {/* Quick Links */}
             <Card>
-              <h3 className="font-semibold mb-4 flex items-center">
-                <Sparkles className="w-5 h-5 mr-2 text-primary-600" />
+              <h3 className="font-semibold mb-4 flex items-center gap-3">
+                <Sparkles className="w-5 h-5 shrink-0 text-primary-600" />
                 Azioni Rapide
               </h3>
               <div className="space-y-2">
                 <Link href="/post/company/new" className="block">
-                  <Button variant="outline" className="w-full" size="sm">
-                    <Plus className="w-4 h-4 mr-2" />
+                  <Button variant="outline" className="w-full justify-start" size="sm">
+                    <Plus className="w-4 h-4 shrink-0" />
                     Nuovo Post
                   </Button>
                 </Link>
-                <Link href="/jobs/manage" className="flex items-center gap-2 text-gray-700 hover:text-primary-600 transition-colors py-2">
-                  <Briefcase className="w-5 h-5" />
+                <Link href="/jobs/manage" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
+                  <Briefcase className="w-5 h-5 shrink-0" />
                   <span>Gestisci Annunci</span>
                 </Link>
-                <Link href="/applications/manage" className="flex items-center gap-2 text-gray-700 hover:text-primary-600 transition-colors py-2">
-                  <Users className="w-5 h-5" />
+                <Link href="/applications/manage" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
+                  <Users className="w-5 h-5 shrink-0" />
                   <span>Candidature</span>
                 </Link>
               </div>
@@ -225,8 +220,8 @@ export default function CompanyDashboard() {
             {/* Create Post Card */}
             <Card className="p-4 bg-gradient-to-r from-primary-50 to-primary-100 border-primary-200">
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-full flex items-center justify-center text-white">
-                  <Briefcase className="w-5 h-5" />
+                <div className="w-10 h-10 shrink-0 bg-gradient-to-br from-primary-500 to-primary-700 rounded-full flex items-center justify-center text-white">
+                  <Briefcase className="w-5 h-5 shrink-0" />
                 </div>
                 <div className="flex-1">
                   <Link href="/post/company/new">
@@ -289,10 +284,10 @@ export default function CompanyDashboard() {
           <aside className="lg:col-span-3 space-y-6">
             {/* Recent Applications */}
             <Card>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold flex items-center">
-                  <TrendingUp className="w-5 h-5 mr-2 text-primary-600" />
-                  Candidature Recenti
+              <div className="flex items-center justify-between gap-4 mb-4">
+                <h3 className="font-semibold flex items-center gap-3 min-w-0">
+                  <TrendingUp className="w-5 h-5 shrink-0 text-primary-600" />
+                  <span className="truncate">Candidature Recenti</span>
                 </h3>
                 <Link href="/applications/manage">
                   <Button variant="ghost" size="sm">Vedi tutte</Button>
@@ -306,15 +301,14 @@ export default function CompanyDashboard() {
               ) : (
                 <div className="space-y-3">
                   {applications.slice(0, 3).map((app) => {
-                    const StatusIcon = statusConfig[app.status].icon
+                    const config = APPLICATION_STATUS_CONFIG[app.status as keyof typeof APPLICATION_STATUS_CONFIG]
+                    const StatusIcon = config.icon
                     return (
                       <div key={app.id} className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                         <h4 className="font-medium text-sm mb-1 line-clamp-1">{app.job_post.title}</h4>
                         <div className="flex items-center gap-2 mt-2">
-                          <StatusIcon className={`w-4 h-4 ${statusConfig[app.status].color}`} />
-                          <span className={`text-xs ${statusConfig[app.status].color}`}>
-                            {statusConfig[app.status].label}
-                          </span>
+                          <StatusIcon className={`w-4 h-4 shrink-0 ${config.color}`} />
+                          <span className={`text-xs ${config.color}`}>{config.label}</span>
                         </div>
                       </div>
                     )

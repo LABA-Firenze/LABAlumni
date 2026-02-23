@@ -119,3 +119,4 @@ await updateStudentYears(supabase)
 Su Supabase, puoi usare le Edge Functions o un cron job esterno per schedulare questa funzione.
 
 
+

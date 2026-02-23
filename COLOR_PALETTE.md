@@ -43,3 +43,4 @@ Tutti i colori della palette rispettano i contrasti WCAG 2.1 AA per testi su sfo
 - **Eleganza**: Combinazione armonica di tutti i colori
 
 
+

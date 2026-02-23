@@ -36,3 +36,4 @@ ALTER TABLE public.students
 CREATE INDEX IF NOT EXISTS idx_students_matricola ON public.students(matricola);
 
 
+
