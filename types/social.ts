@@ -95,6 +95,8 @@ export interface ThesisProposal {
   methodology: string | null
   documents: string[] | null
   status: 'open' | 'in_progress' | 'completed' | 'cancelled'
+  relatore_id: string | null
+  corelatore_id: string | null
   created_at: string
   updated_at: string
   // Extended fields

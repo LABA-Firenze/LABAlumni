@@ -204,10 +204,12 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
                       )}
                     </Link>
                   )}
+                  {role !== 'company' && (
                   <Link href="/tesi" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
                     <BookOpen className="w-5 h-5 shrink-0" />
                     <span>Proposte Tesi</span>
                   </Link>
+                  )}
                   <Link href={role === 'company' ? '/annunci/gestisci' : '/annunci'} className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
                     <Briefcase className="w-5 h-5 shrink-0" />
                     <span>Tirocini e Stage</span>

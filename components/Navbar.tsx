@@ -98,6 +98,7 @@ export function Navbar() {
                 <Briefcase className="w-5 h-5 shrink-0" />
                 Tirocini e Stage
               </Link>
+              {userRole !== 'company' && (
               <Link
                 href="/tesi"
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -109,6 +110,7 @@ export function Navbar() {
                 <BookOpen className="w-5 h-5 shrink-0" />
                 Proposte Tesi
               </Link>
+              )}
             </div>
           )}
 

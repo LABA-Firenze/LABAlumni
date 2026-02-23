@@ -1,12 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useAuth } from '@/components/AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { BookOpen, Calendar, User, FileText, ArrowLeft } from 'lucide-react'
+import { BookOpen, Calendar, User, FileText, ArrowLeft, ThumbsUp, Check, X } from 'lucide-react'
 import Link from 'next/link'
 import type { ThesisProposal } from '@/types/social'
 import type { Student, Profile } from '@/types/database'
@@ -17,6 +17,22 @@ interface ThesisProposalWithStudent extends ThesisProposal {
   student: Student & { profile: Profile }
 }
 
+interface Invitation {
+  id: string
+  thesis_id: string
+  docente_id: string
+  status: 'pending' | 'accepted' | 'rejected'
+  docente?: { id: string; profile?: { full_name: string | null } }
+}
+
+interface Application {
+  id: string
+  thesis_id: string
+  docente_id: string
+  status: 'pending' | 'accepted' | 'rejected'
+  docente?: { id: string; profile?: { full_name: string | null } }
+}
+
 export default function ThesisDetailPage() {
   const { user } = useAuth()
   const router = useRouter()
@@ -24,16 +40,18 @@ export default function ThesisDetailPage() {
   const thesisId = params.id as string
   const [proposal, setProposal] = useState<ThesisProposalWithStudent | null>(null)
   const [loading, setLoading] = useState(true)
+  const [role, setRole] = useState<string | null>(null)
+  const [relatoreInv, setRelatoreInv] = useState<Invitation | null>(null)
+  const [relatoreApps, setRelatoreApps] = useState<Application[]>([])
+  const [corelatoreInv, setCorelatoreInv] = useState<Invitation | null>(null)
+  const [corelatoreApps, setCorelatoreApps] = useState<Application[]>([])
+  const [actionLoading, setActionLoading] = useState(false)
+  const [docenteNames, setDocenteNames] = useState<Record<string, string>>({})
 
-  useEffect(() => {
-    if (thesisId) {
-      loadThesisProposal()
-    }
-  }, [thesisId])
-
-  const loadThesisProposal = async () => {
+  const loadAll = useCallback(async () => {
+    if (!thesisId) return
     try {
-      const { data, error } = await supabase
+      const { data: proposalData, error: proposalErr } = await supabase
         .from('thesis_proposals')
         .select(`
           *,
@@ -44,13 +62,124 @@ export default function ThesisDetailPage() {
         `)
         .eq('id', thesisId)
         .single()
+      if (proposalErr) throw proposalErr
+      setProposal(proposalData as ThesisProposalWithStudent)
 
-      if (error) throw error
-      setProposal(data as ThesisProposalWithStudent)
-    } catch (error) {
-      console.error('Error loading thesis proposal:', error)
+      const [riRes, raRes, ciRes, caRes] = await Promise.all([
+        supabase.from('thesis_relatore_invitations').select('*, docente:docenti(id)').eq('thesis_id', thesisId).maybeSingle(),
+        supabase.from('thesis_relatore_applications').select('*, docente:docenti(id)').eq('thesis_id', thesisId),
+        supabase.from('thesis_corelatore_invitations').select('*, docente:docenti(id)').eq('thesis_id', thesisId).maybeSingle(),
+        supabase.from('thesis_corelatore_applications').select('*, docente:docenti(id)').eq('thesis_id', thesisId),
+      ])
+
+      setRelatoreInv(riRes.data as Invitation | null)
+      setRelatoreApps((raRes.data || []) as Application[])
+      setCorelatoreInv(ciRes.data as Invitation | null)
+      setCorelatoreApps((caRes.data || []) as Application[])
+
+      const docIds = new Set<string>()
+      ;[(riRes.data as Invitation)?.docente_id, (ciRes.data as Invitation)?.docente_id]
+        .concat((raRes.data as Application[])?.map((a) => a.docente_id) || [])
+        .concat((caRes.data as Application[])?.map((a) => a.docente_id) || [])
+        .filter(Boolean)
+        .forEach((id) => docIds.add(id as string))
+      if (docIds.size > 0) {
+        const { data: profs } = await supabase.from('profiles').select('id, full_name').in('id', [...docIds])
+        setDocenteNames(Object.fromEntries((profs || []).map((p) => [p.id, p.full_name || 'Docente'])))
+      }
+
+      if (user?.id) {
+        supabase.from('profiles').select('role').eq('id', user.id).single().then(({ data }) => setRole(data?.role || null))
+      }
+    } catch (e) {
+      console.error(e)
     } finally {
       setLoading(false)
+    }
+  }, [thesisId, user?.id])
+
+  useEffect(() => {
+    loadAll()
+  }, [loadAll])
+
+  useEffect(() => {
+    if (user?.id && role === 'company') {
+      router.replace('/pannello/azienda')
+    }
+  }, [user?.id, role, router])
+
+  const isOwner = user?.id === proposal?.student_id
+  const isDocente = role === 'docente'
+  const currentDocenteRelatoreApp = relatoreApps.find((a) => a.docente_id === user?.id)
+  const currentDocenteCorelatoreApp = corelatoreApps.find((a) => a.docente_id === user?.id)
+  const relatoreInvitationForMe = relatoreInv?.docente_id === user?.id
+  const corelatoreInvitationForMe = corelatoreInv?.docente_id === user?.id
+
+  const handleApplyRelatore = async () => {
+    if (!user || !thesisId || actionLoading) return
+    setActionLoading(true)
+    try {
+      const { error } = await supabase.from('thesis_relatore_applications').insert({ thesis_id: thesisId, docente_id: user.id })
+      if (error) throw error
+      await loadAll()
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const handleApplyCorelatore = async () => {
+    if (!user || !thesisId || actionLoading) return
+    setActionLoading(true)
+    try {
+      const { error } = await supabase.from('thesis_corelatore_applications').insert({ thesis_id: thesisId, docente_id: user.id })
+      if (error) throw error
+      await loadAll()
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const handleInvitationResponse = async (table: 'thesis_relatore_invitations' | 'thesis_corelatore_invitations', invId: string, accept: boolean) => {
+    if (actionLoading) return
+    setActionLoading(true)
+    try {
+      const { error } = await supabase.from(table).update({ status: accept ? 'accepted' : 'rejected' }).eq('id', invId)
+      if (error) throw error
+      // Trigger DB aggiorna thesis_proposals.relatore_id/corelatore_id automaticamente
+      await loadAll()
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const handleApplicationResponse = async (
+    table: 'thesis_relatore_applications' | 'thesis_corelatore_applications',
+    appId: string,
+    accept: boolean
+  ) => {
+    if (!isOwner || actionLoading) return
+    setActionLoading(true)
+    try {
+      const { error } = await supabase.from(table).update({ status: accept ? 'accepted' : 'rejected' }).eq('id', appId)
+      if (error) throw error
+      if (accept) {
+        const app = table === 'thesis_relatore_applications' ? relatoreApps.find((a) => a.id === appId) : corelatoreApps.find((a) => a.id === appId)
+        const col = table === 'thesis_relatore_applications' ? 'relatore_id' : 'corelatore_id'
+        if (app?.docente_id) {
+          await supabase.from('thesis_proposals').update({ [col]: app.docente_id }).eq('id', thesisId)
+        }
+      }
+      await loadAll()
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setActionLoading(false)
     }
   }
 
@@ -189,10 +318,98 @@ export default function ThesisDetailPage() {
                 </div>
               </div>
             )}
+
+            {/* Docente: Inviti in attesa (relatore/corelatore) */}
+            {isDocente && (relatoreInvitationForMe || corelatoreInvitationForMe) && (
+              <div className="space-y-4 p-4 rounded-lg bg-primary-50 border border-primary-200">
+                <h2 className="text-lg font-bold text-gray-900">Inviti in attesa</h2>
+                {relatoreInvitationForMe && relatoreInv?.status === 'pending' && (
+                  <div className="flex items-center justify-between p-3 bg-white rounded-lg border">
+                    <span>Invito come <strong>relatore</strong></span>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" onClick={() => handleInvitationResponse('thesis_relatore_invitations', relatoreInv.id, true)} disabled={actionLoading}>
+                        <Check className="w-4 h-4 mr-1" /> Accetta
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => handleInvitationResponse('thesis_relatore_invitations', relatoreInv.id, false)} disabled={actionLoading}>
+                        <X className="w-4 h-4 mr-1" /> Rifiuta
+                      </Button>
+                    </div>
+                  </div>
+                )}
+                {corelatoreInvitationForMe && corelatoreInv?.status === 'pending' && (
+                  <div className="flex items-center justify-between p-3 bg-white rounded-lg border">
+                    <span>Invito come <strong>corelatore</strong></span>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" onClick={() => handleInvitationResponse('thesis_corelatore_invitations', corelatoreInv.id, true)} disabled={actionLoading}>
+                        <Check className="w-4 h-4 mr-1" /> Accetta
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => handleInvitationResponse('thesis_corelatore_invitations', corelatoreInv.id, false)} disabled={actionLoading}>
+                        <X className="w-4 h-4 mr-1" /> Rifiuta
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Docente: Mi interessa (candidatura) per tesi senza relatore/corelatore - solo se nessun invito pendente */}
+            {isDocente && proposal.status === 'open' && (
+              <div className="space-y-3 p-4 rounded-lg bg-amber-50 border border-amber-200">
+                {!proposal.relatore_id && (!relatoreInv || relatoreInv.status !== 'pending') && !currentDocenteRelatoreApp && (
+                  <Button variant="primary" onClick={handleApplyRelatore} disabled={actionLoading}>
+                    <ThumbsUp className="w-4 h-4 mr-2" /> Mi interessa come relatore
+                  </Button>
+                )}
+                {!proposal.relatore_id && currentDocenteRelatoreApp && currentDocenteRelatoreApp.status === 'pending' && (
+                  <p className="text-amber-800 text-sm">Candidatura come relatore in attesa di risposta dallo studente</p>
+                )}
+                {!proposal.corelatore_id && (!corelatoreInv || corelatoreInv.status !== 'pending') && !currentDocenteCorelatoreApp && (
+                  <Button variant="outline" onClick={handleApplyCorelatore} disabled={actionLoading}>
+                    <ThumbsUp className="w-4 h-4 mr-2" /> Mi interessa come corelatore
+                  </Button>
+                )}
+                {!proposal.corelatore_id && currentDocenteCorelatoreApp && currentDocenteCorelatoreApp.status === 'pending' && (
+                  <p className="text-amber-800 text-sm">Candidatura come corelatore in attesa di risposta dallo studente</p>
+                )}
+              </div>
+            )}
+
+            {/* Studente: Candidature in attesa */}
+            {isOwner && (relatoreApps.some((a) => a.status === 'pending') || corelatoreApps.some((a) => a.status === 'pending')) && (
+              <div className="space-y-4 p-4 rounded-lg bg-green-50 border border-green-200">
+                <h2 className="text-lg font-bold text-gray-900">Candidature in attesa</h2>
+                {relatoreApps.filter((a) => a.status === 'pending').map((app) => (
+                  <div key={app.id} className="flex items-center justify-between p-3 bg-white rounded-lg border">
+                    <span><strong>Relatore:</strong> {docenteNames[app.docente_id] || 'Docente'}</span>
+                    <div className="flex gap-2">
+                      <Button variant="primary" size="sm" onClick={() => handleApplicationResponse('thesis_relatore_applications', app.id, true)} disabled={actionLoading}>
+                        <Check className="w-4 h-4 mr-1" /> Accetta
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => handleApplicationResponse('thesis_relatore_applications', app.id, false)} disabled={actionLoading}>
+                        <X className="w-4 h-4 mr-1" /> Rifiuta
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+                {corelatoreApps.filter((a) => a.status === 'pending').map((app) => (
+                  <div key={app.id} className="flex items-center justify-between p-3 bg-white rounded-lg border">
+                    <span><strong>Corelatore:</strong> {docenteNames[app.docente_id] || 'Docente'}</span>
+                    <div className="flex gap-2">
+                      <Button variant="primary" size="sm" onClick={() => handleApplicationResponse('thesis_corelatore_applications', app.id, true)} disabled={actionLoading}>
+                        <Check className="w-4 h-4 mr-1" /> Accetta
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => handleApplicationResponse('thesis_corelatore_applications', app.id, false)} disabled={actionLoading}>
+                        <X className="w-4 h-4 mr-1" /> Rifiuta
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Footer Actions */}
-          {user?.id === proposal.student_id && (
+          {(isOwner || isDocente) && (
             <div className="p-6 border-t border-gray-200 bg-gray-50">
               <div className="flex justify-end gap-3">
                 <Link href="/tesi">

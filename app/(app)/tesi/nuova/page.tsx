@@ -44,7 +44,7 @@ export default function NewThesisProposalPage() {
 
   useEffect(() => {
     if (role && role !== 'student') {
-      router.replace('/tesi')
+      router.replace(role === 'company' ? '/pannello/azienda' : '/tesi')
     }
   }, [role, router])
 
@@ -85,16 +85,11 @@ export default function NewThesisProposalPage() {
       return
     }
 
-    if (!relatoreId) {
-      setError('Seleziona un relatore')
-      return
-    }
-
     setLoading(true)
     setError('')
 
     try {
-      const { error: insertError } = await supabase
+      const { data: thesisData, error: insertError } = await supabase
         .from('thesis_proposals')
         .insert({
           student_id: user.id,
@@ -103,11 +98,30 @@ export default function NewThesisProposalPage() {
           objectives: objectives.trim() || null,
           methodology: methodology.trim() || null,
           status: 'open',
-          relatore_id: relatoreId || null,
-          corelatore_id: corelatoreId || null,
+          relatore_id: null,
+          corelatore_id: null,
         })
+        .select('id')
+        .single()
 
       if (insertError) throw insertError
+      const thesisId = thesisData?.id
+      if (!thesisId) throw new Error('Errore creazione proposta')
+
+      if (relatoreId) {
+        await supabase.from('thesis_relatore_invitations').insert({
+          thesis_id: thesisId,
+          docente_id: relatoreId,
+          status: 'pending',
+        })
+      }
+      if (corelatoreId) {
+        await supabase.from('thesis_corelatore_invitations').insert({
+          thesis_id: thesisId,
+          docente_id: corelatoreId,
+          status: 'pending',
+        })
+      }
 
       router.push('/tesi')
       router.refresh()
@@ -143,21 +157,21 @@ export default function NewThesisProposalPage() {
 
         <Card variant="elevated" className="p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Relatore (obbligatorio) */}
+            {/* Relatore (opzionale) */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <User className="w-4 h-4 inline mr-1.5 text-primary-600" />
-                Relatore *
+                Relatore
               </label>
-              <Select value={relatoreId} onChange={(e) => { setRelatoreId(e.target.value); if (e.target.value === corelatoreId) setCorelatoreId(''); }} required>
-                <option value="">Seleziona un relatore</option>
+              <Select value={relatoreId} onChange={(e) => { setRelatoreId(e.target.value); if (e.target.value === corelatoreId) setCorelatoreId(''); }}>
+                <option value="">Nessun relatore (i docenti potranno candidarsi)</option>
                 {relatori.map((d) => (
                   <option key={d.id} value={d.id}>
                     {d.profile?.full_name || d.profile?.email} {d.courses?.length ? `· ${d.courses.map((c: string) => COURSE_CONFIG[c as keyof typeof COURSE_CONFIG]?.name).filter(Boolean).join(', ')}` : ''}
                   </option>
                 ))}
               </Select>
-              <p className="text-sm text-gray-500 mt-1">Il relatore è obbligatorio. Riceverà la tua proposta.</p>
+              <p className="text-sm text-gray-500 mt-1">Opzionale. Se selezioni un relatore, riceverà un invito da accettare. Altrimenti i docenti potranno candidarsi.</p>
             </div>
 
             {/* Corelatore (opzionale) */}
@@ -252,7 +266,7 @@ export default function NewThesisProposalPage() {
               <Button
                 type="submit"
                 variant="primary"
-                disabled={loading || !title.trim() || !description.trim() || !relatoreId}
+                disabled={loading || !title.trim() || !description.trim()}
               >
                 {loading ? (
                   <>

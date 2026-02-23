@@ -23,14 +23,22 @@ export default function ThesisPage() {
   const [thesisProposals, setThesisProposals] = useState<ThesisProposalWithStudent[]>([])
   const [loading, setLoading] = useState(true)
   const [filterStatus, setFilterStatus] = useState<string>('open')
+  const [role, setRole] = useState<string | null>(null)
 
   useEffect(() => {
     if (!authLoading && !user) {
       router.push('/accedi')
       return
     }
-
     if (user) {
+      supabase.from('profiles').select('role').eq('id', user.id).single().then(({ data }) => {
+        const r = data?.role || null
+        setRole(r)
+        if (r === 'company') {
+          router.replace('/pannello/azienda')
+          return
+        }
+      })
       loadThesisProposals()
     }
   }, [user, authLoading, router, filterStatus])
@@ -104,14 +112,18 @@ export default function ThesisPage() {
               <BookOpen className="w-8 h-8 text-primary-600" />
               Proposte di Tesi
             </h1>
-            <p className="text-gray-600 mt-2">Esplora le proposte di tesi degli studenti LABA</p>
+            <p className="text-gray-600 mt-2">
+              {role === 'student' ? 'Pubblica la tua proposta o esplora quelle esistenti' : 'Esplora le proposte aperte e candidati come relatore'}
+            </p>
           </div>
-          <Link href="/tesi/nuova">
-            <Button variant="primary">
-              <PlusCircle className="w-5 h-5 mr-2" />
-              Nuova Proposta
-            </Button>
-          </Link>
+          {role === 'student' && (
+            <Link href="/tesi/nuova">
+              <Button variant="primary">
+                <PlusCircle className="w-5 h-5 mr-2" />
+                Nuova Proposta
+              </Button>
+            </Link>
+          )}
         </div>
 
         {/* Filters */}
@@ -144,12 +156,12 @@ export default function ThesisPage() {
               }
             </h3>
             <p className="text-gray-600 mb-6">
-              {filterStatus === 'open' 
-                ? 'Sii il primo a pubblicare una proposta di tesi!'
-                : 'Prova a cambiare filtro o pubblica una nuova proposta'
+              {role === 'student'
+                ? (filterStatus === 'open' ? 'Sii il primo a pubblicare una proposta di tesi!' : 'Prova a cambiare filtro o pubblica una nuova proposta')
+                : 'Nessuna proposta al momento. Potrai candidarti come relatore quando gli studenti ne pubblicheranno.'
               }
             </p>
-            {filterStatus === 'open' && (
+            {filterStatus === 'open' && role === 'student' && (
               <Link href="/tesi/nuova">
                 <Button variant="primary">Pubblica la Prima Proposta</Button>
               </Link>
@@ -204,7 +216,7 @@ export default function ThesisPage() {
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-200">
                     <div className="flex items-center gap-2 text-xs text-gray-500">
                       <Calendar className="w-4 h-4" />
                       <span>
@@ -214,6 +226,9 @@ export default function ThesisPage() {
                           year: 'numeric'
                         })}
                       </span>
+                      {!proposal.relatore_id && (
+                        <span className="px-2 py-0.5 bg-amber-100 text-amber-800 rounded text-xs font-medium">Senza relatore</span>
+                      )}
                     </div>
                     <Link href={`/tesi/${proposal.id}`}>
                       <Button variant="outline" size="sm">
