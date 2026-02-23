@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/components/AuthProvider'
 import { supabase } from '@/lib/supabase'
@@ -8,9 +8,11 @@ import { Navbar } from '@/components/Navbar'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Textarea } from '@/components/ui/Textarea'
+import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
-import { Loader2, Briefcase } from 'lucide-react'
+import { Loader2, Briefcase, FileImage } from 'lucide-react'
 import { COURSE_CONFIG, type CourseType } from '@/types/database'
+import type { PortfolioItem } from '@/types/social'
 
 const requestTypes = [
   { value: 'tirocinio', label: 'Tirocinio' },
@@ -20,31 +22,104 @@ const requestTypes = [
   { value: 'tesi', label: 'Tesi' },
 ]
 
-const COURSES = Object.entries(COURSE_CONFIG).map(([value, config]) => ({
-  value: value as CourseType,
-  label: config.name,
-}))
+const DAYS_OPTIONS = [
+  { value: 'Lun-Ven', label: 'Lun-Ven' },
+  { value: 'Lun-Sab', label: 'Lun-Sab' },
+  { value: 'Lunedì e Mercoledì', label: 'Lunedì e Mercoledì' },
+  { value: 'Martedì e Giovedì', label: 'Martedì e Giovedì' },
+  { value: 'Flessibile', label: 'Flessibile' },
+  { value: 'altro', label: 'Altro (specifica nelle note)' },
+]
 
 export default function NewCollaborationRequestPage() {
   const { user } = useAuth()
   const router = useRouter()
+  const [role, setRole] = useState<'student' | 'company' | null>(null)
   const [requestType, setRequestType] = useState('')
-  const [selectedCourses, setSelectedCourses] = useState<string[]>([])
+  const [availableDays, setAvailableDays] = useState('')
+  const [availableHoursTotal, setAvailableHoursTotal] = useState('')
   const [content, setContent] = useState('')
+  const [selectedPortfolioId, setSelectedPortfolioId] = useState<string>('')
+  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([])
+  const [canPost, setCanPost] = useState(true)
+  const [nextPostDate, setNextPostDate] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [checkingLimit, setCheckingLimit] = useState(true)
 
-  const handleCourseToggle = (courseValue: string) => {
-    setSelectedCourses(prev => 
-      prev.includes(courseValue)
-        ? prev.filter(c => c !== courseValue)
-        : [...prev, courseValue]
-    )
+  useEffect(() => {
+    if (!user) {
+      router.push('/accedi')
+      return
+    }
+    loadRole()
+  }, [user, router])
+
+  useEffect(() => {
+    if (user && role === 'student') {
+      loadPortfolioItems()
+      checkWeeklyLimit()
+    } else if (user && role === 'company') {
+      router.push('/richieste/azienda/nuova')
+    }
+  }, [user, role, router])
+
+  const loadRole = async () => {
+    if (!user) return
+    const { data } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+    setRole(data?.role || null)
+  }
+
+  const loadPortfolioItems = async () => {
+    if (!user) return
+    const { data } = await supabase
+      .from('portfolio_items')
+      .select('*')
+      .eq('student_id', user.id)
+      .order('created_at', { ascending: false })
+    setPortfolioItems(data || [])
+  }
+
+  const checkWeeklyLimit = async () => {
+    if (!user) return
+    setCheckingLimit(true)
+    try {
+      const weekAgo = new Date()
+      weekAgo.setDate(weekAgo.getDate() - 7)
+
+      const { data } = await supabase
+        .from('posts')
+        .select('created_at')
+        .eq('user_id', user.id)
+        .eq('type', 'collaboration_request')
+        .eq('request_from', 'student')
+        .gte('created_at', weekAgo.toISOString())
+        .order('created_at', { ascending: false })
+
+      if (data && data.length >= 1) {
+        setCanPost(false)
+        const lastPost = new Date(data[0].created_at)
+        lastPost.setDate(lastPost.getDate() + 7)
+        setNextPostDate(lastPost.toLocaleDateString('it-IT'))
+      } else {
+        setCanPost(true)
+      }
+    } catch (err) {
+      console.error('Error checking limit:', err)
+      setCanPost(true)
+    } finally {
+      setCheckingLimit(false)
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!user) return
+
+    if (!canPost) {
+      setError('Hai già pubblicato una richiesta questa settimana. Puoi pubblicare di nuovo dopo il ' + nextPostDate)
+      return
+    }
 
     if (!requestType) {
       setError('Seleziona il tipo di richiesta')
@@ -52,12 +127,7 @@ export default function NewCollaborationRequestPage() {
     }
 
     if (!content.trim()) {
-      setError('Descrivi la tua richiesta di collaborazione')
-      return
-    }
-
-    if (selectedCourses.length === 0) {
-      setError('Seleziona almeno un corso di interesse')
+      setError('Inserisci almeno una nota o descrizione')
       return
     }
 
@@ -65,20 +135,21 @@ export default function NewCollaborationRequestPage() {
     setError('')
 
     try {
-      // Create collaboration request post
       const { error: postError } = await supabase
         .from('posts')
         .insert({
           user_id: user.id,
           type: 'collaboration_request',
+          request_from: 'student',
           content: content.trim(),
           request_type: requestType,
-          request_courses: selectedCourses,
+          available_days: availableDays || null,
+          available_hours_total: availableHoursTotal ? parseInt(availableHoursTotal, 10) : null,
+          portfolio_item_id: selectedPortfolioId || null,
         })
 
       if (postError) throw postError
 
-      // Redirect to dashboard
       router.push('/pannello/studente')
       router.refresh()
     } catch (err: any) {
@@ -87,6 +158,21 @@ export default function NewCollaborationRequestPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (!user || role === null || (role === 'student' && checkingLimit)) {
+    return (
+      <div className="min-h-screen bg-gray-100/80">
+        <Navbar />
+        <div className="max-w-3xl mx-auto px-4 py-16 flex justify-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600" />
+        </div>
+      </div>
+    )
+  }
+
+  if (role === 'company') {
+    return null
   }
 
   return (
@@ -103,18 +189,26 @@ export default function NewCollaborationRequestPage() {
           </button>
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
             <Briefcase className="w-8 h-8 text-primary-600" />
-            Pubblica Richiesta di Collaborazione
+            Mettiti in Vetrina
           </h1>
-          <p className="text-gray-600 mt-2">Descrivi l&apos;opportunità che stai cercando</p>
+          <p className="text-gray-600 mt-2">
+            Pubblica una richiesta diretta alle aziende. Il tuo corso è già visibile nel profilo.
+          </p>
         </div>
+
+        {!canPost && (
+          <Card variant="elevated" className="p-4 mb-6 bg-amber-50 border-amber-200">
+            <p className="text-amber-800">
+              Hai già pubblicato una richiesta questa settimana. Puoi pubblicare di nuovo dopo il {nextPostDate}.
+            </p>
+            <p className="text-sm text-amber-700 mt-2">Max 1 richiesta di collaborazione a settimana per studente.</p>
+          </Card>
+        )}
 
         <Card variant="elevated" className="p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Request Type */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Tipo di Richiesta *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Tipo di Richiesta *</label>
               <Select
                 value={requestType}
                 onChange={(e) => setRequestType(e.target.value)}
@@ -127,67 +221,91 @@ export default function NewCollaborationRequestPage() {
               </Select>
             </div>
 
-            {/* Courses */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Corsi di Interesse * (seleziona tutti quelli rilevanti)
-              </label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 border border-gray-200 rounded-lg bg-gray-50 max-h-64 overflow-y-auto">
-                {COURSES.map(course => (
-                  <label
-                    key={course.value}
-                    className="flex items-center gap-2 p-2 hover:bg-white rounded cursor-pointer transition-colors"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedCourses.includes(course.value)}
-                      onChange={() => handleCourseToggle(course.value)}
-                      className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                    />
-                    <span className="text-sm text-gray-700">{course.label}</span>
-                  </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Giorni disponibili</label>
+              <Select
+                value={availableDays}
+                onChange={(e) => setAvailableDays(e.target.value)}
+              >
+                <option value="">Seleziona</option>
+                {DAYS_OPTIONS.map(d => (
+                  <option key={d.value} value={d.value}>{d.label}</option>
                 ))}
-              </div>
+              </Select>
             </div>
 
-            {/* Content */}
+            <div>
+              <Input
+                label="Ore disponibili totali"
+                type="number"
+                min={1}
+                placeholder="es. 150"
+                value={availableHoursTotal}
+                onChange={(e) => setAvailableHoursTotal(e.target.value)}
+              />
+            </div>
+
             <div>
               <Textarea
-                label="Descrizione della Richiesta *"
+                label="Note / Descrizione *"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="Descrivi l&apos;opportunità che stai cercando, le tue competenze, la disponibilità, e qualsiasi altro dettaglio rilevante..."
-                rows={8}
+                placeholder="Descrivi le tue competenze, cosa cerchi, disponibilità extra..."
+                rows={6}
                 required
               />
-              <p className="text-sm text-gray-500 mt-2">
-                Esempio: &quot;Cerco un tirocinio in graphic design. Sono al 3° anno di Graphic Design &amp; Multimedia, 
-                ho competenze in Adobe Creative Suite e sono disponibile per 3-6 mesi part-time. 
-                Interessato a progetti di branding e comunicazione visiva.&quot;
-              </p>
             </div>
 
-            {/* Error */}
+            {portfolioItems.length > 0 && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <FileImage className="w-4 h-4 inline mr-1" />
+                  Allega un progetto dal tuo portfolio (opzionale, max 1)
+                </label>
+                <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-gray-50">
+                  <label className="flex items-center gap-2 p-2 hover:bg-white rounded cursor-pointer">
+                    <input
+                      type="radio"
+                      name="portfolio"
+                      checked={!selectedPortfolioId}
+                      onChange={() => setSelectedPortfolioId('')}
+                      className="rounded-full border-gray-300 text-primary-600"
+                    />
+                    <span className="text-sm">Nessun allegato</span>
+                  </label>
+                  {portfolioItems.map(item => (
+                    <label
+                      key={item.id}
+                      className="flex items-center gap-3 p-2 hover:bg-white rounded cursor-pointer"
+                    >
+                      <input
+                        type="radio"
+                        name="portfolio"
+                        checked={selectedPortfolioId === item.id}
+                        onChange={() => setSelectedPortfolioId(item.id)}
+                        className="rounded-full border-gray-300 text-primary-600"
+                      />
+                      <span className="text-sm font-medium truncate">{item.title}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {error && (
               <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
                 {error}
               </div>
             )}
 
-            {/* Actions */}
             <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => router.back()}
-                disabled={loading}
-              >
+              <Button type="button" variant="outline" onClick={() => router.back()} disabled={loading}>
                 Annulla
               </Button>
               <Button
                 type="submit"
                 variant="primary"
-                disabled={loading || !requestType || !content.trim() || selectedCourses.length === 0}
+                disabled={loading || !requestType || !content.trim() || !canPost}
               >
                 {loading ? (
                   <>
@@ -205,4 +323,3 @@ export default function NewCollaborationRequestPage() {
     </div>
   )
 }
-

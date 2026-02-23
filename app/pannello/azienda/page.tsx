@@ -83,32 +83,46 @@ export default function CompanyDashboard() {
     if (!user) return
 
     try {
-      // Load company's own posts
       const { data: postsData, error } = await supabase
         .from('posts')
         .select(`
           *,
-          user:profiles!posts_user_id_fkey(id, full_name, avatar_url, role)
+          user:profiles!posts_user_id_fkey(id, full_name, avatar_url, role),
+          portfolio_item:portfolio_items(id, title, images)
         `)
-        .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(20)
 
       if (error) throw error
 
-      // Check which posts user has liked
       if (postsData) {
+        const studentUserIds = [...new Set(
+          postsData
+            .filter(p => p.type === 'collaboration_request' && p.request_from !== 'company')
+            .map(p => p.user_id)
+        )]
+        let studentCourses: Record<string, string> = {}
+        if (studentUserIds.length > 0) {
+          const { data: studentsData } = await supabase
+            .from('students')
+            .select('id, course')
+            .in('id', studentUserIds)
+          studentsData?.forEach((s: { id: string; course: string }) => {
+            studentCourses[s.id] = s.course
+          })
+        }
+
         const { data: likedPosts } = await supabase
           .from('post_likes')
           .select('post_id')
           .eq('user_id', user.id)
           .in('post_id', postsData.map(p => p.id))
-
         const likedPostIds = new Set(likedPosts?.map(l => l.post_id) || [])
 
         setPosts(postsData.map(post => ({
           ...post,
-          is_liked: likedPostIds.has(post.id)
+          is_liked: likedPostIds.has(post.id),
+          student_course: studentCourses[post.user_id],
         })) || [])
       }
     } catch (error) {
@@ -201,6 +215,12 @@ export default function CompanyDashboard() {
                   <Button variant="outline" className="w-full justify-start" size="sm">
                     <Plus className="w-4 h-4 shrink-0" />
                     Nuovo Post
+                  </Button>
+                </Link>
+                <Link href="/richieste/azienda/nuova" className="block">
+                  <Button variant="outline" className="w-full justify-start" size="sm">
+                    <Briefcase className="w-4 h-4 shrink-0" />
+                    Offerta Collaborazione
                   </Button>
                 </Link>
                 <Link href="/annunci/gestisci" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">

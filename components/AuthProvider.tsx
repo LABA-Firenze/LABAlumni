@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { FloatingChat } from './FloatingChat'
 import type { User } from '@supabase/supabase-js'
 
 interface AuthContextType {
@@ -51,6 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   return (
     <AuthContext.Provider value={{ user, loading, signOut }}>
       {children}
+      <FloatingChat />
     </AuthContext.Provider>
   )
 }

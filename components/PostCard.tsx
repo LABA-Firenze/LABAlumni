@@ -148,34 +148,76 @@ export function PostCard({ post, onUpdate }: PostCardProps) {
 
       {/* Post Content */}
       <div className="p-4">
-        {/* Collaboration Request Badge */}
-        {post.type === 'collaboration_request' && (
-          <div className="mb-3 flex items-center gap-2 flex-wrap">
-            <div className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
-              {post.request_type === 'tirocinio' && '🎯 Tirocinio'}
-              {post.request_type === 'stage' && '💼 Stage'}
-              {post.request_type === 'collaborazione' && '🤝 Collaborazione'}
-              {post.request_type === 'lavoro' && '💼 Lavoro'}
-              {post.request_type === 'tesi' && '📚 Tesi'}
+        {/* Collaboration Request: Studente vs Azienda */}
+        {post.type === 'collaboration_request' && (() => {
+          const isCompany = post.request_from === 'company' || (post.request_from === null && post.request_courses && post.request_courses.length > 0 && post.user?.role === 'company')
+          return (
+          <div className="mb-3 space-y-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                isCompany ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-700'
+              }`}>
+                {isCompany ? '🏢 Offerta azienda' : '👤 Richiesta studente'}
+              </span>
+              <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+                {post.request_type === 'tirocinio' && '🎯 Tirocinio'}
+                {post.request_type === 'stage' && '💼 Stage'}
+                {post.request_type === 'collaborazione' && '🤝 Collaborazione'}
+                {post.request_type === 'lavoro' && '💼 Lavoro'}
+                {post.request_type === 'tesi' && '📚 Tesi'}
+              </span>
             </div>
-            {post.request_courses && post.request_courses.length > 0 && (
+            {isCompany && post.request_courses && post.request_courses.length > 0 && (
               <div className="flex gap-1 flex-wrap">
+                <span className="text-xs text-gray-500">Rivolto a:</span>
                 {post.request_courses.slice(0, 3).map((course, idx) => (
                   <span key={idx} className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs">
                     {COURSE_CONFIG[course as CourseType]?.name || course}
                   </span>
                 ))}
                 {post.request_courses.length > 3 && (
-                  <span className="px-2 py-0.5 text-gray-500 text-xs">
-                    +{post.request_courses.length - 3}
-                  </span>
+                  <span className="px-2 py-0.5 text-gray-500 text-xs">+{post.request_courses.length - 3}</span>
                 )}
               </div>
             )}
+            {!isCompany && post.student_course && (
+              <div className="flex gap-1 flex-wrap">
+                <span className="text-xs text-gray-500">Corso:</span>
+                <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs">
+                  {COURSE_CONFIG[post.student_course as CourseType]?.name || post.student_course}
+                </span>
+              </div>
+            )}
+            {!isCompany && (post.available_days || post.available_hours_total) && (
+              <div className="flex gap-3 flex-wrap text-xs text-gray-600">
+                {post.available_days && <span>📅 {post.available_days}</span>}
+                {post.available_hours_total && <span>⏱ {post.available_hours_total} ore</span>}
+              </div>
+            )}
+            {isCompany && (post.work_hours || post.interested_days) && (
+              <div className="flex gap-3 flex-wrap text-xs text-gray-600">
+                {post.work_hours && <span>⏱ {post.work_hours} ore tirocinio</span>}
+                {post.interested_days && <span>📅 {post.interested_days}</span>}
+              </div>
+            )}
           </div>
-        )}
+          )
+        })()}
 
         <p className="text-gray-900 whitespace-pre-wrap mb-4">{post.content}</p>
+
+        {post.type === 'collaboration_request' && post.request_from !== 'company' && post.portfolio_item && (
+          <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+            <p className="text-xs font-medium text-gray-600 mb-2">Progetto allegato: {post.portfolio_item.title}</p>
+            {post.portfolio_item.images && post.portfolio_item.images[0] && (
+              <img
+                src={post.portfolio_item.images[0]}
+                alt={post.portfolio_item.title}
+                className="w-full max-h-48 object-cover rounded"
+              />
+            )}
+          </div>
+        )}
         
         {/* Images (only for company posts) */}
         {post.type !== 'collaboration_request' && post.images && post.images.length > 0 && (
