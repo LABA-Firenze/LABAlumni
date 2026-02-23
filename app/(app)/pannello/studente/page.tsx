@@ -6,7 +6,7 @@ import { useAuth } from '@/components/AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { Briefcase, Sparkles } from 'lucide-react'
+import { Briefcase, Users, ArrowRight, Building2 } from 'lucide-react'
 import Link from 'next/link'
 import type { Student, JobPost, Application } from '@/types/database'
 import type { Post } from '@/types/social'
@@ -19,6 +19,7 @@ export default function StudentDashboard() {
   const [student, setStudent] = useState<Student | null>(null)
   const [applications, setApplications] = useState<(Application & { job_post: JobPost })[]>([])
   const [posts, setPosts] = useState<Post[]>([])
+  const [suggestedJobs, setSuggestedJobs] = useState<(JobPost & { company: { company_name: string } })[]>([])
   const [portfolioCount, setPortfolioCount] = useState(0)
   const [connectionsCount, setConnectionsCount] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -108,6 +109,17 @@ export default function StudentDashboard() {
       if (error) throw error
 
       if (postsData) {
+        if (!postsData.length) {
+          const { data: jobs } = await supabase
+            .from('job_posts')
+            .select(`*, company:companies(company_name)`)
+            .eq('active', true)
+            .order('created_at', { ascending: false })
+            .limit(3)
+          setSuggestedJobs((jobs || []) as (JobPost & { company: { company_name: string } })[])
+        } else {
+          setSuggestedJobs([])
+        }
         // Per collaboration_request da studenti, carica il corso
         const studentUserIds = [...new Set(
           postsData
@@ -156,25 +168,23 @@ export default function StudentDashboard() {
 
   return (
     <div className="space-y-4">
-            {/* Create Collaboration Request Card - blu per interattività */}
-            <Card variant="interactive" padding={false} className="p-4 bg-gradient-to-r from-primary-50 via-primary-50/80 to-primary-100/90 border-primary-200/60 shadow-md">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 shrink-0 bg-gradient-to-br from-primary-500 to-primary-700 rounded-full flex items-center justify-center text-white">
-                  <Briefcase className="w-5 h-5 shrink-0" />
-                </div>
+            {/* Hero / Pubblicazione - CTA diretta */}
+            <Card variant="elevated" className="p-5 border border-gray-100">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <div className="flex-1">
-                  <Link href="/richieste/nuova">
-                    <input
-                      type="text"
-                      placeholder="Pubblica una richiesta di collaborazione, tirocinio o stage..."
-                      className="w-full px-4 py-3 border border-primary-200/80 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400 cursor-pointer bg-white shadow-sm"
-                      readOnly
-                    />
-                  </Link>
-                  <p className="text-xs text-gray-600 mt-1 ml-4">
-                    Solo studenti: pubblica richieste di opportunità lavorative
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Cerchi uno stage o vuoi proporre una collaborazione?
+                  </h3>
+                  <p className="text-sm text-gray-600 mt-0.5">
+                    Pubblica una richiesta o scopri opportunità attive.
                   </p>
                 </div>
+                <Link href="/richieste/nuova" className="shrink-0">
+                  <Button variant="primary" size="lg" className="w-full sm:w-auto">
+                    <Briefcase className="w-5 h-5 mr-2" />
+                    Pubblica richiesta
+                  </Button>
+                </Link>
               </div>
             </Card>
 
@@ -198,14 +208,56 @@ export default function StudentDashboard() {
                 ))}
               </div>
             ) : posts.length === 0 ? (
-              <Card variant="elevated" className="p-12 text-center">
-                <Sparkles className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Il tuo feed è vuoto</h3>
-                <p className="text-gray-600 mb-6">Inizia a seguire aziende e studenti per vedere i loro post!</p>
-                <Link href="/annunci">
-                  <Button variant="primary">Esplora Tirocini e Stage</Button>
-                </Link>
-              </Card>
+              <div className="space-y-6">
+                {/* Stato vuoto motivazionale */}
+                <Card variant="elevated" className="p-10 text-center">
+                  <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-primary-100 flex items-center justify-center">
+                    <Users className="w-8 h-8 text-primary-600" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Qui iniziano le tue opportunità.</h3>
+                  <p className="text-gray-600 mb-8 max-w-md mx-auto">
+                    Segui aziende e studenti per scoprire stage, collaborazioni e progetti.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <Link href="/annunci">
+                      <Button variant="primary" size="lg">Scopri opportunità</Button>
+                    </Link>
+                    <Link href="/profilo">
+                      <Button variant="outline" size="lg">Completa il tuo profilo</Button>
+                    </Link>
+                  </div>
+                </Card>
+
+                {/* Stage suggeriti / in evidenza */}
+                {suggestedJobs.length > 0 && (
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4">Opportunità in evidenza</h4>
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      {suggestedJobs.map((job) => (
+                        <Link key={job.id} href={`/annunci/${job.id}`}>
+                          <Card variant="elevated" className="p-4 hover:shadow-lg transition-shadow h-full">
+                            <div className="flex gap-3">
+                              <div className="w-10 h-10 shrink-0 rounded-lg bg-primary-100 flex items-center justify-center">
+                                <Building2 className="w-5 h-5 text-primary-600" />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="font-medium text-gray-900 truncate">{job.title}</p>
+                                <p className="text-sm text-gray-500 truncate">{job.company?.company_name}</p>
+                                <span className="inline-block mt-2 text-xs text-primary-600 font-medium">
+                                  Vedi dettagli <ArrowRight className="w-3 h-3 inline" />
+                                </span>
+                              </div>
+                            </div>
+                          </Card>
+                        </Link>
+                      ))}
+                    </div>
+                    <Link href="/annunci" className="block mt-4 text-center text-primary-600 hover:underline font-medium text-sm">
+                      Vedi tutte le opportunità →
+                    </Link>
+                  </div>
+                )}
+              </div>
             ) : (
               <div className="space-y-4">
                 {posts.map((post) => (
