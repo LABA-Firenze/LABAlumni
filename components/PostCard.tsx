@@ -128,7 +128,7 @@ export function PostCard({ post, onUpdate }: PostCardProps) {
   }
 
   return (
-    <Card className="overflow-hidden">
+    <Card variant="elevated" className="overflow-hidden">
       {/* Header */}
       <div className="p-4 pb-3 border-b border-gray-200">
         <div className="flex items-center justify-between">

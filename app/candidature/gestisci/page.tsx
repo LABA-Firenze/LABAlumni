@@ -127,14 +127,14 @@ export default function ManageApplicationsPage() {
 
   if (loading || authLoading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100/80 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-100/80">
       <Navbar />
       
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -144,7 +144,7 @@ export default function ManageApplicationsPage() {
         </div>
 
         {/* Filters */}
-        <Card className="mb-6">
+        <Card variant="elevated" className="mb-6">
           <div className="flex gap-2">
             {(['all', 'pending', 'accepted', 'rejected'] as const).map((f) => (
               <button
@@ -164,7 +164,7 @@ export default function ManageApplicationsPage() {
 
         {/* Applications list */}
         {filteredApplications.length === 0 ? (
-          <Card className="text-center py-12">
+          <Card variant="elevated" className="text-center py-12">
             <User className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-600 text-lg">
               {filter === 'all' 
@@ -179,7 +179,7 @@ export default function ManageApplicationsPage() {
               const config = APPLICATION_STATUS_CONFIG[app.status as keyof typeof APPLICATION_STATUS_CONFIG]
               const StatusIcon = config.icon
               return (
-                <Card key={app.id}>
+                <Card key={app.id} variant="elevated">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-3">

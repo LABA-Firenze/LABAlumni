@@ -90,7 +90,7 @@ export default function NewCollaborationRequestPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100/80">
       <Navbar />
       
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -108,7 +108,7 @@ export default function NewCollaborationRequestPage() {
           <p className="text-gray-600 mt-2">Descrivi l&apos;opportunità che stai cercando</p>
         </div>
 
-        <Card className="p-6">
+        <Card variant="elevated" className="p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Request Type */}
             <div>

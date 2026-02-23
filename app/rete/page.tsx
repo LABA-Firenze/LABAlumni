@@ -160,7 +160,7 @@ export default function NetworkPage() {
 
   if (loading || authLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100/80 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
       </div>
     )
@@ -176,7 +176,7 @@ export default function NetworkPage() {
   )
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100/80">
       <Navbar />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -191,7 +191,7 @@ export default function NetworkPage() {
 
         {/* Pending Connection Requests */}
         {pendingConnections.length > 0 && (
-          <Card className="mb-6 p-4 bg-blue-50 border-blue-200">
+          <Card variant="elevated" className="mb-6 p-4 bg-blue-50/80 border-blue-200/60">
             <h3 className="font-semibold mb-3">Richieste di Connessione in Attesa</h3>
             <div className="space-y-2">
               {pendingConnections.map((conn) => {
@@ -231,7 +231,7 @@ export default function NetworkPage() {
         )}
 
         {/* Filters */}
-        <Card className="p-4 mb-6">
+        <Card variant="elevated" className="p-4 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -258,7 +258,7 @@ export default function NetworkPage() {
 
         {/* Students Grid */}
         {students.length === 0 ? (
-          <Card className="p-12 text-center">
+          <Card variant="elevated" className="p-12 text-center">
             <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold mb-2">Nessuno studente trovato</h3>
             <p className="text-gray-600">Prova a modificare i filtri di ricerca</p>
@@ -268,7 +268,7 @@ export default function NetworkPage() {
             {students.map((student) => {
               const status = getConnectionStatus(student.id)
               return (
-                <Card key={student.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                <Card key={student.id} variant="elevated" className="overflow-hidden hover:shadow-lg transition-shadow">
                   <div className="p-6">
                     <div className="flex items-center gap-4 mb-4">
                       <div className="w-16 h-16 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white text-xl font-bold">

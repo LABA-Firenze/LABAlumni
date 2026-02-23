@@ -79,14 +79,14 @@ export default function ThesisPage() {
 
   if (loading || authLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100/80 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100/80">
       <Navbar />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -108,7 +108,7 @@ export default function ThesisPage() {
         </div>
 
         {/* Filters */}
-        <Card className="p-4 mb-6">
+        <Card variant="elevated" className="p-4 mb-6">
           <div className="flex gap-2 flex-wrap">
             {(['all', 'open', 'in_progress', 'completed'] as const).map((status) => (
               <button
@@ -128,7 +128,7 @@ export default function ThesisPage() {
 
         {/* Thesis Proposals Grid */}
         {thesisProposals.length === 0 ? (
-          <Card className="p-12 text-center">
+          <Card variant="elevated" className="p-12 text-center">
             <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold mb-2">
               {filterStatus === 'all' 
@@ -151,7 +151,7 @@ export default function ThesisPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {thesisProposals.map((proposal) => (
-              <Card key={proposal.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+              <Card key={proposal.id} variant="elevated" className="overflow-hidden hover:shadow-lg transition-shadow">
                 {/* Header */}
                 <div className="p-6 border-b border-gray-200">
                   <div className="flex items-start justify-between mb-4">

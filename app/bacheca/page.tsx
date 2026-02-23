@@ -85,7 +85,7 @@ export default function CommunityPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-100/80">
       <Navbar />
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -103,7 +103,7 @@ export default function CommunityPage() {
         </div>
 
         {isCompany && showForm && (
-          <Card className="mb-6">
+          <Card variant="elevated" className="mb-6">
             <h2 className="text-xl font-semibold mb-4">Pubblica un Articolo</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <Input
@@ -148,13 +148,13 @@ export default function CommunityPage() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
           </div>
         ) : posts.length === 0 ? (
-          <Card className="text-center py-12">
+          <Card variant="elevated" className="text-center py-12">
             <p className="text-gray-600">Nessun post pubblicato ancora</p>
           </Card>
         ) : (
           <div className="space-y-6">
             {posts.map((post) => (
-              <Card key={post.id}>
+              <Card key={post.id} variant="elevated">
                 <div className="flex items-start gap-4 mb-4">
                   <div className="w-12 h-12 bg-primary-50 rounded-full flex items-center justify-center flex-shrink-0">
                     <Building2 className="w-6 h-6 text-primary" />

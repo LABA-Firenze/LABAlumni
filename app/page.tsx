@@ -33,7 +33,7 @@ const motivationalQuotes = [
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-100/90">
       <Navbar />
       
       {/* Hero Section with Animated Background */}
@@ -127,13 +127,13 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="bg-gray-50 py-20">
+      <section className="bg-gray-100/80 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
             Cosa puoi fare
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card variant="elevated" className="hover:shadow-lg transition-shadow">
               <Briefcase className="w-12 h-12 text-primary-600 mb-4" />
               <h3 className="text-xl font-semibold mb-2">Trova Opportunità</h3>
               <p className="text-gray-600">
@@ -141,7 +141,7 @@ export default function Home() {
               </p>
             </Card>
             
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card variant="elevated" className="hover:shadow-lg transition-shadow">
               <Users className="w-12 h-12 text-primary-600 mb-4" />
               <h3 className="text-xl font-semibold mb-2">Connetterti</h3>
               <p className="text-gray-600">
@@ -149,7 +149,7 @@ export default function Home() {
               </p>
             </Card>
             
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card variant="elevated" className="hover:shadow-lg transition-shadow">
               <MessageSquare className="w-12 h-12 text-primary-600 mb-4" />
               <h3 className="text-xl font-semibold mb-2">Messaggistica</h3>
               <p className="text-gray-600">
@@ -157,7 +157,7 @@ export default function Home() {
               </p>
             </Card>
             
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card variant="elevated" className="hover:shadow-lg transition-shadow">
               <Newspaper className="w-12 h-12 text-primary-600 mb-4" />
               <h3 className="text-xl font-semibold mb-2">Bacheca</h3>
               <p className="text-gray-600">

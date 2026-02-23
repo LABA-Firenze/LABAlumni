@@ -162,14 +162,14 @@ export default function ManageJobsPage() {
 
   if (loading || authLoading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100/80 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-100/80">
       <Navbar />
       
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -187,7 +187,7 @@ export default function ManageJobsPage() {
         </div>
 
         {showForm && (
-          <Card className="mb-6">
+          <Card variant="elevated" className="mb-6">
             <h2 className="text-xl font-semibold mb-6">
               {editingJob ? 'Modifica Annuncio' : 'Nuovo Annuncio'}
             </h2>
@@ -296,12 +296,12 @@ export default function ManageJobsPage() {
         {/* Jobs list */}
         <div className="space-y-4">
           {jobs.length === 0 ? (
-            <Card className="text-center py-12">
+            <Card variant="elevated" className="text-center py-12">
               <p className="text-gray-600">Non hai ancora creato annunci</p>
             </Card>
           ) : (
             jobs.map((job) => (
-              <Card key={job.id}>
+              <Card key={job.id} variant="elevated">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
