@@ -1,3 +1,9 @@
+'use client'
+
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/components/AuthProvider'
+import { supabase } from '@/lib/supabase'
 import { Navbar } from '@/components/Navbar'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
@@ -32,6 +38,43 @@ const motivationalQuotes = [
 ]
 
 export default function Home() {
+  const { user, loading } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (loading) return
+    if (user) {
+      supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+        .then(({ data }: any) => {
+          if (data?.role === 'company') {
+            router.replace('/pannello/azienda')
+          } else {
+            router.replace('/pannello/studente')
+          }
+        })
+    }
+  }, [user, loading, router])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100/90 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600" />
+      </div>
+    )
+  }
+
+  if (user) {
+    return (
+      <div className="min-h-screen bg-gray-100/90 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600" />
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gray-100/90">
       <Navbar />

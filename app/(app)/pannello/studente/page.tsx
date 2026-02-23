@@ -6,12 +6,10 @@ import { useAuth } from '@/components/AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { Briefcase, User, FolderOpen, Plus, Users, TrendingUp, BookOpen, Sparkles } from 'lucide-react'
+import { Briefcase, Sparkles } from 'lucide-react'
 import Link from 'next/link'
-import { APPLICATION_STATUS_CONFIG } from '@/lib/application-status'
 import type { Student, JobPost, Application } from '@/types/database'
 import type { Post } from '@/types/social'
-import { COURSE_CONFIG } from '@/types/database'
 import { PostCard } from '@/components/PostCard'
 
 export default function StudentDashboard() {
@@ -157,66 +155,7 @@ export default function StudentDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100/80">
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* 3 Column Layout */}
-        <div className="grid lg:grid-cols-12 gap-6">
-          
-          {/* Left Sidebar */}
-          <aside className="lg:col-span-3 space-y-6">
-            {/* Profile Summary Card - leggero glass */}
-            <Card variant="glass" className="sticky top-24">
-              <div className="text-center mb-4">
-                <div className="w-20 h-20 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full mx-auto mb-3 flex items-center justify-center text-white text-2xl font-bold">
-                  {profileName?.[0]?.toUpperCase() || (student ? 'S' : '?')}
-                </div>
-                <h3 className="font-semibold text-lg">{profileName || user?.email?.split('@')[0]}</h3>
-                {student && (
-                  <p className="text-sm text-gray-600">{COURSE_CONFIG[student.course]?.name || student.course}</p>
-                )}
-              </div>
-              
-              <div className="space-y-2">
-                <Link href="/profilo" className="block">
-                  <Button variant="outline" className="w-full justify-start" size="sm">
-                    <User className="w-4 h-4 shrink-0" />
-                    Visualizza Profilo
-                  </Button>
-                </Link>
-                <Link href="/portfolio" className="block">
-                  <Button variant="outline" className="w-full justify-start" size="sm">
-                    <FolderOpen className="w-4 h-4 shrink-0" />
-                    Il Mio Portfolio
-                  </Button>
-                </Link>
-                <Link href="/portfolio/nuovo" className="block">
-                  <Button variant="primary" className="w-full justify-start" size="sm">
-                    <Plus className="w-4 h-4 shrink-0" />
-                    Aggiungi Lavoro
-                  </Button>
-                </Link>
-              </div>
-
-              <div className="mt-6 pt-6 border-t border-gray-200 space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Connessioni</span>
-                  <span className="font-semibold">{connectionsCount}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Lavori</span>
-                  <span className="font-semibold">{portfolioCount}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Candidature</span>
-                  <span className="font-semibold">{applications.length}</span>
-                </div>
-              </div>
-            </Card>
-          </aside>
-
-          {/* Main Feed */}
-          <main className="lg:col-span-6 space-y-4">
+    <div className="space-y-4">
             {/* Create Collaboration Request Card - blu per interattività */}
             <Card variant="interactive" padding={false} className="p-4 bg-gradient-to-r from-primary-50 via-primary-50/80 to-primary-100/90 border-primary-200/60 shadow-md">
               <div className="flex items-center gap-4">
@@ -278,74 +217,6 @@ export default function StudentDashboard() {
                 ))}
               </div>
             )}
-          </main>
-
-          {/* Right Sidebar */}
-          <aside className="lg:col-span-3 space-y-6">
-            {/* Recent Applications */}
-            <Card variant="elevated">
-              <div className="flex items-start justify-between gap-3 mb-4">
-                <h3 className="font-semibold flex items-center gap-3 flex-1 min-w-0">
-                  <TrendingUp className="w-5 h-5 shrink-0 text-primary-600" />
-                  <span className="break-words">Le Tue Candidature</span>
-                </h3>
-                <Link href="/candidature" className="shrink-0">
-                  <Button variant="ghost" size="sm" className="whitespace-nowrap">Vedi tutte</Button>
-                </Link>
-              </div>
-
-              {applications.length === 0 ? (
-                <p className="text-sm text-gray-500 text-center py-4">
-                  Nessuna candidatura
-                </p>
-              ) : (
-                <div className="space-y-3">
-                  {applications.slice(0, 3).map((app) => {
-                    const config = APPLICATION_STATUS_CONFIG[app.status as keyof typeof APPLICATION_STATUS_CONFIG]
-                    const StatusIcon = config.icon
-                    return (
-                      <div key={app.id} className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                        <h4 className="font-medium text-sm mb-1 line-clamp-1">{app.job_post.title}</h4>
-                        <div className="flex items-center gap-2 mt-2">
-                          <StatusIcon className={`w-4 h-4 shrink-0 ${config.color}`} />
-                          <span className={`text-xs ${config.color}`}>{config.label}</span>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-            </Card>
-
-            {/* Scopri */}
-            <Card variant="elevated">
-              <h3 className="font-semibold mb-4 flex items-center gap-3">
-                <Sparkles className="w-5 h-5 shrink-0 text-primary-600" />
-                Scopri
-              </h3>
-              <div className="space-y-2">
-                <Link href="/rete" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
-                  <Users className="w-5 h-5 shrink-0" />
-                  <span>Network</span>
-                  {connectionsCount > 0 && (
-                    <span className="ml-auto px-2 py-0.5 bg-primary-100 text-primary-700 rounded-full text-xs font-medium">
-                      {connectionsCount}
-                    </span>
-                  )}
-                </Link>
-                <Link href="/tesi" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
-                  <BookOpen className="w-5 h-5 shrink-0" />
-                  <span>Proposte Tesi</span>
-                </Link>
-                <Link href="/annunci" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
-                  <Briefcase className="w-5 h-5 shrink-0" />
-                  <span>Tirocini e Stage</span>
-                </Link>
-              </div>
-            </Card>
-          </aside>
-        </div>
-      </div>
     </div>
   )
 }
