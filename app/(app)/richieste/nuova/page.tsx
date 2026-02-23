@@ -14,11 +14,8 @@ import { COURSE_CONFIG, type CourseType } from '@/types/database'
 import type { PortfolioItem } from '@/types/social'
 
 const requestTypes = [
-  { value: 'tirocinio', label: 'Tirocinio' },
-  { value: 'stage', label: 'Stage' },
-  { value: 'collaborazione', label: 'Collaborazione' },
+  { value: 'tirocinio', label: 'Tirocinio / Stage' },
   { value: 'lavoro', label: 'Lavoro' },
-  { value: 'tesi', label: 'Tesi' },
 ]
 
 const DAYS_OPTIONS = [

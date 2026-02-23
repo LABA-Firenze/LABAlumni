@@ -1,9 +1,10 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useAuth } from '@/components/AuthProvider'
 import { AppLayout } from '@/components/AppLayout'
+import { Navbar } from '@/components/Navbar'
 
 export default function DashboardLayout({
   children,
@@ -12,6 +13,7 @@ export default function DashboardLayout({
 }) {
   const { user, loading } = useAuth()
   const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
     if (!loading && !user) {
@@ -31,5 +33,19 @@ export default function DashboardLayout({
     return null
   }
 
-  return <AppLayout>{children}</AppLayout>
+  // Sidebar solo in dashboard
+  const isDashboard = pathname === '/pannello/studente' || pathname === '/pannello/azienda'
+
+  if (isDashboard) {
+    return <AppLayout>{children}</AppLayout>
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-100/80">
+      <Navbar />
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {children}
+      </div>
+    </div>
+  )
 }
