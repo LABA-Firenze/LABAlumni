@@ -5,10 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/components/AuthProvider'
 import { supabase } from '@/lib/supabase'
-import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { Textarea } from '@/components/ui/Textarea'
-import { Select } from '@/components/ui/Select'
 import { Loader2, Briefcase, FileImage } from 'lucide-react'
 import type { PortfolioItem } from '@/types/social'
 
@@ -158,14 +155,15 @@ export default function NewCollaborationRequestPage() {
     return null
   }
 
+  const GIORNI_SHORT = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab']
+
   return (
-    <div>
-      
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6">
+    <div className="min-h-screen bg-[#F7F8FA] -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-3xl mx-auto">
+        <div className="mb-5">
           <button
             onClick={() => router.back()}
-            className="text-gray-600 hover:text-gray-900 mb-4 flex items-center gap-2"
+            className="text-gray-600 hover:text-gray-900 mb-4 flex items-center gap-2 transition-colors duration-120"
           >
             ← Indietro
           </button>
@@ -173,131 +171,182 @@ export default function NewCollaborationRequestPage() {
             <Briefcase className="w-8 h-8 text-primary-600" />
             Mettiti in Vetrina
           </h1>
-          <p className="text-gray-600 mt-2">
+          <p className="text-gray-600 mt-1.5">
             Pubblica una richiesta diretta alle aziende. Il tuo corso è già visibile nel profilo.
+          </p>
+          <p className="text-xs text-secondary-500 mt-1">
+            Le aziende vedranno la tua richiesta per 30 giorni.
           </p>
         </div>
 
         {!canPost && (
-          <Card variant="elevated" className="p-4 mb-6 bg-amber-50 border-amber-200">
+          <div className="p-4 mb-6 rounded-2xl bg-amber-50 border border-amber-200 shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
             <p className="text-amber-800">
               Hai già pubblicato una richiesta questa settimana. Puoi pubblicare di nuovo dopo il {nextPostDate}.
             </p>
             <p className="text-sm text-amber-700 mt-2">Max 1 richiesta di collaborazione a settimana per studente.</p>
-          </Card>
+          </div>
         )}
 
-        <Card variant="elevated" className="p-6">
+        <div className="relative bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100/80">
+          <div className="absolute top-6 right-6 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+            <span className="text-xs font-medium text-secondary-500 uppercase tracking-wider">Bozza</span>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Tipo di Richiesta *</label>
-              <Select
-                value={requestType}
-                onChange={(e) => setRequestType(e.target.value)}
-                required
-              >
-                <option value="">Seleziona tipo di richiesta</option>
-                {requestTypes.map(type => (
-                  <option key={type.value} value={type.value}>{type.label}</option>
-                ))}
-              </Select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Giorni disponibili</label>
-              <div className="flex flex-wrap gap-4">
-                {GIORNI.map(giorno => (
-                  <label
-                    key={giorno}
-                    className="flex items-center gap-2 cursor-pointer"
+            {/* 1. COSA VUOI FARE */}
+            <div className="space-y-4 pt-2">
+              <h3 className="text-[11px] font-semibold text-secondary-500 uppercase tracking-[0.08em]">
+                Cosa vuoi fare
+              </h3>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Tipo di Richiesta *</label>
+                <div className="relative">
+                  <select
+                    value={requestType}
+                    onChange={(e) => setRequestType(e.target.value)}
+                    required
+                    className="w-full px-4 py-2.5 pr-10 rounded-xl bg-[#FAFAFB] border border-gray-200/90 text-gray-900
+                      focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400 focus:bg-white
+                      hover:border-gray-300 transition-all duration-[120ms] appearance-none cursor-pointer
+                      shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]"
+                    style={{
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+                      backgroundPosition: 'right 0.75rem center',
+                      backgroundRepeat: 'no-repeat',
+                    }}
                   >
-                    <input
-                      type="checkbox"
-                      checked={selectedDays.includes(giorno)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedDays(prev => [...prev, giorno])
-                        } else {
-                          setSelectedDays(prev => prev.filter(d => d !== giorno))
-                        }
-                      }}
-                      className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                    />
-                    <span className="text-sm">{giorno}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <Textarea
-                label="Note / Descrizione *"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Descrivi le tue competenze, cosa cerchi, disponibilità extra..."
-                rows={6}
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <FileImage className="w-4 h-4 inline mr-1" />
-                Seleziona un progetto dal tuo portfolio (opzionale, max 1)
-              </label>
-              {portfolioItems.length === 0 ? (
-                <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 text-gray-600 text-sm">
-                  Non hai ancora caricato lavori nel portfolio.{' '}
-                  <Link href="/portfolio/nuovo" className="text-primary-600 hover:underline font-medium">
-                    Aggiungi un lavoro
-                  </Link>{' '}
-                  per poterlo allegare alla richiesta.
+                    <option value="">Seleziona tipo di richiesta</option>
+                    {requestTypes.map(type => (
+                      <option key={type.value} value={type.value}>{type.label}</option>
+                    ))}
+                  </select>
                 </div>
-              ) : (
-                <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-gray-50">
-                  <label className="flex items-center gap-2 p-2 hover:bg-white rounded cursor-pointer">
-                    <input
-                      type="radio"
-                      name="portfolio"
-                      checked={!selectedPortfolioId}
-                      onChange={() => setSelectedPortfolioId('')}
-                      className="rounded-full border-gray-300 text-primary-600"
-                    />
-                    <span className="text-sm">Nessun allegato</span>
-                  </label>
-                  {portfolioItems.map(item => (
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Giorni disponibili</label>
+                <div className="flex flex-wrap gap-2">
+                  {GIORNI.map((giorno, i) => (
                     <label
-                      key={item.id}
-                      className="flex items-center gap-3 p-2 hover:bg-white rounded cursor-pointer"
+                      key={giorno}
+                      className={`px-4 py-2 rounded-xl border text-sm font-medium cursor-pointer transition-all duration-[120ms]
+                        ${selectedDays.includes(giorno)
+                          ? 'bg-primary-500/12 border-primary-300/50 text-primary-700'
+                          : 'bg-transparent border-gray-200/80 text-gray-600 hover:bg-primary-500/6 hover:border-gray-300'
+                        }`}
                     >
                       <input
-                        type="radio"
-                        name="portfolio"
-                        checked={selectedPortfolioId === item.id}
-                        onChange={() => setSelectedPortfolioId(item.id)}
-                        className="rounded-full border-gray-300 text-primary-600"
+                        type="checkbox"
+                        checked={selectedDays.includes(giorno)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedDays(prev => [...prev, giorno])
+                          } else {
+                            setSelectedDays(prev => prev.filter(d => d !== giorno))
+                          }
+                        }}
+                        className="sr-only"
                       />
-                      <span className="text-sm font-medium truncate">{item.title}</span>
+                      {GIORNI_SHORT[i]}
                     </label>
                   ))}
                 </div>
-              )}
+              </div>
+            </div>
+
+            {/* 2. COME TI PRESENTI */}
+            <div className="space-y-4 pt-4">
+              <h3 className="text-[11px] font-semibold text-secondary-500 uppercase tracking-[0.08em]">
+                Come ti presenti
+              </h3>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Note / Descrizione *</label>
+                <textarea
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  placeholder="Descrivi le tue competenze, cosa cerchi, disponibilità extra..."
+                  rows={6}
+                  required
+                    className="w-full px-4 py-3 rounded-xl bg-[#FAFAFB] border border-gray-200/90 text-gray-900 placeholder:text-gray-400
+                    focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400 focus:bg-white
+                    hover:border-gray-300 transition-all duration-[120ms] resize-none min-h-[140px]
+                    shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]"
+                />
+              </div>
+            </div>
+
+            {/* 3. RAFFORZA LA RICHIESTA */}
+            <div className="space-y-4 pt-4">
+              <h3 className="text-[11px] font-semibold text-secondary-500 uppercase tracking-[0.08em]">
+                Rafforza la richiesta
+              </h3>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <FileImage className="w-4 h-4 inline mr-1.5 text-primary-500" />
+                  Seleziona un progetto dal tuo portfolio (opzionale, max 1)
+                </label>
+                {portfolioItems.length === 0 ? (
+                  <div className="rounded-xl p-4 bg-secondary-50/80 border border-gray-200/80 text-gray-600 text-sm">
+                    Non hai ancora caricato lavori nel portfolio.{' '}
+                    <Link href="/portfolio/nuovo" className="text-primary-600 hover:underline font-medium transition-colors duration-[120ms]">
+                      Aggiungi un lavoro
+                    </Link>{' '}
+                    per poterlo allegare alla richiesta.
+                  </div>
+                ) : (
+                  <div className="space-y-1 max-h-48 overflow-y-auto rounded-xl p-3 bg-secondary-50/60 border border-gray-200/80">
+                    <label className="flex items-center gap-3 p-2.5 hover:bg-white/80 rounded-lg cursor-pointer transition-all duration-[120ms]">
+                      <input
+                        type="radio"
+                        name="portfolio"
+                        checked={!selectedPortfolioId}
+                        onChange={() => setSelectedPortfolioId('')}
+                        className="rounded-full border-gray-300 text-primary-600 focus:ring-primary-500/40 w-4 h-4"
+                      />
+                      <span className="text-sm">Nessun allegato</span>
+                    </label>
+                    {portfolioItems.map(item => (
+                      <label
+                        key={item.id}
+                        className="flex items-center gap-3 p-2.5 hover:bg-white/80 rounded-lg cursor-pointer transition-all duration-[120ms]"
+                      >
+                        <input
+                          type="radio"
+                          name="portfolio"
+                          checked={selectedPortfolioId === item.id}
+                          onChange={() => setSelectedPortfolioId(item.id)}
+                          className="rounded-full border-gray-300 text-primary-600 focus:ring-primary-500/40 w-4 h-4"
+                        />
+                        <span className="text-sm font-medium truncate">{item.title}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             {error && (
-              <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+              <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">
                 {error}
               </div>
             )}
 
-            <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
-              <Button type="button" variant="outline" onClick={() => router.back()} disabled={loading}>
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => router.back()}
+                disabled={loading}
+                className="transition-all duration-[120ms] hover:-translate-y-px"
+              >
                 Annulla
               </Button>
               <Button
                 type="submit"
                 variant="primary"
                 disabled={loading || !requestType || !content.trim() || !canPost}
+                className="transition-all duration-[120ms] hover:-translate-y-px disabled:hover:translate-y-0 disabled:hover:shadow-none"
               >
                 {loading ? (
                   <>
@@ -310,7 +359,7 @@ export default function NewCollaborationRequestPage() {
               </Button>
             </div>
           </form>
-        </Card>
+        </div>
       </div>
     </div>
   )
