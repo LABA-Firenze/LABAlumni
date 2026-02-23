@@ -23,26 +23,41 @@ export default function PortfolioItemDetailPage() {
 
   useEffect(() => {
     if (itemId) {
+      const loadItem = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('portfolio_items')
+            .select('*')
+            .eq('id', itemId)
+            .single()
+          if (error) throw error
+          setItem(data)
+        } catch (err) {
+          console.error('Error loading portfolio item:', err)
+        } finally {
+          setLoading(false)
+        }
+      }
       loadItem()
     }
   }, [itemId])
 
-  const loadItem = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('portfolio_items')
-        .select('*')
-        .eq('id', itemId)
-        .single()
-
-      if (error) throw error
-      setItem(data)
-    } catch (error) {
-      console.error('Error loading portfolio item:', error)
-    } finally {
-      setLoading(false)
+  useEffect(() => {
+    if (!carouselOpen) return
+    const total = (item?.images?.length || 0) + (item?.video_url ? 1 : 0)
+    if (total === 0) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setCarouselOpen(false)
+      if (e.key === 'ArrowRight') setCarouselIndex((i) => (i + 1) % total)
+      if (e.key === 'ArrowLeft') setCarouselIndex((i) => (i - 1 + total) % total)
     }
-  }
+    window.addEventListener('keydown', onKey)
+    document.body.style.overflow = 'hidden'
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = ''
+    }
+  }, [carouselOpen, item?.images?.length, item?.video_url])
 
   const handleDelete = async () => {
     if (!confirm('Sei sicuro di voler eliminare questo lavoro?')) return
@@ -94,21 +109,6 @@ export default function PortfolioItemDetailPage() {
 
   const nextSlide = () => setCarouselIndex((i) => (i + 1) % totalSlides)
   const prevSlide = () => setCarouselIndex((i) => (i - 1 + totalSlides) % totalSlides)
-
-  useEffect(() => {
-    if (!carouselOpen) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setCarouselOpen(false)
-      if (e.key === 'ArrowRight') nextSlide()
-      if (e.key === 'ArrowLeft') prevSlide()
-    }
-    window.addEventListener('keydown', onKey)
-    document.body.style.overflow = 'hidden'
-    return () => {
-      window.removeEventListener('keydown', onKey)
-      document.body.style.overflow = ''
-    }
-  }, [carouselOpen])
 
   return (
     <div className="space-y-6">
