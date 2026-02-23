@@ -7,10 +7,8 @@ import { supabase } from '@/lib/supabase'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Textarea } from '@/components/ui/Textarea'
-import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Loader2, Briefcase, FileImage } from 'lucide-react'
-import { COURSE_CONFIG, type CourseType } from '@/types/database'
 import type { PortfolioItem } from '@/types/social'
 
 const requestTypes = [
@@ -18,22 +16,14 @@ const requestTypes = [
   { value: 'lavoro', label: 'Lavoro' },
 ]
 
-const DAYS_OPTIONS = [
-  { value: 'Lun-Ven', label: 'Lun-Ven' },
-  { value: 'Lun-Sab', label: 'Lun-Sab' },
-  { value: 'Lunedì e Mercoledì', label: 'Lunedì e Mercoledì' },
-  { value: 'Martedì e Giovedì', label: 'Martedì e Giovedì' },
-  { value: 'Flessibile', label: 'Flessibile' },
-  { value: 'altro', label: 'Altro (specifica nelle note)' },
-]
+const GIORNI = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato']
 
 export default function NewCollaborationRequestPage() {
   const { user } = useAuth()
   const router = useRouter()
   const [role, setRole] = useState<'student' | 'company' | null>(null)
   const [requestType, setRequestType] = useState('')
-  const [availableDays, setAvailableDays] = useState('')
-  const [availableHoursTotal, setAvailableHoursTotal] = useState('')
+  const [selectedDays, setSelectedDays] = useState<string[]>([])
   const [content, setContent] = useState('')
   const [selectedPortfolioId, setSelectedPortfolioId] = useState<string>('')
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([])
@@ -139,8 +129,7 @@ export default function NewCollaborationRequestPage() {
           request_from: 'student',
           content: content.trim(),
           request_type: requestType,
-          available_days: availableDays || null,
-          available_hours_total: availableHoursTotal ? parseInt(availableHoursTotal, 10) : null,
+          available_days: selectedDays.length > 0 ? selectedDays.join(', ') : null,
           portfolio_item_id: selectedPortfolioId || null,
         })
 
@@ -215,26 +204,28 @@ export default function NewCollaborationRequestPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Giorni disponibili</label>
-              <Select
-                value={availableDays}
-                onChange={(e) => setAvailableDays(e.target.value)}
-              >
-                <option value="">Seleziona</option>
-                {DAYS_OPTIONS.map(d => (
-                  <option key={d.value} value={d.value}>{d.label}</option>
+              <div className="flex flex-wrap gap-4">
+                {GIORNI.map(giorno => (
+                  <label
+                    key={giorno}
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedDays.includes(giorno)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedDays(prev => [...prev, giorno])
+                        } else {
+                          setSelectedDays(prev => prev.filter(d => d !== giorno))
+                        }
+                      }}
+                      className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                    />
+                    <span className="text-sm">{giorno}</span>
+                  </label>
                 ))}
-              </Select>
-            </div>
-
-            <div>
-              <Input
-                label="Ore disponibili totali"
-                type="number"
-                min={1}
-                placeholder="es. 150"
-                value={availableHoursTotal}
-                onChange={(e) => setAvailableHoursTotal(e.target.value)}
-              />
+              </div>
             </div>
 
             <div>
@@ -248,12 +239,20 @@ export default function NewCollaborationRequestPage() {
               />
             </div>
 
-            {portfolioItems.length > 0 && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <FileImage className="w-4 h-4 inline mr-1" />
-                  Allega un progetto dal tuo portfolio (opzionale, max 1)
-                </label>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <FileImage className="w-4 h-4 inline mr-1" />
+                Seleziona un progetto dal tuo portfolio (opzionale, max 1)
+              </label>
+              {portfolioItems.length === 0 ? (
+                <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 text-gray-600 text-sm">
+                  Non hai ancora caricato lavori nel portfolio.{' '}
+                  <Link href="/portfolio/nuovo" className="text-primary-600 hover:underline font-medium">
+                    Aggiungi un lavoro
+                  </Link>{' '}
+                  per poterlo allegare alla richiesta.
+                </div>
+              ) : (
                 <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-gray-50">
                   <label className="flex items-center gap-2 p-2 hover:bg-white rounded cursor-pointer">
                     <input
@@ -281,8 +280,8 @@ export default function NewCollaborationRequestPage() {
                     </label>
                   ))}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
             {error && (
               <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
