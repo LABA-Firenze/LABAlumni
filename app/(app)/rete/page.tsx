@@ -1,13 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/components/AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { Users, UserPlus, Check, X, Search } from 'lucide-react'
+import { Users, UserPlus, Check, X, Search, Building2, GraduationCap } from 'lucide-react'
 import { COURSE_CONFIG, type CourseType } from '@/types/database'
 import type { Student, Profile } from '@/types/database'
 import type { StudentConnection } from '@/types/social'
@@ -20,11 +20,20 @@ interface StudentWithProfile extends Student {
 export default function NetworkPage() {
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const qFromUrl = searchParams.get('q') || ''
   const [students, setStudents] = useState<StudentWithProfile[]>([])
   const [connections, setConnections] = useState<StudentConnection[]>([])
-  const [searchQuery, setSearchQuery] = useState('')
+  const [searchQuery, setSearchQuery] = useState(qFromUrl)
   const [loading, setLoading] = useState(true)
   const [filterCourse, setFilterCourse] = useState<string>('')
+  const [tab, setTab] = useState<'studenti' | 'aziende' | 'docenti'>('studenti')
+  const [companies, setCompanies] = useState<{ id: string; company_name: string; logo_url: string | null; industry: string | null }[]>([])
+  const [docenti, setDocenti] = useState<{ id: string; full_name: string | null; avatar_url: string | null; courses?: string[] }[]>([])
+
+  useEffect(() => {
+    setSearchQuery(qFromUrl)
+  }, [qFromUrl])
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -35,6 +44,8 @@ export default function NetworkPage() {
     if (user) {
       loadNetwork()
       loadConnections()
+      loadCompanies()
+      loadDocenti()
     }
   }, [user, authLoading, router])
 
@@ -73,6 +84,42 @@ export default function NetworkPage() {
       console.error('Error loading network:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadDocenti = async () => {
+    try {
+      const { data: docData } = await supabase.from('docenti').select('id').or('can_relatore.eq.true,can_corelatore.eq.true')
+      if (!docData?.length) {
+        setDocenti([])
+        return
+      }
+      const { data: profData } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url')
+        .in('id', docData.map((d: { id: string }) => d.id))
+      const { data: docFull } = await supabase.from('docenti').select('id, courses').in('id', docData.map((d: { id: string }) => d.id))
+      const docMap = new Map((docFull || []).map((d: any) => [d.id, d]))
+      setDocenti((profData || []).map((p: any) => ({
+        id: p.id,
+        full_name: p.full_name,
+        avatar_url: p.avatar_url,
+        courses: docMap.get(p.id)?.courses,
+      })))
+    } catch (err) {
+      console.error('Error loading docenti:', err)
+    }
+  }
+
+  const loadCompanies = async () => {
+    try {
+      const { data } = await supabase
+        .from('companies')
+        .select('id, company_name, logo_url, industry')
+        .order('company_name')
+      setCompanies(data || [])
+    } catch (err) {
+      console.error('Error loading companies:', err)
     }
   }
 
@@ -183,6 +230,15 @@ export default function NetworkPage() {
     c.student2_id === user?.id && c.status === 'pending'
   )
 
+  const filteredCompanies = companies.filter((c) =>
+    !searchQuery || c.company_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    c.industry?.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  const filteredDocenti = docenti.filter((d) =>
+    !searchQuery || d.full_name?.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
   return (
       <div className="space-y-6">
         <div>
@@ -190,7 +246,33 @@ export default function NetworkPage() {
             <Users className="w-8 h-8 text-primary-600" />
             Network
           </h1>
-          <p className="text-gray-600 mt-2">Connettiti con altri studenti LABA</p>
+          <p className="text-gray-600 mt-2">Connettiti con studenti e scopri le aziende</p>
+          <div className="flex gap-2 mt-4">
+            <button
+              onClick={() => setTab('studenti')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                tab === 'studenti' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Studenti
+            </button>
+            <button
+              onClick={() => setTab('aziende')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                tab === 'aziende' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Aziende
+            </button>
+            <button
+              onClick={() => setTab('docenti')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                tab === 'docenti' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Docenti
+            </button>
+          </div>
         </div>
 
         {/* Pending Connection Requests */}
@@ -241,58 +323,150 @@ export default function NetworkPage() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <Input
                 type="text"
-                placeholder="Cerca per nome o email..."
+                placeholder={tab === 'studenti' ? 'Cerca per nome o email...' : tab === 'aziende' ? 'Cerca aziende...' : 'Cerca docenti...'}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
               />
             </div>
-            <select
-              value={filterCourse}
-              onChange={(e) => setFilterCourse(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              <option value="">Tutti i corsi</option>
-              {courses.map(course => (
-                <option key={course.value} value={course.value}>{course.label}</option>
-              ))}
-            </select>
+            {tab === 'studenti' && (
+              <select
+                value={filterCourse}
+                onChange={(e) => setFilterCourse(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                <option value="">Tutti i corsi</option>
+                {courses.map(course => (
+                  <option key={course.value} value={course.value}>{course.label}</option>
+                ))}
+              </select>
+            )}
           </div>
         </Card>
 
+        {/* Companies Grid */}
+        {tab === 'aziende' && (
+          filteredCompanies.length === 0 ? (
+            <Card variant="elevated" className="p-12 text-center">
+              <Building2 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Nessuna azienda trovata</h3>
+              <p className="text-gray-600">Prova a modificare la ricerca</p>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredCompanies.map((company) => (
+                <Link key={company.id} href={`/azienda/${company.id}`} className="block group">
+                  <Card variant="elevated" className="overflow-hidden hover:shadow-lg transition-shadow h-full">
+                    <div className="p-6">
+                      <div className="flex items-center gap-4 mb-3">
+                        <div className="w-14 h-14 rounded-xl bg-primary-100 flex items-center justify-center shrink-0 overflow-hidden">
+                          {company.logo_url ? (
+                            <img src={company.logo_url} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <Building2 className="w-7 h-7 text-primary-600" />
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <h3 className="font-semibold text-lg truncate group-hover:text-primary-600 transition-colors">
+                            {company.company_name}
+                          </h3>
+                          {company.industry && (
+                            <p className="text-sm text-gray-600 truncate">{company.industry}</p>
+                          )}
+                          <span className="text-xs text-primary-600 mt-1 inline-block">Vedi profilo e annunci →</span>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          )
+        )}
+
+        {/* Docenti Grid */}
+        {tab === 'docenti' && (
+          filteredDocenti.length === 0 ? (
+            <Card variant="elevated" className="p-12 text-center">
+              <GraduationCap className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Nessun docente trovato</h3>
+              <p className="text-gray-600">Prova a modificare la ricerca</p>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredDocenti.map((doc) => (
+                <Link key={doc.id} href={`/profilo/${doc.id}`} className="block group">
+                  <Card variant="elevated" className="overflow-hidden hover:shadow-lg transition-shadow h-full">
+                    <div className="p-6">
+                      <div className="flex items-center gap-4 mb-3">
+                        <div className="w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center shrink-0 overflow-hidden">
+                          {doc.avatar_url ? (
+                            <img src={doc.avatar_url} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <GraduationCap className="w-7 h-7 text-amber-600" />
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <h3 className="font-semibold text-lg group-hover:text-primary-600 transition-colors truncate">
+                            {doc.full_name || 'Docente'}
+                          </h3>
+                          {doc.courses?.length ? (
+                            <p className="text-sm text-gray-600 truncate">
+                              {doc.courses.map((c) => COURSE_CONFIG[c as CourseType]?.name || c).join(', ')}
+                            </p>
+                          ) : (
+                            <p className="text-sm text-gray-500">Docente</p>
+                          )}
+                          <span className="text-xs text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity mt-1 inline-block">Vedi profilo →</span>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          )
+        )}
+
         {/* Students Grid */}
-        {students.length === 0 ? (
-          <Card variant="elevated" className="p-12 text-center">
-            <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold mb-2">Nessuno studente trovato</h3>
-            <p className="text-gray-600">Prova a modificare i filtri di ricerca</p>
-          </Card>
-        ) : (
+        {tab === 'studenti' && (
+          students.length === 0 ? (
+            <Card variant="elevated" className="p-12 text-center">
+              <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Nessuno studente trovato</h3>
+              <p className="text-gray-600">Prova a modificare i filtri di ricerca</p>
+            </Card>
+          ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {students.map((student) => {
               const status = getConnectionStatus(student.id)
               return (
                 <Card key={student.id} variant="elevated" className="overflow-hidden hover:shadow-lg transition-shadow">
                   <div className="p-6">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-16 h-16 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white text-xl font-bold">
-                        {student.profile?.full_name?.[0]?.toUpperCase() || student.profile?.email?.[0]?.toUpperCase() || 'S'}
+                    <Link href={`/profilo/${student.id}`} className="block group">
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="w-16 h-16 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white text-xl font-bold overflow-hidden">
+                          {student.profile?.full_name?.[0]?.toUpperCase() || student.profile?.email?.[0]?.toUpperCase() || 'S'}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-lg group-hover:text-primary-600 transition-colors">
+                            {student.profile?.full_name || 'Studente'}
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            {COURSE_CONFIG[student.course]?.name || student.course}
+                          </p>
+                          <span className="text-xs text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity mt-1 inline-block">
+                            Vedi profilo e portfolio →
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg">
-                          {student.profile?.full_name || 'Studente'}
-                        </h3>
-                        <p className="text-sm text-gray-600">
-                          {COURSE_CONFIG[student.course]?.name || student.course}
-                        </p>
-                      </div>
-                    </div>
 
-                    {student.year && (
-                      <p className="text-sm text-gray-500 mb-4">
-                        {student.year}° anno
-                      </p>
-                    )}
+                      {student.year && (
+                        <p className="text-sm text-gray-500 mb-4">
+                          {student.year}° anno
+                        </p>
+                      )}
+                    </Link>
 
                     <div className="flex gap-2">
                       {status === 'none' && (
@@ -355,6 +529,7 @@ export default function NetworkPage() {
               )
             })}
           </div>
+          )
         )}
       </div>
   )

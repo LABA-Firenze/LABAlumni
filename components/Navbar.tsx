@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase'
 import { Button } from './ui/Button'
 import { User, LogOut, MoreHorizontal, MessageCircle, LayoutDashboard, Newspaper, Briefcase, BookOpen } from 'lucide-react'
 import { openFloatingChat } from './FloatingChat'
+import { HeaderSearch } from './HeaderSearch'
 
 export function Navbar() {
   const { user, loading, signOut } = useAuth()
@@ -54,11 +55,13 @@ export function Navbar() {
   return (
     <nav className="bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-14">
+        <div className="flex justify-between items-center h-14 gap-4">
           <Link href={user ? dashboardHref : '/'} className="flex items-center gap-2 shrink-0">
             <img src="/logoSito.svg" alt="LABA" className="h-8 w-auto" />
             <span className="text-xl font-bold" style={{ color: '#104a96' }}>Alumni</span>
           </Link>
+
+          {!loading && user && <HeaderSearch />}
 
           {!loading && user && (
             <div className="flex items-center gap-1">

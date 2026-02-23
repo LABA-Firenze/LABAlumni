@@ -23,6 +23,7 @@ export default function StudentDashboard() {
   const [suggestedJobs, setSuggestedJobs] = useState<(JobPost & { company: { company_name: string } })[]>([])
   const [portfolioCount, setPortfolioCount] = useState(0)
   const [connectionsCount, setConnectionsCount] = useState(0)
+  const [myRequest, setMyRequest] = useState<Post | null>(null)
   const [loading, setLoading] = useState(true)
   const [postLoading, setPostLoading] = useState(true)
 
@@ -34,6 +35,7 @@ export default function StudentDashboard() {
 
     if (user) {
       loadStudentData()
+      loadMyRequest()
       loadFeedPosts()
     }
   }, [user, authLoading, router])
@@ -90,6 +92,40 @@ export default function StudentDashboard() {
       console.error('Error loading student data:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadMyRequest = async () => {
+    if (!user) return
+    try {
+      const { data } = await supabase
+        .from('posts')
+        .select(`
+          *,
+          user:profiles!posts_user_id_fkey(id, full_name, avatar_url, role),
+          portfolio_item:portfolio_items(id, title, images)
+        `)
+        .eq('user_id', user.id)
+        .eq('type', 'collaboration_request')
+        .eq('request_from', 'student')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      if (data) {
+        const { data: studentData } = await supabase
+          .from('students')
+          .select('course')
+          .eq('id', user.id)
+          .single()
+        setMyRequest({
+          ...data,
+          student_course: studentData?.course,
+        } as Post)
+      } else {
+        setMyRequest(null)
+      }
+    } catch {
+      setMyRequest(null)
     }
   }
 
@@ -196,6 +232,14 @@ export default function StudentDashboard() {
                 </Link>
               </div>
             </Card>
+
+            {/* La tua richiesta in vetrina */}
+            {myRequest && (
+              <div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-3">La tua richiesta in vetrina</h4>
+                <PostCard post={myRequest} onUpdate={() => { loadMyRequest(); loadFeedPosts() }} />
+              </div>
+            )}
 
             {/* Feed Posts */}
             {postLoading ? (

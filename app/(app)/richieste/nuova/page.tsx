@@ -158,37 +158,27 @@ export default function NewCollaborationRequestPage() {
   const GIORNI_SHORT = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab']
 
   return (
-    <div className="min-h-screen bg-[#F7F8FA] -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="mb-5">
-          <button
-            onClick={() => router.back()}
-            className="text-gray-600 hover:text-gray-900 mb-4 flex items-center gap-2 transition-colors duration-120"
-          >
-            ← Indietro
-          </button>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
             <Briefcase className="w-8 h-8 text-primary-600" />
-            Mettiti in Vetrina
+            Dai visibilità al tuo talento
           </h1>
-          <p className="text-gray-600 mt-1.5">
-            Pubblica una richiesta diretta alle aziende. Il tuo corso è già visibile nel profilo.
-          </p>
-          <p className="text-xs text-secondary-500 mt-1">
-            Le aziende vedranno la tua richiesta per 30 giorni.
-          </p>
-        </div>
+        <p className="text-gray-600 mt-1.5">
+          Pubblica la tua disponibilità per stage o lavoro.
+        </p>
+      </div>
 
-        {!canPost && (
+      {!canPost && (
           <div className="p-4 mb-6 rounded-2xl bg-amber-50 border border-amber-200 shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
             <p className="text-amber-800">
               Hai già pubblicato una richiesta questa settimana. Puoi pubblicare di nuovo dopo il {nextPostDate}.
             </p>
-            <p className="text-sm text-amber-700 mt-2">Max 1 richiesta di collaborazione a settimana per studente.</p>
+            <p className="text-sm text-amber-700 mt-2">Puoi allegare al massimo 1 progetto dal portfolio. Una nuova richiesta è possibile dopo tale data.</p>
           </div>
-        )}
+      )}
 
-        <div className="relative bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100/80">
+      <div className="relative bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <div className="absolute top-6 right-6 flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
             <span className="text-xs font-medium text-secondary-500 uppercase tracking-wider">Bozza</span>
@@ -284,7 +274,7 @@ export default function NewCollaborationRequestPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <FileImage className="w-4 h-4 inline mr-1.5 text-primary-500" />
-                  Seleziona un progetto dal tuo portfolio (opzionale, max 1)
+                  Seleziona un progetto dal portfolio (opzionale, max 1 allegato)
                 </label>
                 {portfolioItems.length === 0 ? (
                   <div className="rounded-xl p-4 bg-secondary-50/80 border border-gray-200/80 text-gray-600 text-sm">
@@ -360,7 +350,6 @@ export default function NewCollaborationRequestPage() {
             </div>
           </form>
         </div>
-      </div>
     </div>
   )
 }
