@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/components/AuthProvider'
 import { supabase } from '@/lib/supabase'
-import { Navbar } from '@/components/Navbar'
+import { AppLayout } from '@/components/AppLayout'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Textarea } from '@/components/ui/Textarea'
@@ -107,10 +107,8 @@ export default function JobDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100/80">
-      <Navbar />
-      
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <AppLayout>
+      <div className="space-y-6">
         <Link href="/annunci">
           <Button variant="ghost" size="sm" className="mb-6">← Torna a Tirocini e Stage</Button>
         </Link>
@@ -233,7 +231,7 @@ export default function JobDetailPage() {
           </Card>
         )}
       </div>
-    </div>
+    </AppLayout>
   )
 }
 

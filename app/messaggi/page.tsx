@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/components/AuthProvider'
 import { supabase } from '@/lib/supabase'
-import { Navbar } from '@/components/Navbar'
+import { AppLayout } from '@/components/AppLayout'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -211,11 +211,9 @@ export default function MessagesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100/80">
-      <Navbar />
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
+    <AppLayout>
+      <div className="space-y-6">
+        <div>
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
             <Mail className="w-8 h-8 text-primary-600" />
             Messaggi
@@ -410,7 +408,7 @@ export default function MessagesPage() {
           </div>
         </div>
       </div>
-    </div>
+    </AppLayout>
   )
 }
 

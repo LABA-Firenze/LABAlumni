@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/components/AuthProvider'
 import { supabase } from '@/lib/supabase'
-import { Navbar } from '@/components/Navbar'
+import { AppLayout } from '@/components/AppLayout'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -85,11 +85,9 @@ export default function CommunityPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100/80">
-      <Navbar />
-      
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-8">
+    <AppLayout>
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
               <Newspaper className="w-8 h-8 text-primary-600" />
@@ -183,7 +181,7 @@ export default function CommunityPage() {
           </div>
         )}
       </div>
-    </div>
+    </AppLayout>
   )
 }
 
