@@ -11,6 +11,7 @@ import { Briefcase, MapPin, Clock, Building2 } from 'lucide-react'
 import Link from 'next/link'
 import type { JobPost } from '@/types/database'
 import { COURSE_CONFIG } from '@/types/database'
+import { SkeletonJobCard } from '@/components/ui/Skeleton'
 
 export default function JobDetailPage() {
   const params = useParams()
@@ -83,8 +84,16 @@ export default function JobDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+      <div className="space-y-6">
+        <SkeletonJobCard />
+        <div className="rounded-2xl bg-white shadow-md border p-6 animate-pulse">
+          <div className="h-6 w-32 rounded-lg bg-gray-200 mb-4" />
+          <div className="space-y-2">
+            <div className="h-4 bg-gray-200 rounded w-full" />
+            <div className="h-4 bg-gray-200 rounded w-4/5" />
+            <div className="h-4 bg-gray-200 rounded w-3/4" />
+          </div>
+        </div>
       </div>
     )
   }

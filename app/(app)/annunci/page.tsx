@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Briefcase, MapPin, Clock } from 'lucide-react'
 import Link from 'next/link'
+import { SkeletonJobCard } from '@/components/ui/Skeleton'
 import type { JobPost, CourseType } from '@/types/database'
 import { COURSE_CONFIG } from '@/types/database'
 
@@ -119,8 +120,10 @@ export default function JobsPage() {
 
         {/* Jobs list */}
         {loading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <div className="space-y-4">
+            {[1, 2, 3, 4].map((i) => (
+              <SkeletonJobCard key={i} />
+            ))}
           </div>
         ) : filteredJobs.length === 0 ? (
           <Card variant="elevated" className="text-center py-16">

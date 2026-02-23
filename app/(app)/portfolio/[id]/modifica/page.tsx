@@ -208,8 +208,16 @@ export default function EditPortfolioItemPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100/80 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-6 space-y-4">
+          <div className="h-5 w-24 rounded-lg bg-gray-200 animate-pulse" />
+          <div className="h-9 w-48 rounded-lg bg-gray-200 animate-pulse" />
+        </div>
+        <div className="rounded-2xl bg-white shadow-md border p-6 animate-pulse space-y-6">
+          <div className="h-10 w-full rounded-lg bg-gray-200" />
+          <div className="h-32 w-full rounded-lg bg-gray-200" />
+          <div className="h-10 w-1/2 rounded-lg bg-gray-200" />
+        </div>
       </div>
     )
   }

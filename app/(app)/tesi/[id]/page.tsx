@@ -11,6 +11,7 @@ import Link from 'next/link'
 import type { ThesisProposal } from '@/types/social'
 import type { Student, Profile } from '@/types/database'
 import { COURSE_CONFIG } from '@/types/database'
+import { SkeletonCard } from '@/components/ui/Skeleton'
 
 interface ThesisProposalWithStudent extends ThesisProposal {
   student: Student & { profile: Profile }
@@ -69,8 +70,9 @@ export default function ThesisDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600" />
+      <div className="space-y-6">
+        <div className="h-6 w-24 rounded-lg bg-gray-200 animate-pulse" />
+        <SkeletonCard lines={5} />
       </div>
     )
   }

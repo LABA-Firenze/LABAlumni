@@ -11,6 +11,7 @@ import { Users, UserPlus, Check, X, Search } from 'lucide-react'
 import { COURSE_CONFIG, type CourseType } from '@/types/database'
 import type { Student, Profile } from '@/types/database'
 import type { StudentConnection } from '@/types/social'
+import { SkeletonCard } from '@/components/ui/Skeleton'
 
 interface StudentWithProfile extends Student {
   profile: Profile
@@ -159,8 +160,16 @@ export default function NetworkPage() {
 
   if (loading || authLoading) {
     return (
-      <div className="flex items-center justify-center py-24">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600" />
+      <div className="space-y-6">
+        <div>
+          <div className="h-9 w-48 rounded-lg bg-gray-200 animate-pulse mb-2" />
+          <div className="h-5 w-72 rounded-lg bg-gray-200 animate-pulse" />
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <SkeletonCard key={i} lines={2} />
+          ))}
+        </div>
       </div>
     )
   }

@@ -13,6 +13,7 @@ import { Plus, Edit, Trash2, Eye, EyeOff, Briefcase } from 'lucide-react'
 import Link from 'next/link'
 import type { JobPost, CourseType } from '@/types/database'
 import { COURSE_CONFIG } from '@/types/database'
+import { SkeletonJobCard } from '@/components/ui/Skeleton'
 
 const JOB_TYPES = ['tirocinio', 'stage', 'collaborazione', 'lavoro']
 
@@ -161,8 +162,16 @@ export default function ManageJobsPage() {
 
   if (loading || authLoading) {
     return (
-      <div className="flex items-center justify-center py-24">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+      <div className="space-y-6">
+        <div>
+          <div className="h-9 w-48 rounded-lg bg-gray-200 animate-pulse mb-2" />
+          <div className="h-5 w-80 rounded-lg bg-gray-200 animate-pulse" />
+        </div>
+        <div className="space-y-4">
+          {[1, 2, 3, 4].map((i) => (
+            <SkeletonJobCard key={i} />
+          ))}
+        </div>
       </div>
     )
   }

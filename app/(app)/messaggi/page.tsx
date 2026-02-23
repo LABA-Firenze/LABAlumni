@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/Textarea'
 import { Select } from '@/components/ui/Select'
 import { Send, Mail, User, Building2, Search } from 'lucide-react'
 import type { Message, Profile } from '@/types/database'
+import { Skeleton, SkeletonCard } from '@/components/ui/Skeleton'
 
 export default function MessagesPage() {
   const { user, loading: authLoading } = useAuth()
@@ -203,8 +204,29 @@ export default function MessagesPage() {
 
   if (loading || authLoading) {
     return (
-      <div className="flex items-center justify-center py-24">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+      <div className="flex gap-6 min-h-[400px]">
+        <div className="w-80 shrink-0 space-y-3">
+          <Skeleton className="h-10 w-full rounded-lg" />
+          {[1, 2, 3, 4, 5].map((i) => (
+            <SkeletonCard key={i} lines={1} />
+          ))}
+        </div>
+        <div className="flex-1 rounded-2xl bg-white shadow-md border p-6">
+          <div className="space-y-4 animate-pulse">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-12 w-12 rounded-full" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-3 w-24" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-4 w-2/3" />
+            </div>
+          </div>
+        </div>
       </div>
     )
   }

@@ -35,6 +35,9 @@ export default function DashboardLayout({
 
   // Sidebar solo in dashboard (una sola copia, da AppLayout)
   const isDashboard = pathname === '/pannello/studente' || pathname === '/pannello/azienda'
+  const isWidePage = pathname?.startsWith('/profilo') || pathname?.startsWith('/portfolio') ||
+    pathname?.startsWith('/annunci') || pathname?.startsWith('/rete') || pathname?.startsWith('/candidature') ||
+    pathname?.startsWith('/messaggi') || pathname?.startsWith('/tesi') || pathname === '/bacheca'
 
   if (isDashboard) {
     return <AppLayout>{children}</AppLayout>
@@ -43,7 +46,7 @@ export default function DashboardLayout({
   return (
     <div className="min-h-screen bg-gray-100/80">
       <Navbar />
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className={`mx-auto px-4 sm:px-6 lg:px-8 py-8 ${isWidePage ? 'max-w-7xl' : 'max-w-4xl'}`}>
         {children}
       </div>
     </div>

@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button'
 import { ArrowLeft, Calendar, Tag, Video, Image as ImageIcon, Edit, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import type { PortfolioItem } from '@/types/social'
+import { SkeletonPortfolioItem } from '@/components/ui/Skeleton'
 
 export default function PortfolioItemDetailPage() {
   const { user } = useAuth()
@@ -60,8 +61,9 @@ export default function PortfolioItemDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600" />
+      <div className="space-y-6">
+        <div className="h-6 w-24 rounded-lg bg-gray-200 animate-pulse" />
+        <SkeletonPortfolioItem />
       </div>
     )
   }

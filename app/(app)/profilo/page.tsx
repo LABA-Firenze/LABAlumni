@@ -27,6 +27,7 @@ import Link from 'next/link'
 import type { Student, Company, Profile, CourseType } from '@/types/database'
 import type { PortfolioItem } from '@/types/social'
 import { COURSE_CONFIG } from '@/types/database'
+import { SkeletonProfileSidebar, SkeletonCard, SkeletonPortfolioItem } from '@/components/ui/Skeleton'
 
 const COURSES = Object.entries(COURSE_CONFIG).map(([value, config]) => ({
   value: value as CourseType,
@@ -212,8 +213,22 @@ export default function ProfilePage() {
 
   if (loading || authLoading) {
     return (
-      <div className="flex items-center justify-center py-24">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+      <div className="min-h-screen bg-gray-100/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="grid lg:grid-cols-12 gap-6">
+            <aside className="lg:col-span-3">
+              <SkeletonProfileSidebar />
+            </aside>
+            <main className="lg:col-span-6 space-y-4">
+              <SkeletonCard lines={4} />
+              <SkeletonCard lines={2} />
+            </main>
+            <aside className="lg:col-span-3 space-y-6">
+              <SkeletonCard lines={3} />
+              <SkeletonCard lines={4} />
+            </aside>
+          </div>
+        </div>
       </div>
     )
   }

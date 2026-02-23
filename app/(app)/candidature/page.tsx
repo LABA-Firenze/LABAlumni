@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button'
 import { Briefcase } from 'lucide-react'
 import Link from 'next/link'
 import { APPLICATION_STATUS_CONFIG } from '@/lib/application-status'
+import { SkeletonApplicationCard } from '@/components/ui/Skeleton'
 import type { Application, JobPost } from '@/types/database'
 
 export default function ApplicationsPage() {
@@ -54,8 +55,16 @@ export default function ApplicationsPage() {
 
   if (loading || authLoading) {
     return (
-      <div className="flex items-center justify-center py-24">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+      <div className="space-y-6">
+        <div>
+          <div className="h-9 w-56 rounded-lg bg-gray-200 animate-pulse mb-2" />
+          <div className="h-5 w-72 rounded-lg bg-gray-200 animate-pulse" />
+        </div>
+        <div className="space-y-4">
+          {[1, 2, 3, 4].map((i) => (
+            <SkeletonApplicationCard key={i} />
+          ))}
+        </div>
       </div>
     )
   }

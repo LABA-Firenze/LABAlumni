@@ -11,6 +11,7 @@ import Link from 'next/link'
 import { APPLICATION_STATUS_CONFIG } from '@/lib/application-status'
 import type { Application, JobPost, Student } from '@/types/database'
 import { COURSE_CONFIG } from '@/types/database'
+import { SkeletonApplicationCard } from '@/components/ui/Skeleton'
 
 export default function ManageApplicationsPage() {
   const { user, loading: authLoading } = useAuth()
@@ -126,8 +127,16 @@ export default function ManageApplicationsPage() {
 
   if (loading || authLoading) {
     return (
-      <div className="flex items-center justify-center py-24">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+      <div className="space-y-6">
+        <div>
+          <div className="h-9 w-56 rounded-lg bg-gray-200 animate-pulse mb-2" />
+          <div className="h-5 w-80 rounded-lg bg-gray-200 animate-pulse" />
+        </div>
+        <div className="space-y-4">
+          {[1, 2, 3, 4].map((i) => (
+            <SkeletonApplicationCard key={i} />
+          ))}
+        </div>
       </div>
     )
   }

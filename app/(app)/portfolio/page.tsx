@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button'
 import { Plus, Image as ImageIcon, Calendar, Tag, ExternalLink, Edit, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import type { PortfolioItem } from '@/types/social'
+import { Skeleton, SkeletonPortfolioItem } from '@/components/ui/Skeleton'
 
 export default function PortfolioPage() {
   const { user, loading: authLoading } = useAuth()
@@ -66,8 +67,19 @@ export default function PortfolioPage() {
 
   if (loading || authLoading) {
     return (
-      <div className="flex items-center justify-center py-24">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600" />
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <Skeleton className="h-9 w-48 mb-2" />
+            <Skeleton className="h-5 w-64" />
+          </div>
+          <Skeleton className="h-10 w-36" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <SkeletonPortfolioItem key={i} />
+          ))}
+        </div>
       </div>
     )
   }
