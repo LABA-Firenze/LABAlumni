@@ -187,14 +187,14 @@ export function FloatingChat() {
     <>
       <button
         onClick={() => setOpen(!open)}
-        className="fixed bottom-6 left-6 z-40 w-14 h-14 bg-primary-600 hover:bg-primary-700 text-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105"
+        className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-primary-600 hover:bg-primary-700 text-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105"
         aria-label="Messaggi"
       >
         <MessageCircle className="w-7 h-7" />
       </button>
 
       {open && (
-        <div className="fixed bottom-24 left-6 z-50 w-[380px] max-w-[calc(100vw-3rem)] bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden flex flex-col max-h-[520px]">
+        <div className="fixed bottom-24 right-6 z-50 w-[380px] max-w-[calc(100vw-3rem)] bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden flex flex-col max-h-[520px]">
           <div className="bg-primary-600 text-white px-4 py-3 flex items-center justify-between shrink-0">
             <h3 className="font-semibold">Messaggi</h3>
             <button
