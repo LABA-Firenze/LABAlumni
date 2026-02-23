@@ -232,7 +232,7 @@ export default function NewCollaborationRequestPage() {
                       key={giorno}
                       className={`px-4 py-2 rounded-xl border text-sm font-medium cursor-pointer transition-all duration-[120ms]
                         ${selectedDays.includes(giorno)
-                          ? 'bg-primary-500/12 border-primary-300/50 text-primary-700'
+                          ? 'bg-primary-600 border-primary-600 text-white'
                           : 'bg-transparent border-gray-200/80 text-gray-600 hover:bg-primary-500/6 hover:border-gray-300'
                         }`}
                     >
