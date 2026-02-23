@@ -27,6 +27,7 @@ interface AppLayoutProps {
 
 export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
   const { user } = useAuth()
+  const [profileName, setProfileName] = useState<string | null>(null)
   const [role, setRole] = useState<'student' | 'company' | null>(null)
   const [student, setStudent] = useState<Student | null>(null)
   const [company, setCompany] = useState<Company | null>(null)
@@ -36,8 +37,9 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
 
   useEffect(() => {
     if (!user) return
-    supabase.from('profiles').select('role').eq('id', user.id).single().then(({ data }: any) => {
+    supabase.from('profiles').select('role, full_name').eq('id', user.id).single().then(({ data }: any) => {
       setRole(data?.role || null)
+      setProfileName(data?.full_name || null)
     })
   }, [user])
 
@@ -79,9 +81,9 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
             <Card variant="glass" className="sticky top-24">
               <div className="text-center mb-4">
                 <div className="w-20 h-20 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full mx-auto mb-3 flex items-center justify-center text-white text-2xl font-bold">
-                  {student ? (student.course?.[0]?.toUpperCase() || 'S') : company ? (company.company_name?.[0]?.toUpperCase() || 'A') : '?'}
+                  {profileName?.[0]?.toUpperCase() || (student ? 'S' : company ? (company.company_name?.[0]?.toUpperCase() || 'A') : '?')}
                 </div>
-                <h3 className="font-semibold text-lg">{user?.email?.split('@')[0]}</h3>
+                <h3 className="font-semibold text-lg">{profileName || user?.email?.split('@')[0]}</h3>
                 {student && (
                   <p className="text-sm text-gray-600">{COURSE_CONFIG[student.course]?.name || student.course}</p>
                 )}
