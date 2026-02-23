@@ -131,3 +131,23 @@ export function SkeletonList({ rows = 5 }: { rows?: number }) {
     </div>
   )
 }
+
+/** Scopri/Discover sidebar skeleton (right sidebar dashboard) */
+export function SkeletonScopriSidebar() {
+  return (
+    <div className="rounded-2xl bg-white shadow-md border border-gray-100 p-6">
+      <div className="flex items-center gap-3 mb-4">
+        <Skeleton className="h-5 w-5 rounded" />
+        <Skeleton className="h-5 w-20" />
+      </div>
+      <div className="space-y-2">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="flex items-center gap-3 py-2">
+            <Skeleton className="h-5 w-5 shrink-0 rounded" />
+            <Skeleton className="h-4 flex-1" />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}

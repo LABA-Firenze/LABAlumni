@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { COURSE_CONFIG } from '@/types/database'
+import { SkeletonProfileSidebar, SkeletonScopriSidebar } from './ui/Skeleton'
 import type { Student, Company } from '@/types/database'
 
 interface AppLayoutProps {
@@ -69,6 +70,7 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
   }, [user, role])
 
   const hasSidebars = !!user
+  const sidebarLoading = !!user && role === null
 
   return (
     <div className="min-h-screen bg-gray-100/80">
@@ -78,6 +80,11 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
           {/* Left Sidebar - solo se loggato */}
           {hasSidebars && (
           <aside className="lg:col-span-3 space-y-6">
+            {sidebarLoading ? (
+              <div className="sticky top-24">
+                <SkeletonProfileSidebar />
+              </div>
+            ) : (
             <Card variant="glass" className="sticky top-24">
               <div className="text-center mb-4">
                 <div className="w-20 h-20 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full mx-auto mb-3 flex items-center justify-center text-white text-2xl font-bold">
@@ -136,6 +143,7 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
                 </div>
               )}
             </Card>
+            )}
           </aside>
           )}
 
@@ -145,7 +153,9 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
           {/* Right Sidebar - solo se loggato */}
           {hasSidebars && (
           <aside className="lg:col-span-3 space-y-6">
-            {rightSidebar ?? (
+            {sidebarLoading ? (
+              <SkeletonScopriSidebar />
+            ) : rightSidebar ?? (
               <Card variant="elevated">
                 <h3 className="font-semibold mb-4 flex items-center gap-3">
                   <Sparkles className="w-5 h-5 shrink-0 text-primary-600" />
