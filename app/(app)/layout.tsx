@@ -33,8 +33,8 @@ export default function DashboardLayout({
     return null
   }
 
-  // Sidebar solo in dashboard (una sola copia, da AppLayout)
-  const isDashboard = pathname === '/pannello/studente' || pathname === '/pannello/azienda'
+  // Sidebar in dashboard e proproste tesi (AppLayout)
+  const isDashboard = pathname === '/pannello/studente' || pathname === '/pannello/azienda' || pathname?.startsWith('/tesi')
   const isWidePage = pathname?.startsWith('/profilo') || pathname?.startsWith('/portfolio') ||
     pathname?.startsWith('/annunci') || pathname?.startsWith('/rete') || pathname?.startsWith('/candidature') ||
     pathname?.startsWith('/messaggi') || pathname?.startsWith('/tesi') || pathname === '/bacheca'

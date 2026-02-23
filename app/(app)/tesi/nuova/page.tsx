@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/components/AuthProvider'
 import { supabase } from '@/lib/supabase'
@@ -8,17 +8,68 @@ import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Textarea } from '@/components/ui/Textarea'
 import { Input } from '@/components/ui/Input'
-import { Loader2, BookOpen, FileText } from 'lucide-react'
+import { Select } from '@/components/ui/Select'
+import { Loader2, BookOpen, FileText, User, Users } from 'lucide-react'
+import { COURSE_CONFIG } from '@/types/database'
+import type { Docente } from '@/types/database'
+import type { Profile } from '@/types/database'
+
+interface DocenteWithProfile extends Docente {
+  profile: Profile
+}
 
 export default function NewThesisProposalPage() {
   const { user } = useAuth()
   const router = useRouter()
+  const [role, setRole] = useState<string | null>(null)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [objectives, setObjectives] = useState('')
   const [methodology, setMethodology] = useState('')
+  const [relatoreId, setRelatoreId] = useState('')
+  const [corelatoreId, setCorelatoreId] = useState('')
+  const [docenti, setDocenti] = useState<DocenteWithProfile[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (user) {
+      supabase.from('profiles').select('role').eq('id', user.id).single().then(({ data }) => setRole(data?.role || null))
+    }
+  }, [user])
+
+  useEffect(() => {
+    loadDocenti()
+  }, [])
+
+  useEffect(() => {
+    if (role && role !== 'student') {
+      router.replace('/tesi')
+    }
+  }, [role, router])
+
+  const loadDocenti = async () => {
+    const { data: docData } = await supabase
+      .from('docenti')
+      .select('*')
+      .or('can_relatore.eq.true,can_corelatore.eq.true')
+    if (!docData?.length) {
+      setDocenti([])
+      return
+    }
+    const { data: profData } = await supabase
+      .from('profiles')
+      .select('id, full_name, email')
+      .in('id', docData.map((d: { id: string }) => d.id))
+    const profMap = new Map((profData || []).map((p: { id: string }) => [p.id, p]))
+    setDocenti(docData.map((d: Docente & { id: string }) => ({
+      ...d,
+      profile: profMap.get(d.id) || { id: d.id, full_name: null, email: null },
+    })) as DocenteWithProfile[])
+  }
+
+  const relatori = docenti.filter((d) => d.can_relatore)
+  const correlatori = docenti.filter((d) => d.can_corelatore && d.id !== relatoreId)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -31,6 +82,11 @@ export default function NewThesisProposalPage() {
 
     if (!description.trim()) {
       setError('La descrizione è obbligatoria')
+      return
+    }
+
+    if (!relatoreId) {
+      setError('Seleziona un relatore')
       return
     }
 
@@ -47,6 +103,8 @@ export default function NewThesisProposalPage() {
           objectives: objectives.trim() || null,
           methodology: methodology.trim() || null,
           status: 'open',
+          relatore_id: relatoreId || null,
+          corelatore_id: corelatoreId || null,
         })
 
       if (insertError) throw insertError
@@ -59,6 +117,10 @@ export default function NewThesisProposalPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (role && role !== 'student') {
+    return null
   }
 
   return (
@@ -81,6 +143,40 @@ export default function NewThesisProposalPage() {
 
         <Card variant="elevated" className="p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Relatore (obbligatorio) */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <User className="w-4 h-4 inline mr-1.5 text-primary-600" />
+                Relatore *
+              </label>
+              <Select value={relatoreId} onChange={(e) => { setRelatoreId(e.target.value); if (e.target.value === corelatoreId) setCorelatoreId(''); }} required>
+                <option value="">Seleziona un relatore</option>
+                {relatori.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.profile?.full_name || d.profile?.email} {d.courses?.length ? `· ${d.courses.map((c: string) => COURSE_CONFIG[c as keyof typeof COURSE_CONFIG]?.name).filter(Boolean).join(', ')}` : ''}
+                  </option>
+                ))}
+              </Select>
+              <p className="text-sm text-gray-500 mt-1">Il relatore è obbligatorio. Riceverà la tua proposta.</p>
+            </div>
+
+            {/* Corelatore (opzionale) */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Users className="w-4 h-4 inline mr-1.5 text-primary-600" />
+                Corelatore
+              </label>
+              <Select value={corelatoreId} onChange={(e) => setCorelatoreId(e.target.value)}>
+                <option value="">Nessun corelatore</option>
+                {correlatori.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.profile?.full_name || d.profile?.email} {d.courses?.length ? `· ${d.courses.map((c: string) => COURSE_CONFIG[c as keyof typeof COURSE_CONFIG]?.name).filter(Boolean).join(', ')}` : ''}
+                  </option>
+                ))}
+              </Select>
+              <p className="text-sm text-gray-500 mt-1">Opzionale. Max 1 relatore + 1 corelatore.</p>
+            </div>
+
             {/* Title */}
             <div>
               <Input
@@ -156,7 +252,7 @@ export default function NewThesisProposalPage() {
               <Button
                 type="submit"
                 variant="primary"
-                disabled={loading || !title.trim() || !description.trim()}
+                disabled={loading || !title.trim() || !description.trim() || !relatoreId}
               >
                 {loading ? (
                   <>

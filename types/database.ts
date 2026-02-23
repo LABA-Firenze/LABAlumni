@@ -1,7 +1,7 @@
 // Export social types
 export * from './social'
 
-export type UserRole = 'student' | 'company'
+export type UserRole = 'student' | 'company' | 'docente'
 export type ApplicationStatus = 'pending' | 'accepted' | 'rejected'
 export type CourseType = 
   | 'graphic-design-multimedia'
@@ -35,6 +35,16 @@ export interface Student {
   phone: string | null
   matricola: string | null
   last_year_update: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface Docente {
+  id: string
+  bio: string | null
+  courses: CourseType[]
+  can_relatore: boolean
+  can_corelatore: boolean
   created_at: string
   updated_at: string
 }

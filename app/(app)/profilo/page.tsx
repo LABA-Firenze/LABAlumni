@@ -24,9 +24,10 @@ import {
   ExternalLink,
 } from 'lucide-react'
 import Link from 'next/link'
-import type { Student, Company, Profile, CourseType } from '@/types/database'
+import type { Student, Company, Docente, Profile, CourseType } from '@/types/database'
 import type { PortfolioItem } from '@/types/social'
 import { COURSE_CONFIG } from '@/types/database'
+import { ProfilePill } from '@/components/ProfilePill'
 import { SkeletonProfileSidebar, SkeletonCard, SkeletonPortfolioItem } from '@/components/ui/Skeleton'
 
 const COURSES = Object.entries(COURSE_CONFIG).map(([value, config]) => ({
@@ -41,6 +42,7 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [student, setStudent] = useState<Student | null>(null)
   const [company, setCompany] = useState<Company | null>(null)
+  const [docente, setDocente] = useState<Docente | null>(null)
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([])
   const [applications, setApplications] = useState<any[]>([])
   const [portfolioCount, setPortfolioCount] = useState(0)
@@ -137,6 +139,13 @@ export default function ProfilePage() {
           .order('created_at', { ascending: false })
           .limit(3)
         setApplications(appData || [])
+      } else if (profileData?.role === 'docente') {
+        const { data: docenteData } = await supabase
+          .from('docenti')
+          .select('*')
+          .eq('id', user.id)
+          .single()
+        setDocente(docenteData)
       } else {
         const { data: companyData } = await supabase
           .from('companies')
@@ -248,8 +257,11 @@ export default function ProfilePage() {
                     {fullName?.[0]?.toUpperCase() || (student ? 'S' : '?')}
                   </div>
                   <h3 className="font-semibold text-lg">{fullName || user?.email?.split('@')[0]}</h3>
+                  <div className="mt-1.5 flex justify-center">
+                    <ProfilePill role={profile?.role} />
+                  </div>
                   {student && (
-                    <p className="text-sm text-gray-600">{COURSE_CONFIG[student.course]?.name}</p>
+                    <p className="text-sm text-gray-600 mt-1">{COURSE_CONFIG[student.course]?.name}</p>
                   )}
                 </div>
 
@@ -453,12 +465,56 @@ export default function ProfilePage() {
     )
   }
 
+  // === PROFILO DOCENTE ===
+  if (profile?.role === 'docente') {
+    return (
+      <div className="min-h-screen bg-gray-100/80">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Card variant="elevated" className="mb-6">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                {fullName?.[0]?.toUpperCase() || 'D'}
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">{fullName || user?.email}</h1>
+                <ProfilePill role="docente" />
+                {docente && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    {docente.can_relatore && 'Relatore'}
+                    {docente.can_relatore && docente.can_corelatore && ' · '}
+                    {docente.can_corelatore && 'Corelatore'}
+                  </p>
+                )}
+              </div>
+            </div>
+            {docente?.bio && <p className="text-gray-700">{docente.bio}</p>}
+            {docente?.courses && docente.courses.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {docente.courses.map((c: string) => (
+                  <span key={c} className="px-2 py-1 bg-amber-100 text-amber-800 rounded-lg text-sm">
+                    {COURSE_CONFIG[c as CourseType]?.name || c}
+                  </span>
+                ))}
+              </div>
+            )}
+          </Card>
+          <Link href="/tesi">
+            <Button variant="primary">Proposte Tesi</Button>
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
   // === PROFILO AZIENDA (layout attuale) ===
   return (
     <div className="min-h-screen bg-gray-100/80">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Profilo Azienda</h1>
-        <p className="text-gray-600 mb-8">Gestisci i dati della tua azienda</p>
+        <div className="flex items-center gap-3 mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Profilo Azienda</h1>
+          <ProfilePill role="company" />
+        </div>
+        <p className="text-gray-600 -mt-6 mb-8">Gestisci i dati della tua azienda</p>
 
         <Card variant="elevated" className="mb-6">
           <h2 className="flex items-center gap-2 text-lg font-semibold mb-4">

@@ -19,7 +19,8 @@ import {
 import Link from 'next/link'
 import { COURSE_CONFIG } from '@/types/database'
 import { SkeletonProfileSidebar, SkeletonScopriSidebar } from './ui/Skeleton'
-import type { Student, Company } from '@/types/database'
+import type { Student, Company, Docente } from '@/types/database'
+import { ProfilePill } from './ProfilePill'
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -29,9 +30,10 @@ interface AppLayoutProps {
 export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
   const { user } = useAuth()
   const [profileName, setProfileName] = useState<string | null>(null)
-  const [role, setRole] = useState<'student' | 'company' | null>(null)
+  const [role, setRole] = useState<'student' | 'company' | 'docente' | null>(null)
   const [student, setStudent] = useState<Student | null>(null)
   const [company, setCompany] = useState<Company | null>(null)
+  const [docente, setDocente] = useState<Docente | null>(null)
   const [connectionsCount, setConnectionsCount] = useState(0)
   const [portfolioCount, setPortfolioCount] = useState(0)
   const [applicationsCount, setApplicationsCount] = useState(0)
@@ -74,6 +76,9 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
           const { count } = await supabase.from('applications').select('*', { count: 'exact', head: true }).in('job_post_id', ids)
           setApplicationsCount(count || 0)
         }
+      } else if (r === 'docente') {
+        const { data: docData } = await supabase.from('docenti').select('*').eq('id', user.id).single()
+        setDocente(docData)
       }
       setSidebarReady(true)
     }
@@ -100,14 +105,20 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
             <Card variant="glass" className="sticky top-24">
               <div className="text-center mb-4">
                 <div className="w-20 h-20 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full mx-auto mb-3 flex items-center justify-center text-white text-2xl font-bold">
-                  {profileName?.[0]?.toUpperCase() || (student ? 'S' : company ? (company.company_name?.[0]?.toUpperCase() || 'A') : '?')}
+                  {profileName?.[0]?.toUpperCase() || (student ? 'S' : company ? (company.company_name?.[0]?.toUpperCase() || 'A') : docente ? 'D' : '?')}
                 </div>
                 <h3 className="font-semibold text-lg">{profileName || user?.email?.split('@')[0]}</h3>
+                <div className="mt-1.5 flex justify-center">
+                  <ProfilePill role={role} />
+                </div>
                 {student && (
-                  <p className="text-sm text-gray-600">{COURSE_CONFIG[student.course]?.name || student.course}</p>
+                  <p className="text-sm text-gray-600 mt-1">{COURSE_CONFIG[student.course]?.name || student.course}</p>
                 )}
                 {company && (
-                  <p className="text-sm text-gray-600">{company.company_name}</p>
+                  <p className="text-sm text-gray-600 mt-1">{company.company_name}</p>
+                )}
+                {docente && (
+                  <p className="text-sm text-gray-600 mt-1">Relatore · Corelatore</p>
                 )}
               </div>
               <div className="space-y-2">
@@ -132,6 +143,14 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
                       </Button>
                     </Link>
                   </>
+                )}
+                {role === 'docente' && (
+                  <Link href="/tesi" className="block">
+                    <Button variant="primary" className="w-full justify-start" size="sm">
+                      <BookOpen className="w-4 h-4 shrink-0" />
+                      Proposte Tesi
+                    </Button>
+                  </Link>
                 )}
               </div>
               {(role === 'student' || role === 'company') && (

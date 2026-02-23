@@ -20,6 +20,8 @@ export default function DashboardRedirect() {
         .then(({ data }: any) => {
           if (data?.role === 'company') {
             router.push('/pannello/azienda')
+          } else if (data?.role === 'docente') {
+            router.push('/tesi')
           } else {
             router.push('/pannello/studente')
           }

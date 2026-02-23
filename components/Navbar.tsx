@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import { useAuth } from './AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { Button } from './ui/Button'
-import { User, LogOut, MoreHorizontal, MessageCircle, LayoutDashboard, Newspaper, Briefcase } from 'lucide-react'
+import { User, LogOut, MoreHorizontal, MessageCircle, LayoutDashboard, Newspaper, Briefcase, BookOpen } from 'lucide-react'
 import { openFloatingChat } from './FloatingChat'
 
 export function Navbar() {
@@ -41,7 +41,7 @@ export function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const dashboardHref = userRole === 'company' ? '/pannello/azienda' : '/pannello/studente'
+  const dashboardHref = userRole === 'company' ? '/pannello/azienda' : userRole === 'docente' ? '/tesi' : '/pannello/studente'
   const annunciHref = userRole === 'company' ? '/annunci/gestisci' : '/annunci'
 
   const isActive = (href: string) => {
@@ -94,6 +94,17 @@ export function Navbar() {
               >
                 <Briefcase className="w-5 h-5 shrink-0" />
                 Tirocini e Stage
+              </Link>
+              <Link
+                href="/tesi"
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  pathname?.startsWith('/tesi')
+                    ? 'bg-primary-50 text-primary-700'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <BookOpen className="w-5 h-5 shrink-0" />
+                Proposte Tesi
               </Link>
             </div>
           )}
