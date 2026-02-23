@@ -35,42 +35,54 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
   const [connectionsCount, setConnectionsCount] = useState(0)
   const [portfolioCount, setPortfolioCount] = useState(0)
   const [applicationsCount, setApplicationsCount] = useState(0)
+  const [sidebarReady, setSidebarReady] = useState(false)
 
   useEffect(() => {
     if (!user) return
-    supabase.from('profiles').select('role, full_name').eq('id', user.id).single().then(({ data }: any) => {
-      setRole(data?.role || null)
-      setProfileName(data?.full_name || null)
-    })
+
+    const loadSidebarData = async () => {
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('role, full_name')
+        .eq('id', user.id)
+        .single()
+
+      const r = profileData?.role || null
+      const pn = profileData?.full_name || null
+      setRole(r)
+      setProfileName(pn)
+
+      if (r === 'student') {
+        const [studentRes, connRes, portRes, appRes] = await Promise.all([
+          supabase.from('students').select('*').eq('id', user.id).single(),
+          supabase.from('student_connections').select('*', { count: 'exact', head: true }).or(`student1_id.eq.${user.id},student2_id.eq.${user.id}`).eq('status', 'accepted'),
+          supabase.from('portfolio_items').select('*', { count: 'exact', head: true }).eq('student_id', user.id),
+          supabase.from('applications').select('*', { count: 'exact', head: true }).eq('student_id', user.id),
+        ])
+        setStudent(studentRes.data)
+        setConnectionsCount(connRes.count || 0)
+        setPortfolioCount(portRes.count || 0)
+        setApplicationsCount(appRes.count || 0)
+      } else if (r === 'company') {
+        const [companyRes, jobsRes] = await Promise.all([
+          supabase.from('companies').select('*').eq('id', user.id).single(),
+          supabase.from('job_posts').select('id').eq('company_id', user.id),
+        ])
+        setCompany(companyRes.data)
+        const ids = (jobsRes.data || []).map((j: { id: string }) => j.id)
+        if (ids.length > 0) {
+          const { count } = await supabase.from('applications').select('*', { count: 'exact', head: true }).in('job_post_id', ids)
+          setApplicationsCount(count || 0)
+        }
+      }
+      setSidebarReady(true)
+    }
+
+    loadSidebarData()
   }, [user])
 
-  useEffect(() => {
-    if (!user || role !== 'student') return
-    supabase.from('students').select('*').eq('id', user.id).single().then(({ data }) => setStudent(data))
-    supabase.from('student_connections').select('*', { count: 'exact', head: true })
-      .or(`student1_id.eq.${user.id},student2_id.eq.${user.id}`).eq('status', 'accepted')
-      .then(({ count }) => setConnectionsCount(count || 0))
-    supabase.from('portfolio_items').select('*', { count: 'exact', head: true })
-      .eq('student_id', user.id)
-      .then(({ count }) => setPortfolioCount(count || 0))
-    supabase.from('applications').select('*', { count: 'exact', head: true })
-      .eq('student_id', user.id)
-      .then(({ count }) => setApplicationsCount(count || 0))
-  }, [user, role])
-
-  useEffect(() => {
-    if (!user || role !== 'company') return
-    supabase.from('companies').select('*').eq('id', user.id).single().then(({ data }) => setCompany(data))
-    supabase.from('job_posts').select('id').eq('company_id', user.id).then(({ data: jobs }) => {
-      const ids = jobs?.map((j: { id: string }) => j.id) || []
-      if (ids.length === 0) return setApplicationsCount(0)
-      supabase.from('applications').select('*', { count: 'exact', head: true }).in('job_post_id', ids)
-        .then(({ count }) => setApplicationsCount(count || 0))
-    })
-  }, [user, role])
-
   const hasSidebars = !!user
-  const sidebarLoading = !!user && role === null
+  const sidebarLoading = !!user && !sidebarReady
 
   return (
     <div className="min-h-screen bg-gray-100/80">
