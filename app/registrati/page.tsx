@@ -435,12 +435,19 @@ export default function RegisterPage() {
             </div>
           </form>
 
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-2">
             <p className="text-gray-600">
               Hai già un account?{' '}
               <Link href="/accedi" className="text-primary-600 font-medium hover:text-primary-700 hover:underline transition-colors">
                 Accedi
               </Link>
+            </p>
+            <p className="text-gray-500 text-xs">
+              Sei un docente?{' '}
+              <Link href="/registrazione/docente" className="text-primary-600 hover:underline">Registrati come docente</Link>
+              {' · '}
+              Sei un&apos;azienda?{' '}
+              <Link href="/registrazione/azienda" className="text-primary-600 hover:underline">Registra azienda</Link>
             </p>
           </div>
         </Card>

@@ -98,9 +98,11 @@ export default function LoginPage() {
             <div className="mt-6 text-center space-y-2">
               <p className="text-gray-600 text-sm">
                 Non hai un account?{' '}
-                <Link href="/registrati" className="text-primary-600 font-medium hover:text-primary-700 hover:underline transition-colors">
-                  Registrati
-                </Link>
+                <Link href="/registrati" className="text-primary-600 font-medium hover:underline">Studente</Link>
+                {' · '}
+                <Link href="/registrazione/docente" className="text-primary-600 font-medium hover:underline">Docente</Link>
+                {' · '}
+                <Link href="/registrazione/azienda" className="text-primary-600 font-medium hover:underline">Azienda</Link>
               </p>
               <Link href="/" className="block text-gray-500 text-sm hover:text-primary-600 transition-colors">
                 ← Torna alla home
