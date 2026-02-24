@@ -232,7 +232,7 @@ export default function ThesisDetailPage() {
 
         <Card variant="elevated" className="overflow-hidden">
           {/* Header */}
-          <div className="p-8 border-b border-gray-200 bg-gradient-to-r from-primary-50 to-primary-100">
+          <div className="p-8 border-b border-gray-200 bg-gradient-to-r from-primary-50 to-primary-100 rounded-t-2xl">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 <h1 className="text-3xl font-bold text-gray-900 mb-4">{proposal.title}</h1>
