@@ -67,7 +67,7 @@ export default function Home() {
         <div className="absolute top-16 right-16 w-72 h-72 bg-white/5 rounded-full blur-3xl" />
         <div className="absolute bottom-16 left-16 w-96 h-96 bg-primary-400/10 rounded-full blur-3xl" />
         
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-4xl mx-auto">
             <div className="flex items-center justify-center gap-3 mb-8 animate-fade-in">
               <GraduationCap className="w-10 h-10 text-white/90" />
@@ -185,7 +185,7 @@ export default function Home() {
 
       {/* Features Section */}
       <section className="bg-gray-100/80 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
             Cosa puoi fare
           </h2>
@@ -280,7 +280,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <p className="text-lg font-semibold mb-2">LABAlumni</p>
             <p className="text-gray-400">Piattaforma di job placement per LABA Firenze</p>

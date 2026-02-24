@@ -55,6 +55,9 @@ module.exports = {
         'float': 'float 6s ease-in-out infinite',
         'scroll-horizontal': 'scrollHorizontal 30s linear infinite',
       },
+      maxWidth: {
+        '8xl': '90rem', // 1440px - leggermente più largo del 7xl (1280px)
+      },
       keyframes: {
         fadeIn: {
           '0%': { opacity: '0' },
