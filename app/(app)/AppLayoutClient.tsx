@@ -33,7 +33,7 @@ export default function AppLayoutClient({
     return null
   }
 
-  const isDashboard = pathname === '/pannello/studente' || pathname === '/pannello/azienda' || pathname?.startsWith('/tesi')
+  const isDashboard = pathname === '/pannello/studente' || pathname === '/pannello/azienda'
   const isWidePage = pathname?.startsWith('/profilo') || pathname?.startsWith('/portfolio') ||
     pathname?.startsWith('/annunci') || pathname?.startsWith('/azienda') || pathname?.startsWith('/rete') ||
     pathname?.startsWith('/candidature') || pathname?.startsWith('/messaggi') || pathname?.startsWith('/tesi') ||
