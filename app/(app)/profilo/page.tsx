@@ -223,7 +223,7 @@ export default function ProfilePage() {
   if (loading || authLoading) {
     return (
       <div className="min-h-screen bg-gray-100/80">
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid lg:grid-cols-12 gap-6">
             <aside className="lg:col-span-3">
               <SkeletonProfileSidebar />
@@ -247,7 +247,7 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen bg-gray-100/80">
 
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid lg:grid-cols-12 gap-6">
             {/* Sidebar sinistra (come dashboard) */}
             <aside className="lg:col-span-3 space-y-6">

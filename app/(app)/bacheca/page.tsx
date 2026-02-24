@@ -90,7 +90,7 @@ export default function CommunityPage() {
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
               <Newspaper className="w-8 h-8 text-primary-600" />
-              Bacheca Comunitaria
+              Bacheca
             </h1>
             <p className="text-gray-600 mt-2">Notizie e aggiornamenti dalle aziende</p>
           </div>

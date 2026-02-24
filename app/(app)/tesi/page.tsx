@@ -105,7 +105,7 @@ export default function ThesisPage() {
   }
 
   return (
-      <div className="max-w-5xl mx-auto space-y-6">
+      <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
@@ -168,7 +168,7 @@ export default function ThesisPage() {
             )}
           </Card>
         ) : (
-          <div className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {thesisProposals.map((proposal) => (
               <Card key={proposal.id} variant="elevated" className="overflow-hidden hover:shadow-lg transition-shadow">
                 {/* Header */}

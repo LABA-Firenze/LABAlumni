@@ -192,7 +192,7 @@ export default function PublicProfilePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100/80">
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid lg:grid-cols-12 gap-6">
             <aside className="lg:col-span-3">
               <SkeletonProfileSidebar />
@@ -226,7 +226,7 @@ export default function PublicProfilePage() {
 
     return (
       <div className="min-h-screen bg-gray-100/80">
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Link
             href="/rete"
             className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 text-sm font-medium mb-6"
