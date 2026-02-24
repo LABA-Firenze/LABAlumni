@@ -242,13 +242,14 @@ export default function NetworkPage() {
 
   return (
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <Users className="w-8 h-8 text-primary-600" />
-            Network
-          </h1>
-          <p className="text-gray-600 mt-2">Connettiti con studenti e scopri le aziende</p>
-          <div className="flex gap-2 mt-4">
+        <Card variant="elevated" className="p-6 bg-gradient-to-br from-primary-50/60 to-white border-primary-100/60">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+              <Users className="w-8 h-8 text-primary-600" />
+              Network
+            </h1>
+            <p className="text-gray-600 mt-2">Connettiti con studenti e scopri le aziende</p>
+            <div className="flex gap-2 mt-4">
             <button
               onClick={() => setTab('studenti')}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -274,7 +275,8 @@ export default function NetworkPage() {
               Docenti
             </button>
           </div>
-        </div>
+          </div>
+        </Card>
 
         {/* Pending Connection Requests */}
         {pendingConnections.length > 0 && (

@@ -86,21 +86,23 @@ export default function CommunityPage() {
 
   return (
     <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <Newspaper className="w-8 h-8 text-primary-600" />
-              Bacheca
-            </h1>
-            <p className="text-gray-600 mt-2">Notizie e aggiornamenti dalle aziende</p>
+        <Card variant="elevated" className="p-6 bg-gradient-to-br from-primary-50/60 to-white border-primary-100/60">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                <Newspaper className="w-8 h-8 text-primary-600" />
+                Bacheca
+              </h1>
+              <p className="text-gray-600 mt-2">Notizie e aggiornamenti dalle aziende</p>
+            </div>
+            {isCompany && (
+              <Button variant="primary" onClick={() => setShowForm(true)}>
+                <Plus className="w-5 h-5 mr-2" />
+                Nuovo Post
+              </Button>
+            )}
           </div>
-          {isCompany && (
-            <Button variant="primary" onClick={() => setShowForm(true)}>
-              <Plus className="w-5 h-5 mr-2" />
-              Nuovo Post
-            </Button>
-          )}
-        </div>
+        </Card>
 
         {isCompany && showForm && (
           <Card variant="elevated" className="mb-6">

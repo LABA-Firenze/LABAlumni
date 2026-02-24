@@ -106,25 +106,27 @@ export default function ThesisPage() {
 
   return (
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <BookOpen className="w-8 h-8 text-primary-600" />
-              Proposte di Tesi
-            </h1>
-            <p className="text-gray-600 mt-2">
-              {role === 'student' ? 'Pubblica la tua proposta o esplora quelle esistenti' : 'Esplora le proposte aperte e candidati come relatore'}
-            </p>
+        <Card variant="elevated" className="p-6 bg-gradient-to-br from-primary-50/60 to-white border-primary-100/60">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                <BookOpen className="w-8 h-8 text-primary-600" />
+                Proposte di Tesi
+              </h1>
+              <p className="text-gray-600 mt-2">
+                {role === 'student' ? 'Pubblica la tua proposta o esplora quelle esistenti' : 'Esplora le proposte aperte e candidati come relatore'}
+              </p>
+            </div>
+            {role === 'student' && (
+              <Link href="/tesi/nuova">
+                <Button variant="primary">
+                  <PlusCircle className="w-5 h-5 mr-2" />
+                  Nuova Proposta
+                </Button>
+              </Link>
+            )}
           </div>
-          {role === 'student' && (
-            <Link href="/tesi/nuova">
-              <Button variant="primary">
-                <PlusCircle className="w-5 h-5 mr-2" />
-                Nuova Proposta
-              </Button>
-            </Link>
-          )}
-        </div>
+        </Card>
 
         {/* Filters */}
         <Card variant="elevated" className="p-4 mb-6">

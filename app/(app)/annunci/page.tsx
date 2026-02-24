@@ -89,13 +89,13 @@ export default function JobsPage() {
 
   return (
     <div className="space-y-6">
-        <div>
+        <Card variant="elevated" className="p-6 bg-gradient-to-br from-primary-50/60 to-white border-primary-100/60">
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
             <Briefcase className="w-8 h-8 text-primary-600" />
             Tirocini e Stage
           </h1>
           <p className="text-gray-600 mt-2">Trova le opportunità giuste per te</p>
-        </div>
+        </Card>
 
         {/* Filters */}
         <Card variant="elevated" className="mb-6">
