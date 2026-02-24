@@ -17,7 +17,7 @@ export default function AppLayoutClient({
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/accedi')
+      router.push('/')
     }
   }, [user, loading, router])
 

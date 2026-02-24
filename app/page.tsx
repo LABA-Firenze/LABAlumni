@@ -173,7 +173,7 @@ export default function Home() {
                     <span className="text-gray-700">Entra in contatto diretto</span>
                   </li>
                 </ul>
-                <Link href="/registrati" className="inline-flex items-center gap-2 mt-6 text-accent-600 font-semibold hover:text-accent-700 transition-colors">
+                <Link href="/registrazione/azienda" className="inline-flex items-center gap-2 mt-6 text-accent-600 font-semibold hover:text-accent-700 transition-colors">
                   Registra la tua azienda
                   <ArrowRight className="w-4 h-4" />
                 </Link>
