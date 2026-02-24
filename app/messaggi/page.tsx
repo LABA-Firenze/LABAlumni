@@ -204,14 +204,14 @@ export default function MessagesPage() {
 
   if (loading || authLoading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100/80 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-100/80">
       <Navbar />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -227,7 +227,7 @@ export default function MessagesPage() {
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Conversations list */}
           <div className="lg:col-span-1">
-            <Card>
+            <Card variant="elevated">
               <div className="mb-4">
                 <div className="relative">
                   <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -292,7 +292,7 @@ export default function MessagesPage() {
           {/* Messages view */}
           <div className="lg:col-span-2">
             {selectedConversation ? (
-              <Card>
+              <Card variant="elevated">
                 <div className="mb-6 pb-4 border-b border-gray-200">
                   <h2 className="text-xl font-semibold">
                     {conversations.get(selectedConversation)?.user.full_name ||
@@ -353,7 +353,7 @@ export default function MessagesPage() {
                 </form>
               </Card>
             ) : (
-              <Card className="text-center py-16">
+              <Card variant="elevated" className="text-center py-16">
                 <Mail className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-600">
                   {userRole === 'student'
@@ -365,7 +365,7 @@ export default function MessagesPage() {
 
             {/* Nuovo messaggio: solo per aziende */}
             {!selectedConversation && userRole === 'company' && (
-              <Card className="mt-6">
+              <Card variant="elevated" className="mt-6">
                 <h2 className="text-xl font-semibold mb-4">Nuovo Messaggio</h2>
                 <form onSubmit={handleSendMessage} className="space-y-4">
                   <Select

@@ -67,14 +67,14 @@ export default function PortfolioPage() {
 
   if (loading || authLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100/80 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100/80">
       <Navbar />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -94,7 +94,7 @@ export default function PortfolioPage() {
 
         {/* Portfolio Grid */}
         {portfolioItems.length === 0 ? (
-          <Card className="p-12 text-center">
+          <Card variant="elevated" className="p-12 text-center">
             <ImageIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold mb-2">Il tuo portfolio è vuoto</h3>
             <p className="text-gray-600 mb-6">Inizia a condividere i tuoi lavori e progetti!</p>
@@ -105,7 +105,7 @@ export default function PortfolioPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {portfolioItems.map((item) => (
-              <Card key={item.id} className="overflow-hidden hover:shadow-xl transition-shadow group">
+              <Card key={item.id} variant="elevated" className="overflow-hidden hover:shadow-xl transition-shadow group">
                 {/* Image */}
                 {item.images && item.images.length > 0 && (
                   <div className="relative aspect-video bg-gray-200 overflow-hidden">

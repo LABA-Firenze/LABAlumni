@@ -128,14 +128,14 @@ export default function StudentDashboard() {
 
   if (loading || authLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100/80 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100/80">
       <Navbar />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -144,8 +144,8 @@ export default function StudentDashboard() {
           
           {/* Left Sidebar */}
           <aside className="lg:col-span-3 space-y-6">
-            {/* Profile Summary Card */}
-            <Card className="sticky top-24">
+            {/* Profile Summary Card - leggero glass */}
+            <Card variant="glass" className="sticky top-24">
               <div className="text-center mb-4">
                 <div className="w-20 h-20 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full mx-auto mb-3 flex items-center justify-center text-white text-2xl font-bold">
                   {student ? (student.course?.[0]?.toUpperCase() || 'S') : 'S'}
@@ -192,39 +192,12 @@ export default function StudentDashboard() {
                 </div>
               </div>
             </Card>
-
-            {/* Quick Links */}
-            <Card>
-              <h3 className="font-semibold mb-4 flex items-center gap-3">
-                <Sparkles className="w-5 h-5 shrink-0 text-primary-600" />
-                Scopri
-              </h3>
-              <div className="space-y-2">
-                <Link href="/rete" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
-                  <Users className="w-5 h-5 shrink-0" />
-                  <span>Network</span>
-                  {connectionsCount > 0 && (
-                    <span className="ml-auto px-2 py-0.5 bg-primary-100 text-primary-700 rounded-full text-xs font-medium">
-                      {connectionsCount}
-                    </span>
-                  )}
-                </Link>
-                <Link href="/tesi" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
-                  <BookOpen className="w-5 h-5 shrink-0" />
-                  <span>Proposte Tesi</span>
-                </Link>
-                <Link href="/annunci" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
-                  <Briefcase className="w-5 h-5 shrink-0" />
-                  <span>Annunci Lavoro</span>
-                </Link>
-              </div>
-            </Card>
           </aside>
 
           {/* Main Feed */}
           <main className="lg:col-span-6 space-y-4">
-            {/* Create Collaboration Request Card */}
-            <Card className="p-4 bg-gradient-to-r from-primary-50 to-primary-100 border-primary-200">
+            {/* Create Collaboration Request Card - blu per interattività */}
+            <Card variant="interactive" padding={false} className="p-4 bg-gradient-to-r from-primary-50 via-primary-50/80 to-primary-100/90 border-primary-200/60 shadow-md">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 shrink-0 bg-gradient-to-br from-primary-500 to-primary-700 rounded-full flex items-center justify-center text-white">
                   <Briefcase className="w-5 h-5 shrink-0" />
@@ -234,7 +207,7 @@ export default function StudentDashboard() {
                     <input
                       type="text"
                       placeholder="Pubblica una richiesta di collaborazione, tirocinio o stage..."
-                      className="w-full px-4 py-2 border border-primary-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 cursor-pointer bg-white"
+                      className="w-full px-4 py-3 border border-primary-200/80 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400 cursor-pointer bg-white shadow-sm"
                       readOnly
                     />
                   </Link>
@@ -249,7 +222,7 @@ export default function StudentDashboard() {
             {postLoading ? (
               <div className="space-y-4">
                 {[...Array(3)].map((_, i) => (
-                  <Card key={i} className="p-6">
+                  <Card key={i} variant="elevated" className="p-6">
                     <div className="animate-pulse space-y-4">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
@@ -265,7 +238,7 @@ export default function StudentDashboard() {
                 ))}
               </div>
             ) : posts.length === 0 ? (
-              <Card className="p-12 text-center">
+              <Card variant="elevated" className="p-12 text-center">
                 <Sparkles className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-2">Il tuo feed è vuoto</h3>
                 <p className="text-gray-600 mb-6">Inizia a seguire aziende e studenti per vedere i loro post!</p>
@@ -289,14 +262,14 @@ export default function StudentDashboard() {
           {/* Right Sidebar */}
           <aside className="lg:col-span-3 space-y-6">
             {/* Recent Applications */}
-            <Card>
-              <div className="flex items-center justify-between gap-4 mb-4">
-                <h3 className="font-semibold flex items-center gap-3 min-w-0">
+            <Card variant="elevated">
+              <div className="flex items-start justify-between gap-3 mb-4">
+                <h3 className="font-semibold flex items-center gap-3 flex-1 min-w-0">
                   <TrendingUp className="w-5 h-5 shrink-0 text-primary-600" />
-                  <span className="truncate">Le Tue Candidature</span>
+                  <span className="break-words">Le Tue Candidature</span>
                 </h3>
-                <Link href="/candidature">
-                  <Button variant="ghost" size="sm">Vedi tutte</Button>
+                <Link href="/candidature" className="shrink-0">
+                  <Button variant="ghost" size="sm" className="whitespace-nowrap">Vedi tutte</Button>
                 </Link>
               </div>
 
@@ -323,12 +296,31 @@ export default function StudentDashboard() {
               )}
             </Card>
 
-            {/* Suggested Companies */}
-            <Card>
-              <h3 className="font-semibold mb-4">Aziende Consigliate</h3>
-              <p className="text-sm text-gray-500 text-center py-4">
-                Prossimamente
-              </p>
+            {/* Scopri */}
+            <Card variant="elevated">
+              <h3 className="font-semibold mb-4 flex items-center gap-3">
+                <Sparkles className="w-5 h-5 shrink-0 text-primary-600" />
+                Scopri
+              </h3>
+              <div className="space-y-2">
+                <Link href="/rete" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
+                  <Users className="w-5 h-5 shrink-0" />
+                  <span>Network</span>
+                  {connectionsCount > 0 && (
+                    <span className="ml-auto px-2 py-0.5 bg-primary-100 text-primary-700 rounded-full text-xs font-medium">
+                      {connectionsCount}
+                    </span>
+                  )}
+                </Link>
+                <Link href="/tesi" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
+                  <BookOpen className="w-5 h-5 shrink-0" />
+                  <span>Proposte Tesi</span>
+                </Link>
+                <Link href="/annunci" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
+                  <Briefcase className="w-5 h-5 shrink-0" />
+                  <span>Annunci Lavoro</span>
+                </Link>
+              </div>
             </Card>
           </aside>
         </div>

@@ -12,6 +12,11 @@ export interface Post {
   thesis_proposal_id: string | null
   request_type?: 'tirocinio' | 'stage' | 'collaborazione' | 'lavoro' | 'tesi' | null
   request_courses?: string[] | null
+  request_from?: 'student' | 'company' | null
+  available_days?: string | null
+  available_hours_total?: number | null
+  work_hours?: number | null
+  interested_days?: string | null
   likes_count: number
   comments_count: number
   shares_count: number
@@ -26,6 +31,7 @@ export interface Post {
   }
   job_post?: any
   portfolio_item?: PortfolioItem
+  student_course?: string
   thesis_proposal?: ThesisProposal
   is_liked?: boolean
   comments?: PostComment[]
@@ -89,6 +95,8 @@ export interface ThesisProposal {
   methodology: string | null
   documents: string[] | null
   status: 'open' | 'in_progress' | 'completed' | 'cancelled'
+  relatore_id: string | null
+  corelatore_id: string | null
   created_at: string
   updated_at: string
   // Extended fields

@@ -209,14 +209,14 @@ export default function EditPortfolioItemPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100/80 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100/80">
       <Navbar />
       
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -230,7 +230,7 @@ export default function EditPortfolioItemPage() {
           <h1 className="text-3xl font-bold text-gray-900">Modifica Lavoro</h1>
         </div>
 
-        <Card className="p-6">
+        <Card variant="elevated" className="p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Title */}
             <div>

@@ -84,7 +84,7 @@ export default function JobDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100/80 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     )
@@ -92,10 +92,10 @@ export default function JobDetailPage() {
 
   if (!job) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-gray-100/80">
         <Navbar />
         <div className="max-w-4xl mx-auto px-4 py-16">
-          <Card className="text-center py-12">
+          <Card variant="elevated" className="text-center py-12">
             <p className="text-gray-600 text-lg">Annuncio non trovato</p>
             <Link href="/annunci">
               <Button variant="primary" className="mt-4">Torna agli annunci</Button>
@@ -107,7 +107,7 @@ export default function JobDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-100/80">
       <Navbar />
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -115,7 +115,7 @@ export default function JobDetailPage() {
           <Button variant="ghost" size="sm" className="mb-6">← Torna agli annunci</Button>
         </Link>
 
-        <Card className="mb-6">
+        <Card variant="elevated" className="mb-6">
           <div className="mb-6">
             <div className="flex items-center gap-3 mb-4">
               <span className="px-3 py-1 bg-primary-50 text-primary text-sm rounded-full font-medium">
@@ -165,7 +165,7 @@ export default function JobDetailPage() {
         </Card>
 
         {/* Company info */}
-        <Card className="mb-6">
+        <Card variant="elevated" className="mb-6">
           <h2 className="text-xl font-semibold mb-4">Informazioni Azienda</h2>
           <div className="space-y-2">
             <p className="font-medium text-lg">{job.company.company_name}</p>
@@ -187,7 +187,7 @@ export default function JobDetailPage() {
 
         {/* Application form */}
         {user && !hasApplied && (
-          <Card>
+          <Card variant="elevated">
             <h2 className="text-xl font-semibold mb-4">Candidati per questa posizione</h2>
             <div className="space-y-4">
               <Textarea
@@ -210,7 +210,7 @@ export default function JobDetailPage() {
         )}
 
         {hasApplied && (
-          <Card className="bg-green-50 border-green-200">
+          <Card variant="elevated" className="bg-green-50/90 border-green-200/60">
             <p className="text-green-800 font-medium">
               ✓ Hai già inviato la tua candidatura per questa posizione
             </p>
@@ -218,7 +218,7 @@ export default function JobDetailPage() {
         )}
 
         {!user && (
-          <Card className="bg-blue-50 border-blue-200">
+          <Card variant="elevated" className="bg-blue-50/90 border-blue-200/60">
             <p className="text-blue-800 mb-4">
               Accedi o registrati per candidarti a questa posizione
             </p>

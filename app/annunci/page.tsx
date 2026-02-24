@@ -88,7 +88,7 @@ export default function JobsPage() {
   )
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-100/80">
       <Navbar />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -98,7 +98,7 @@ export default function JobsPage() {
         </div>
 
         {/* Filters */}
-        <Card className="mb-6">
+        <Card variant="elevated" className="mb-6">
           <div className="grid md:grid-cols-2 gap-4">
             <Input
               placeholder="Cerca annunci..."
@@ -124,14 +124,14 @@ export default function JobsPage() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
           </div>
         ) : filteredJobs.length === 0 ? (
-          <Card className="text-center py-12">
+          <Card variant="elevated" className="text-center py-12">
             <Briefcase className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-600 text-lg">Nessun annuncio trovato</p>
           </Card>
         ) : (
           <div className="space-y-4">
             {filteredJobs.map((job) => (
-              <Card key={job.id} className="hover:shadow-lg transition-shadow">
+              <Card key={job.id} variant="elevated" className="hover:shadow-lg transition-shadow">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
