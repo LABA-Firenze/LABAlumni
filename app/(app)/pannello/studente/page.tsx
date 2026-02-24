@@ -218,10 +218,10 @@ export default function StudentDashboard() {
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-gray-900">
-                    Cerchi uno stage o vuoi proporre una collaborazione?
+                    Pubblica una richiesta di stage o collaborazione
                   </h3>
                   <p className="text-sm text-gray-600 mt-0.5">
-                    Pubblica una richiesta o scopri opportunità attive.
+                    Scopri le opportunità attive e fatti trovare dalle aziende
                   </p>
                 </div>
                 <Link href="/richieste/nuova" className="shrink-0">
