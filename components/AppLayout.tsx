@@ -109,7 +109,7 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
                 <div className="w-20 h-20 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full mx-auto mb-3 flex items-center justify-center text-white text-2xl font-bold">
                   {profileName?.[0]?.toUpperCase() || (student ? 'S' : company ? (company.company_name?.[0]?.toUpperCase() || 'A') : docente ? 'D' : '?')}
                 </div>
-                <h3 className="font-semibold text-lg">{profileName || user?.email?.split('@')[0]}</h3>
+                <h3 className="font-semibold text-lg uppercase">{profileName || user?.email?.split('@')[0]}</h3>
                 <div className="mt-1.5 flex justify-center">
                   <ProfilePill role={role} />
                 </div>
