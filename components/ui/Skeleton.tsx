@@ -24,23 +24,94 @@ export function SkeletonText({ className = '', width = 'w-full' }: { className?:
   return <Skeleton className={`h-4 ${width} ${className}`} />
 }
 
-/** Card skeleton - placeholder for Card component */
+/** Card skeleton - placeholder per PostCard e card generiche (no image block per evitare layout shift) */
 export function SkeletonCard({ lines = 3 }: { lines?: number }) {
   return (
-    <div className="rounded-2xl bg-white shadow-md border border-gray-100 p-6">
-      <div className="flex items-center gap-3 mb-4">
-        <SkeletonAvatar className="w-12 h-12 shrink-0" />
-        <div className="flex-1 space-y-2">
-          <SkeletonText width="w-1/3" />
-          <SkeletonText width="w-1/4" />
+    <div className="rounded-2xl bg-white shadow-md shadow-gray-200/80 border border-gray-100 overflow-hidden">
+      <div className="p-4 pb-3 border-b border-gray-200">
+        <div className="flex items-center gap-3">
+          <SkeletonAvatar className="w-10 h-10 shrink-0" />
+          <div className="flex-1 space-y-1">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-3 w-16" />
+          </div>
         </div>
       </div>
-      <div className="space-y-2">
+      <div className="p-4 space-y-2">
         {[...Array(lines)].map((_, i) => (
-          <SkeletonText key={i} width={i === lines - 1 ? 'w-2/3' : 'w-full'} />
+          <SkeletonText key={i} width={i === lines - 1 ? 'w-3/4' : 'w-full'} />
         ))}
       </div>
-      <div className="mt-4 h-32 rounded-lg bg-gray-200 animate-pulse" />
+    </div>
+  )
+}
+
+/** Thesis proposal card skeleton - match tesi card layout */
+export function SkeletonThesisCard() {
+  return (
+    <div className="rounded-2xl bg-white shadow-md shadow-gray-200/80 border border-gray-100 overflow-hidden">
+      <div className="p-6 border-b border-gray-200">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-6 w-3/4" />
+            <div className="flex gap-4">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-4 w-40" />
+            </div>
+          </div>
+          <Skeleton className="h-6 w-16 rounded-full shrink-0" />
+        </div>
+      </div>
+      <div className="p-6 space-y-4">
+        <div>
+          <Skeleton className="h-4 w-24 mb-2" />
+          <div className="space-y-1">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-2/3" />
+          </div>
+        </div>
+        <div>
+          <Skeleton className="h-4 w-20 mb-2" />
+          <div className="space-y-1">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-4/5" />
+          </div>
+        </div>
+        <div>
+          <Skeleton className="h-4 w-24 mb-2" />
+          <div className="space-y-1">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-3/4" />
+          </div>
+        </div>
+        <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+          <Skeleton className="h-4 w-40" />
+          <Skeleton className="h-9 w-20 rounded-lg" />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/** Bacheca community post skeleton */
+export function SkeletonBachecaCard() {
+  return (
+    <div className="rounded-2xl bg-white shadow-md shadow-gray-200/80 border border-gray-100 p-6">
+      <div className="flex items-start gap-4 mb-4">
+        <SkeletonAvatar className="w-12 h-12 shrink-0" />
+        <div className="flex-1 space-y-1">
+          <Skeleton className="h-5 w-48" />
+          <Skeleton className="h-4 w-24" />
+        </div>
+      </div>
+      <Skeleton className="h-8 w-3/4 mb-3" />
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-2/3" />
+      </div>
     </div>
   )
 }
@@ -71,52 +142,73 @@ export function SkeletonProfileSidebar() {
   )
 }
 
-/** Portfolio grid item skeleton */
+/** Portfolio grid item skeleton - match portfolio card layout */
 export function SkeletonPortfolioItem() {
   return (
-    <div className="rounded-2xl bg-white shadow-md border overflow-hidden">
+    <div className="rounded-2xl bg-white shadow-md shadow-gray-200/80 border border-gray-100 overflow-hidden">
       <Skeleton className="aspect-video w-full rounded-none" />
       <div className="p-4 space-y-2">
         <Skeleton className="h-5 w-3/4" />
         <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-9 w-full rounded-lg" />
+        <Skeleton className="h-4 w-4/5" />
+        <div className="flex gap-3 pt-1">
+          <Skeleton className="h-4 w-12" />
+          <Skeleton className="h-4 w-16" />
+        </div>
+        <Skeleton className="h-9 w-full rounded-lg mt-2" />
       </div>
     </div>
   )
 }
 
-/** Job/annuncio card skeleton */
+/** Job/annuncio card skeleton - match Card annunci layout */
 export function SkeletonJobCard() {
   return (
-    <div className="rounded-2xl bg-white shadow-md border border-gray-100 p-6">
-      <div className="flex gap-3 mb-3">
-        <Skeleton className="h-6 w-48" />
-        <Skeleton className="h-6 w-20 rounded-full" />
+    <div className="rounded-2xl bg-white shadow-md shadow-gray-200/80 border border-gray-100 p-6">
+      <div className="flex justify-between items-start">
+        <div className="flex-1">
+          <div className="flex items-center gap-3 mb-2">
+            <Skeleton className="h-6 w-48" />
+            <Skeleton className="h-6 w-20 rounded-full" />
+          </div>
+          <div className="flex items-center gap-4 mb-3">
+            <Skeleton className="h-4 w-36" />
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-4 w-20" />
+          </div>
+          <div className="space-y-2 mb-4">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-4/5" />
+          </div>
+          <div className="flex gap-2 mb-4">
+            <Skeleton className="h-6 w-16 rounded-full" />
+            <Skeleton className="h-6 w-20 rounded-full" />
+            <Skeleton className="h-6 w-24 rounded-full" />
+          </div>
+          <Skeleton className="h-10 w-24 rounded-full" />
+        </div>
       </div>
-      <div className="flex gap-4 mb-3">
-        <Skeleton className="h-4 w-32" />
-        <Skeleton className="h-4 w-24" />
-      </div>
-      <div className="space-y-2 mb-4">
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-2/3" />
-      </div>
-      <Skeleton className="h-10 w-24" />
     </div>
   )
 }
 
-/** Application card skeleton */
+/** Application card skeleton - match candidature card layout */
 export function SkeletonApplicationCard() {
   return (
-    <div className="rounded-2xl bg-white shadow-md border border-gray-100 p-6">
-      <div className="flex justify-between gap-4 mb-2">
-        <Skeleton className="h-6 w-56" />
-        <Skeleton className="h-8 w-20 rounded-full" />
+    <div className="rounded-2xl bg-white shadow-md shadow-gray-200/80 border border-gray-100 p-6">
+      <div className="flex justify-between items-start">
+        <div className="flex-1">
+          <div className="flex items-center gap-3 mb-2 flex-wrap">
+            <Skeleton className="h-6 w-48" />
+            <Skeleton className="h-7 w-24 rounded-full" />
+          </div>
+          <Skeleton className="h-4 w-56 mb-2" />
+          <div className="flex items-center gap-4 mt-2">
+            <Skeleton className="h-4 w-32" />
+          </div>
+        </div>
+        <Skeleton className="h-9 w-24 rounded-lg shrink-0" />
       </div>
-      <Skeleton className="h-4 w-40 mb-3" />
-      <Skeleton className="h-16 w-full rounded-lg mb-3" />
-      <Skeleton className="h-4 w-32" />
     </div>
   )
 }

@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/Textarea'
 import { Plus, Building2, Newspaper } from 'lucide-react'
 import Link from 'next/link'
 import type { CommunityPost } from '@/types/database'
-import { SkeletonCard } from '@/components/ui/Skeleton'
+import { SkeletonBachecaCard } from '@/components/ui/Skeleton'
 
 export default function CommunityPage() {
   const { user } = useAuth()
@@ -146,7 +146,7 @@ export default function CommunityPage() {
         {loading ? (
           <div className="space-y-6">
             {[1, 2, 3].map((i) => (
-              <SkeletonCard key={i} lines={4} />
+              <SkeletonBachecaCard key={i} />
             ))}
           </div>
         ) : posts.length === 0 ? (

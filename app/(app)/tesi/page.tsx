@@ -11,7 +11,7 @@ import Link from 'next/link'
 import type { ThesisProposal } from '@/types/social'
 import type { Student, Profile } from '@/types/database'
 import { COURSE_CONFIG } from '@/types/database'
-import { SkeletonCard } from '@/components/ui/Skeleton'
+import { SkeletonThesisCard } from '@/components/ui/Skeleton'
 
 interface ThesisProposalWithStudent extends ThesisProposal {
   student: Student & { profile: Profile }
@@ -97,7 +97,7 @@ export default function ThesisPage() {
         </div>
         <div className="space-y-4">
           {[1, 2, 3, 4].map((i) => (
-            <SkeletonCard key={i} lines={4} />
+            <SkeletonThesisCard key={i} />
           ))}
         </div>
       </div>
