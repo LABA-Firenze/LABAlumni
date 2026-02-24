@@ -24,6 +24,7 @@ import { COURSE_CONFIG } from '@/types/database'
 import { ProfilePill } from '@/components/ProfilePill'
 import { PostCard } from '@/components/PostCard'
 import { SkeletonProfileSidebar, SkeletonCard } from '@/components/ui/Skeleton'
+import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 
 export default function PublicProfilePage() {
   const params = useParams()
@@ -42,6 +43,7 @@ export default function PublicProfilePage() {
   const [connectionStatus, setConnectionStatus] = useState<'none' | 'connected' | 'pending' | 'sent'>('none')
   const [isCurrentUserStudent, setIsCurrentUserStudent] = useState(false)
   const isOwnProfile = user?.id === profileId
+  const showSkeleton = useMinimumLoading(loading)
 
   useEffect(() => {
     if (user) {
@@ -189,7 +191,7 @@ export default function PublicProfilePage() {
     }
   }
 
-  if (loading) {
+  if (showSkeleton) {
     return (
       <div className="min-h-screen bg-gray-100/80">
         <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

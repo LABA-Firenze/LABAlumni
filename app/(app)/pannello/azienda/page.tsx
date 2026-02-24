@@ -13,6 +13,7 @@ import type { Company, JobPost, Application } from '@/types/database'
 import type { Post } from '@/types/social'
 import { PostCard } from '@/components/PostCard'
 import { SkeletonCard } from '@/components/ui/Skeleton'
+import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 
 export default function CompanyDashboard() {
   const { user, loading: authLoading } = useAuth()
@@ -23,6 +24,7 @@ export default function CompanyDashboard() {
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
   const [postLoading, setPostLoading] = useState(true)
+  const showSkeleton = useMinimumLoading(loading)
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -124,7 +126,7 @@ export default function CompanyDashboard() {
     }
   }
 
-  if (loading || authLoading) {
+  if (showSkeleton || authLoading) {
     return (
       <div className="space-y-4">
         <div className="rounded-2xl bg-white p-6 animate-pulse">

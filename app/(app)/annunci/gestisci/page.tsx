@@ -14,6 +14,7 @@ import Link from 'next/link'
 import type { JobPost, CourseType } from '@/types/database'
 import { COURSE_CONFIG } from '@/types/database'
 import { SkeletonJobCard } from '@/components/ui/Skeleton'
+import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 
 const JOB_TYPES = ['tirocinio', 'stage', 'collaborazione', 'lavoro']
 
@@ -34,6 +35,7 @@ export default function ManageJobsPage() {
   const [location, setLocation] = useState('')
   const [remote, setRemote] = useState(false)
   const [active, setActive] = useState(true)
+  const showSkeleton = useMinimumLoading(loading)
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -160,7 +162,7 @@ export default function ManageJobsPage() {
     }
   }
 
-  if (loading || authLoading) {
+  if (showSkeleton || authLoading) {
     return (
       <div className="space-y-6">
         <div>

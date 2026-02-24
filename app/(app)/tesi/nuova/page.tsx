@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useAuth } from '@/components/AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { Card } from '@/components/ui/Card'
@@ -31,6 +32,7 @@ export default function NewThesisProposalPage() {
   const [docenti, setDocenti] = useState<DocenteWithProfile[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [existingProposal, setExistingProposal] = useState<{ id: string; title: string } | null>(null)
 
   useEffect(() => {
     if (user) {
@@ -47,6 +49,19 @@ export default function NewThesisProposalPage() {
       router.replace(role === 'company' ? '/pannello/azienda' : '/tesi')
     }
   }, [role, router])
+
+  useEffect(() => {
+    if (user && role === 'student') {
+      supabase
+        .from('thesis_proposals')
+        .select('id, title')
+        .eq('student_id', user.id)
+        .in('status', ['open', 'in_progress'])
+        .limit(1)
+        .maybeSingle()
+        .then(({ data }) => setExistingProposal(data || null))
+    }
+  }, [user, role])
 
   const loadDocenti = async () => {
     const { data: docData } = await supabase
@@ -155,6 +170,23 @@ export default function NewThesisProposalPage() {
           <p className="text-gray-600 mt-2">Pubblica la tua proposta di tesi per trovare un relatore</p>
         </div>
 
+        {existingProposal ? (
+          <Card variant="elevated" className="p-6 text-center">
+            <div className="space-y-4">
+              <p className="text-lg text-gray-700">
+                Hai già una proposta di tesi attiva. Per crearne una nuova, elimina prima quella esistente.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Link href={`/tesi/${existingProposal.id}`} className="inline-flex">
+                  <Button variant="primary">Vai alla tua proposta</Button>
+                </Link>
+                <Button variant="outline" onClick={() => router.push('/tesi')}>
+                  Torna alle proposte
+                </Button>
+              </div>
+            </div>
+          </Card>
+        ) : (
         <Card variant="elevated" className="p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Relatore (opzionale) */}
@@ -283,6 +315,7 @@ export default function NewThesisProposalPage() {
             </div>
           </form>
         </Card>
+        )}
       </div>
     </div>
   )

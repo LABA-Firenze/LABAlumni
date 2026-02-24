@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Briefcase, MapPin, Clock, Building2, Globe, ArrowLeft } from 'lucide-react'
 import { SkeletonJobCard } from '@/components/ui/Skeleton'
+import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 import type { Company } from '@/types/database'
 import { COURSE_CONFIG } from '@/types/database'
 
@@ -18,6 +19,7 @@ export default function AziendaPage() {
   const [company, setCompany] = useState<Company | null>(null)
   const [jobs, setJobs] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const showSkeleton = useMinimumLoading(loading)
 
   useEffect(() => {
     loadCompany()
@@ -59,7 +61,7 @@ export default function AziendaPage() {
     }
   }
 
-  if (loading) {
+  if (showSkeleton) {
     return (
       <div className="space-y-6">
         <div className="h-8 w-48 rounded-lg bg-gray-200 animate-pulse" />

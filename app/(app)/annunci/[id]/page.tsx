@@ -12,6 +12,7 @@ import Link from 'next/link'
 import type { JobPost } from '@/types/database'
 import { COURSE_CONFIG } from '@/types/database'
 import { SkeletonJobCard } from '@/components/ui/Skeleton'
+import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 
 export default function JobDetailPage() {
   const params = useParams()
@@ -22,6 +23,7 @@ export default function JobDetailPage() {
   const [loading, setLoading] = useState(true)
   const [applying, setApplying] = useState(false)
   const [hasApplied, setHasApplied] = useState(false)
+  const showSkeleton = useMinimumLoading(loading)
 
   useEffect(() => {
     loadJob()
@@ -82,7 +84,7 @@ export default function JobDetailPage() {
     }
   }
 
-  if (loading) {
+  if (showSkeleton) {
     return (
       <div className="space-y-6">
         <SkeletonJobCard />

@@ -10,6 +10,7 @@ import { ArrowLeft, Calendar, Tag, Video, Image as ImageIcon, Edit, Trash2, Chev
 import Link from 'next/link'
 import type { PortfolioItem } from '@/types/social'
 import { SkeletonPortfolioItem } from '@/components/ui/Skeleton'
+import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 
 export default function PortfolioItemDetailPage() {
   const { user } = useAuth()
@@ -20,6 +21,7 @@ export default function PortfolioItemDetailPage() {
   const [loading, setLoading] = useState(true)
   const [carouselOpen, setCarouselOpen] = useState(false)
   const [carouselIndex, setCarouselIndex] = useState(0)
+  const showSkeleton = useMinimumLoading(loading)
 
   useEffect(() => {
     if (itemId) {
@@ -76,7 +78,7 @@ export default function PortfolioItemDetailPage() {
     }
   }
 
-  if (loading) {
+  if (showSkeleton) {
     return (
       <div className="space-y-6">
         <div className="h-6 w-24 rounded-lg bg-gray-200 animate-pulse" />

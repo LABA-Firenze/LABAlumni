@@ -6,7 +6,16 @@ import { usePathname } from 'next/navigation'
 import { useAuth } from './AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { Button } from './ui/Button'
-import { User, LogOut, MoreHorizontal, MessageCircle, LayoutDashboard, Newspaper, Briefcase, BookOpen } from 'lucide-react'
+import {
+  UserCircleIcon,
+  ArrowRightOnRectangleIcon,
+  EllipsisHorizontalIcon,
+  ChatBubbleLeftRightIcon,
+  Squares2X2Icon,
+  NewspaperIcon,
+  BriefcaseIcon,
+  BookOpenIcon,
+} from '@heroicons/react/24/solid'
 import { openFloatingChat } from './FloatingChat'
 import { HeaderSearch } from './HeaderSearch'
 
@@ -73,7 +82,7 @@ export function Navbar() {
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                <LayoutDashboard className="w-5 h-5 shrink-0" />
+                <Squares2X2Icon className="w-5 h-5 shrink-0" />
                 Dashboard
               </Link>
               <Link
@@ -84,7 +93,7 @@ export function Navbar() {
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                <Newspaper className="w-5 h-5 shrink-0" />
+                <NewspaperIcon className="w-5 h-5 shrink-0" />
                 Bacheca
               </Link>
               <Link
@@ -95,7 +104,7 @@ export function Navbar() {
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                <Briefcase className="w-5 h-5 shrink-0" />
+                <BriefcaseIcon className="w-5 h-5 shrink-0" />
                 Tirocini e Stage
               </Link>
               {userRole !== 'company' && (
@@ -107,7 +116,7 @@ export function Navbar() {
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                <BookOpen className="w-5 h-5 shrink-0" />
+                <BookOpenIcon className="w-5 h-5 shrink-0" />
                 Proposte Tesi
               </Link>
               )}
@@ -121,7 +130,7 @@ export function Navbar() {
                       className="p-2 rounded-full text-gray-600 hover:bg-gray-100 transition-colors"
                       aria-label="Menu"
                     >
-                      <MoreHorizontal className="w-6 h-6" />
+                      <EllipsisHorizontalIcon className="w-6 h-6" />
                     </button>
                     {menuOpen && (
                       <div className="absolute right-0 mt-1 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
@@ -130,7 +139,7 @@ export function Navbar() {
                           onClick={() => setMenuOpen(false)}
                           className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50"
                         >
-                          <User className="w-5 h-5 shrink-0 text-gray-500" />
+                          <UserCircleIcon className="w-5 h-5 shrink-0 text-gray-500" />
                           <span>Profilo</span>
                         </Link>
                         <button
@@ -140,7 +149,7 @@ export function Navbar() {
                           }}
                           className="flex items-center gap-3 w-full px-4 py-3 text-left text-gray-700 hover:bg-gray-50"
                         >
-                          <MessageCircle className="w-5 h-5 shrink-0 text-gray-500" />
+                          <ChatBubbleLeftRightIcon className="w-5 h-5 shrink-0 text-gray-500" />
                           <span>Messaggi</span>
                         </button>
                         <div className="border-t border-gray-100 my-1" />
@@ -151,7 +160,7 @@ export function Navbar() {
                           }}
                           className="flex items-center gap-3 w-full px-4 py-3 text-red-600 hover:bg-red-50"
                         >
-                          <LogOut className="w-5 h-5 shrink-0" />
+                          <ArrowRightOnRectangleIcon className="w-5 h-5 shrink-0" />
                           <span>Esci</span>
                         </button>
                       </div>

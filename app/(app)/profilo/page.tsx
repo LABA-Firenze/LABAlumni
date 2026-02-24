@@ -29,6 +29,7 @@ import type { PortfolioItem } from '@/types/social'
 import { COURSE_CONFIG } from '@/types/database'
 import { ProfilePill } from '@/components/ProfilePill'
 import { SkeletonProfileSidebar, SkeletonCard, SkeletonPortfolioItem } from '@/components/ui/Skeleton'
+import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 
 const COURSES = Object.entries(COURSE_CONFIG).map(([value, config]) => ({
   value: value as CourseType,
@@ -70,6 +71,7 @@ export default function ProfilePage() {
   const [cap, setCap] = useState('')
   const [province, setProvince] = useState('')
   const [country, setCountry] = useState('Italia')
+  const showSkeleton = useMinimumLoading(loading)
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -220,7 +222,7 @@ export default function ProfilePage() {
     }
   }
 
-  if (loading || authLoading) {
+  if (showSkeleton || authLoading) {
     return (
       <div className="min-h-screen bg-gray-100/80">
         <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

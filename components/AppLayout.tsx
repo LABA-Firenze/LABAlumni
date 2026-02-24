@@ -7,17 +7,18 @@ import { Navbar } from './Navbar'
 import { Card } from './ui/Card'
 import { Button } from './ui/Button'
 import {
-  User,
-  FolderOpen,
-  Plus,
-  Briefcase,
-  Users,
-  BookOpen,
-  Sparkles,
-  TrendingUp,
-} from 'lucide-react'
+  UserCircleIcon,
+  FolderOpenIcon,
+  PlusIcon,
+  BriefcaseIcon,
+  UsersIcon,
+  BookOpenIcon,
+  SparklesIcon,
+  ArrowTrendingUpIcon,
+} from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import { COURSE_CONFIG } from '@/types/database'
+import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 import { SkeletonProfileSidebar, SkeletonScopriSidebar } from './ui/Skeleton'
 import type { Student, Company, Docente } from '@/types/database'
 import { ProfilePill } from './ProfilePill'
@@ -87,7 +88,8 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
   }, [user])
 
   const hasSidebars = !!user
-  const sidebarLoading = !!user && !sidebarReady
+  const sidebarLoadingRaw = !!user && !sidebarReady
+  const sidebarLoading = useMinimumLoading(sidebarLoadingRaw)
 
   return (
     <div className="min-h-screen bg-gray-100/80">
@@ -124,7 +126,7 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
               <div className="space-y-2">
                 <Link href="/profilo" className="block">
                   <Button variant="outline" className="w-full justify-start" size="sm">
-                    <User className="w-4 h-4 shrink-0" />
+                    <UserCircleIcon className="w-4 h-4 shrink-0" />
                     Profilo
                   </Button>
                 </Link>
@@ -132,13 +134,13 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
                   <>
                     <Link href="/portfolio" className="block">
                       <Button variant="outline" className="w-full justify-start" size="sm">
-                        <FolderOpen className="w-4 h-4 shrink-0" />
+                        <FolderOpenIcon className="w-4 h-4 shrink-0" />
                         Portfolio
                       </Button>
                     </Link>
                     <Link href="/portfolio/nuovo" className="block">
                       <Button variant="primary" className="w-full justify-start" size="sm">
-                        <Plus className="w-4 h-4 shrink-0" />
+                        <PlusIcon className="w-4 h-4 shrink-0" />
                         Aggiungi Lavoro
                       </Button>
                     </Link>
@@ -147,7 +149,7 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
                 {role === 'docente' && (
                   <Link href="/tesi" className="block">
                     <Button variant="primary" className="w-full justify-start" size="sm">
-                      <BookOpen className="w-4 h-4 shrink-0" />
+                      <BookOpenIcon className="w-4 h-4 shrink-0" />
                       Proposte Tesi
                     </Button>
                   </Link>
@@ -189,13 +191,13 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
             ) : rightSidebar ?? (
               <Card variant="elevated">
                 <h3 className="font-semibold mb-4 flex items-center gap-3">
-                  <Sparkles className="w-5 h-5 shrink-0 text-primary-600" />
+                  <SparklesIcon className="w-5 h-5 shrink-0 text-primary-600" />
                   Scopri
                 </h3>
                 <div className="space-y-2">
                   {role === 'student' && (
                     <Link href="/rete" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
-                      <Users className="w-5 h-5 shrink-0" />
+                      <UsersIcon className="w-5 h-5 shrink-0" />
                       <span>Network</span>
                       {connectionsCount > 0 && (
                         <span className="ml-auto px-2 py-0.5 bg-primary-100 text-primary-700 rounded-full text-xs font-medium">
@@ -206,17 +208,17 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
                   )}
                   {role !== 'company' && (
                   <Link href="/tesi" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
-                    <BookOpen className="w-5 h-5 shrink-0" />
+                    <BookOpenIcon className="w-5 h-5 shrink-0" />
                     <span>Proposte Tesi</span>
                   </Link>
                   )}
                   <Link href={role === 'company' ? '/annunci/gestisci' : '/annunci'} className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
-                    <Briefcase className="w-5 h-5 shrink-0" />
+                    <BriefcaseIcon className="w-5 h-5 shrink-0" />
                     <span>Tirocini e Stage</span>
                   </Link>
                   {role === 'student' && (
                     <Link href="/candidature" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
-                      <TrendingUp className="w-5 h-5 shrink-0" />
+                      <ArrowTrendingUpIcon className="w-5 h-5 shrink-0" />
                       <span>Le Tue Candidature</span>
                     </Link>
                   )}

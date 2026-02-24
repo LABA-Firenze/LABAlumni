@@ -13,6 +13,7 @@ import { COURSE_CONFIG, type CourseType } from '@/types/database'
 import type { Student, Profile } from '@/types/database'
 import type { StudentConnection } from '@/types/social'
 import { SkeletonCard } from '@/components/ui/Skeleton'
+import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 
 interface StudentWithProfile extends Student {
   profile: Profile
@@ -31,6 +32,7 @@ export default function NetworkPage() {
   const [tab, setTab] = useState<'studenti' | 'aziende' | 'docenti'>('studenti')
   const [companies, setCompanies] = useState<{ id: string; company_name: string; logo_url: string | null; industry: string | null }[]>([])
   const [docenti, setDocenti] = useState<{ id: string; full_name: string | null; avatar_url: string | null; courses?: string[] }[]>([])
+  const showSkeleton = useMinimumLoading(loading)
 
   useEffect(() => {
     setSearchQuery(qFromUrl)
@@ -206,7 +208,7 @@ export default function NetworkPage() {
     loadNetwork()
   }, [searchQuery, filterCourse, user])
 
-  if (loading || authLoading) {
+  if (showSkeleton || authLoading) {
     return (
       <div className="space-y-6">
         <div>

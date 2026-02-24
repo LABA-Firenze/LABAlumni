@@ -11,6 +11,7 @@ import { Plus, Building2, Newspaper } from 'lucide-react'
 import Link from 'next/link'
 import type { CommunityPost } from '@/types/database'
 import { SkeletonBachecaCard } from '@/components/ui/Skeleton'
+import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 
 export default function CommunityPage() {
   const { user } = useAuth()
@@ -21,6 +22,7 @@ export default function CommunityPage() {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [isCompany, setIsCompany] = useState(false)
+  const showSkeleton = useMinimumLoading(loading)
 
   useEffect(() => {
     loadPosts()
@@ -145,7 +147,7 @@ export default function CommunityPage() {
           </Card>
         )}
 
-        {loading ? (
+        {showSkeleton ? (
           <div className="space-y-6">
             {[1, 2, 3].map((i) => (
               <SkeletonBachecaCard key={i} />

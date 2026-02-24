@@ -10,6 +10,7 @@ import { Select } from '@/components/ui/Select'
 import { Briefcase, MapPin, Clock } from 'lucide-react'
 import Link from 'next/link'
 import { SkeletonJobCard } from '@/components/ui/Skeleton'
+import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 import type { JobPost, CourseType } from '@/types/database'
 import { COURSE_CONFIG } from '@/types/database'
 
@@ -28,6 +29,7 @@ export default function JobsPage() {
   const [search, setSearch] = useState('')
   const [selectedCourse, setSelectedCourse] = useState<CourseType | 'all'>('all')
   const [studentCourse, setStudentCourse] = useState<CourseType | null>(null)
+  const showSkeleton = useMinimumLoading(loading)
 
   useEffect(() => {
     if (user) {
@@ -119,7 +121,7 @@ export default function JobsPage() {
         </Card>
 
         {/* Jobs list */}
-        {loading ? (
+        {showSkeleton ? (
           <div className="space-y-4">
             {[1, 2, 3, 4].map((i) => (
               <SkeletonJobCard key={i} />

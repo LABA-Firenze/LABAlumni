@@ -12,6 +12,7 @@ import { APPLICATION_STATUS_CONFIG } from '@/lib/application-status'
 import type { Application, JobPost, Student } from '@/types/database'
 import { COURSE_CONFIG } from '@/types/database'
 import { SkeletonApplicationCard } from '@/components/ui/Skeleton'
+import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 
 export default function ManageApplicationsPage() {
   const { user, loading: authLoading } = useAuth()
@@ -19,6 +20,7 @@ export default function ManageApplicationsPage() {
   const [applications, setApplications] = useState<(Application & { job_post: JobPost; student: Student & { profile: any } })[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<'all' | 'pending' | 'accepted' | 'rejected'>('all')
+  const showSkeleton = useMinimumLoading(loading)
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -125,7 +127,7 @@ export default function ManageApplicationsPage() {
     ? applications 
     : applications.filter(app => app.status === filter)
 
-  if (loading || authLoading) {
+  if (showSkeleton || authLoading) {
     return (
       <div className="space-y-6">
         <div>

@@ -6,12 +6,13 @@ import { useAuth } from '@/components/AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { BookOpen, Calendar, User, FileText, ArrowLeft, ThumbsUp, Check, X } from 'lucide-react'
+import { BookOpen, Calendar, User, FileText, ArrowLeft, ThumbsUp, Check, X, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import type { ThesisProposal } from '@/types/social'
 import type { Student, Profile } from '@/types/database'
 import { COURSE_CONFIG } from '@/types/database'
 import { SkeletonCard } from '@/components/ui/Skeleton'
+import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 
 interface ThesisProposalWithStudent extends ThesisProposal {
   student: Student & { profile: Profile }
@@ -47,6 +48,7 @@ export default function ThesisDetailPage() {
   const [corelatoreApps, setCorelatoreApps] = useState<Application[]>([])
   const [actionLoading, setActionLoading] = useState(false)
   const [docenteNames, setDocenteNames] = useState<Record<string, string>>({})
+  const showSkeleton = useMinimumLoading(loading)
 
   const loadAll = useCallback(async () => {
     if (!thesisId) return
@@ -183,6 +185,22 @@ export default function ThesisDetailPage() {
     }
   }
 
+  const handleDelete = async () => {
+    if (!user || !thesisId || !isOwner || actionLoading) return
+    if (!confirm('Vuoi eliminare questa proposta? Potrai crearne una nuova dopo.')) return
+    setActionLoading(true)
+    try {
+      const { error } = await supabase.from('thesis_proposals').delete().eq('id', thesisId)
+      if (error) throw error
+      router.push('/tesi')
+      router.refresh()
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
   const statusLabels = {
     open: 'Aperta',
     in_progress: 'In corso',
@@ -197,7 +215,7 @@ export default function ThesisDetailPage() {
     cancelled: 'bg-red-100 text-red-700 border-red-200',
   }
 
-  if (loading) {
+  if (showSkeleton) {
     return (
       <div className="space-y-6">
         <div className="h-6 w-24 rounded-lg bg-gray-200 animate-pulse" />
@@ -411,10 +429,18 @@ export default function ThesisDetailPage() {
           {/* Footer Actions */}
           {(isOwner || isDocente) && (
             <div className="p-6 border-t border-gray-200 bg-gray-50">
-              <div className="flex justify-end gap-3">
-                <Link href="/tesi">
-                  <Button variant="outline">Torna alle Proposte</Button>
-                </Link>
+              <div className="flex flex-wrap justify-between items-center gap-3">
+                {isOwner && (
+                  <Button variant="outline" onClick={handleDelete} disabled={actionLoading} className="text-red-600 border-red-300 hover:bg-red-50">
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Elimina proposta
+                  </Button>
+                )}
+                <div className="flex gap-3 ml-auto">
+                  <Link href="/tesi">
+                    <Button variant="outline">Torna alle Proposte</Button>
+                  </Link>
+                </div>
               </div>
             </div>
           )}

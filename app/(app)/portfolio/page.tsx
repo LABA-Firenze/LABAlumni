@@ -10,12 +10,14 @@ import { Plus, Image as ImageIcon, Calendar, Tag, ExternalLink, Edit, Trash2 } f
 import Link from 'next/link'
 import type { PortfolioItem } from '@/types/social'
 import { Skeleton, SkeletonPortfolioItem } from '@/components/ui/Skeleton'
+import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 
 export default function PortfolioPage() {
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([])
   const [loading, setLoading] = useState(true)
+  const showSkeleton = useMinimumLoading(loading)
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -65,7 +67,7 @@ export default function PortfolioPage() {
     }
   }
 
-  if (loading || authLoading) {
+  if (showSkeleton || authLoading) {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">

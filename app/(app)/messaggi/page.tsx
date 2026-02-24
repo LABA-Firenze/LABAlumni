@@ -12,6 +12,7 @@ import { Select } from '@/components/ui/Select'
 import { Send, Mail, User, Building2, Search } from 'lucide-react'
 import type { Message, Profile } from '@/types/database'
 import { Skeleton, SkeletonCard } from '@/components/ui/Skeleton'
+import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 
 export default function MessagesPage() {
   const { user, loading: authLoading } = useAuth()
@@ -29,6 +30,7 @@ export default function MessagesPage() {
   const [newMessage, setNewMessage] = useState({ recipient_id: '', subject: '', content: '' })
   const [conversationMessage, setConversationMessage] = useState({ subject: '', content: '' })
   const [searchTerm, setSearchTerm] = useState('')
+  const showSkeleton = useMinimumLoading(loading)
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -202,7 +204,7 @@ export default function MessagesPage() {
       new Date(a.lastMessage?.created_at || 0).getTime()
     )
 
-  if (loading || authLoading) {
+  if (showSkeleton || authLoading) {
     return (
       <div className="flex gap-6 min-h-[400px]">
         <div className="w-80 shrink-0 space-y-3">

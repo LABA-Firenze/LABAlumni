@@ -10,6 +10,7 @@ import { Briefcase } from 'lucide-react'
 import Link from 'next/link'
 import { APPLICATION_STATUS_CONFIG } from '@/lib/application-status'
 import { SkeletonApplicationCard } from '@/components/ui/Skeleton'
+import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 import type { Application, JobPost } from '@/types/database'
 
 export default function ApplicationsPage() {
@@ -17,6 +18,7 @@ export default function ApplicationsPage() {
   const router = useRouter()
   const [applications, setApplications] = useState<(Application & { job_post: JobPost & { company: any } })[]>([])
   const [loading, setLoading] = useState(true)
+  const showSkeleton = useMinimumLoading(loading)
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -53,7 +55,7 @@ export default function ApplicationsPage() {
     }
   }
 
-  if (loading || authLoading) {
+  if (showSkeleton || authLoading) {
     return (
       <div className="space-y-6">
         <div>

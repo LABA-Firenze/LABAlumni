@@ -6,12 +6,13 @@ import { useAuth } from '@/components/AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { Briefcase, Users, ArrowRight, Building2 } from 'lucide-react'
+import { BriefcaseIcon, UsersIcon, ArrowRightIcon, BuildingOffice2Icon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import type { Student, JobPost, Application } from '@/types/database'
 import type { Post } from '@/types/social'
 import { PostCard } from '@/components/PostCard'
 import { SkeletonCard } from '@/components/ui/Skeleton'
+import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 
 export default function StudentDashboard() {
   const { user, loading: authLoading } = useAuth()
@@ -26,6 +27,7 @@ export default function StudentDashboard() {
   const [myRequest, setMyRequest] = useState<Post | null>(null)
   const [loading, setLoading] = useState(true)
   const [postLoading, setPostLoading] = useState(true)
+  const showSkeleton = useMinimumLoading(loading)
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -195,7 +197,7 @@ export default function StudentDashboard() {
   }
 
 
-  if (loading || authLoading) {
+  if (showSkeleton || authLoading) {
     return (
       <div className="space-y-4">
         <div className="rounded-2xl bg-white shadow-md border border-gray-100 p-6 animate-pulse">
@@ -226,7 +228,7 @@ export default function StudentDashboard() {
                 </div>
                 <Link href="/richieste/nuova" className="shrink-0">
                   <Button variant="primary" size="lg" className="w-full sm:w-auto">
-                    <Briefcase className="w-5 h-5 mr-2" />
+                    <BriefcaseIcon className="w-5 h-5 mr-2" />
                     Pubblica richiesta
                   </Button>
                 </Link>
@@ -253,7 +255,7 @@ export default function StudentDashboard() {
                 {/* Stato vuoto motivazionale */}
                 <Card variant="elevated" className="p-10 text-center">
                   <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-primary-100 flex items-center justify-center">
-                    <Users className="w-8 h-8 text-primary-600" />
+                    <UsersIcon className="w-8 h-8 text-primary-600" />
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">Qui iniziano le tue opportunità.</h3>
                   <p className="text-gray-600 mb-8 max-w-md mx-auto">
@@ -279,13 +281,13 @@ export default function StudentDashboard() {
                           <Card variant="elevated" className="p-4 hover:shadow-lg transition-shadow h-full">
                             <div className="flex gap-3">
                               <div className="w-10 h-10 shrink-0 rounded-lg bg-primary-100 flex items-center justify-center">
-                                <Building2 className="w-5 h-5 text-primary-600" />
+                                <BuildingOffice2Icon className="w-5 h-5 text-primary-600" />
                               </div>
                               <div className="min-w-0 flex-1">
                                 <p className="font-medium text-gray-900 truncate">{job.title}</p>
                                 <p className="text-sm text-gray-500 truncate">{job.company?.company_name}</p>
                                 <span className="inline-block mt-2 text-xs text-primary-600 font-medium">
-                                  Vedi dettagli <ArrowRight className="w-3 h-3 inline" />
+                                  Vedi dettagli <ArrowRightIcon className="w-3 h-3 inline" />
                                 </span>
                               </div>
                             </div>

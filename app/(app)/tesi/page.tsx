@@ -12,6 +12,7 @@ import type { ThesisProposal } from '@/types/social'
 import type { Student, Profile } from '@/types/database'
 import { COURSE_CONFIG } from '@/types/database'
 import { SkeletonThesisCard } from '@/components/ui/Skeleton'
+import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 
 interface ThesisProposalWithStudent extends ThesisProposal {
   student: Student & { profile: Profile }
@@ -24,6 +25,8 @@ export default function ThesisPage() {
   const [loading, setLoading] = useState(true)
   const [filterStatus, setFilterStatus] = useState<string>('open')
   const [role, setRole] = useState<string | null>(null)
+  const [hasActiveProposal, setHasActiveProposal] = useState(false)
+  const showSkeleton = useMinimumLoading(loading)
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -42,6 +45,21 @@ export default function ThesisPage() {
       loadThesisProposals()
     }
   }, [user, authLoading, router, filterStatus])
+
+  useEffect(() => {
+    if (!user || role !== 'student') {
+      setHasActiveProposal(false)
+      return
+    }
+    supabase
+      .from('thesis_proposals')
+      .select('id')
+      .eq('student_id', user.id)
+      .in('status', ['open', 'in_progress'])
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => setHasActiveProposal(!!data))
+  }, [user?.id, role])
 
   const loadThesisProposals = async () => {
     try {
@@ -85,7 +103,7 @@ export default function ThesisPage() {
     cancelled: 'bg-red-100 text-red-700 border-red-200',
   }
 
-  if (loading || authLoading) {
+  if (showSkeleton || authLoading) {
     return (
       <div className="space-y-6">
         <div className="flex justify-between">
@@ -117,7 +135,7 @@ export default function ThesisPage() {
                 {role === 'student' ? 'Pubblica la tua proposta o esplora quelle esistenti' : 'Esplora le proposte aperte e candidati come relatore'}
               </p>
             </div>
-            {role === 'student' && (
+            {role === 'student' && !hasActiveProposal && (
               <Link href="/tesi/nuova">
                 <Button variant="primary">
                   <PlusCircle className="w-5 h-5 mr-2" />
@@ -163,7 +181,7 @@ export default function ThesisPage() {
                 : 'Nessuna proposta al momento. Potrai candidarti come relatore quando gli studenti ne pubblicheranno.'
               }
             </p>
-            {filterStatus === 'open' && role === 'student' && (
+            {filterStatus === 'open' && role === 'student' && !hasActiveProposal && (
               <Link href="/tesi/nuova">
                 <Button variant="primary">Pubblica la Prima Proposta</Button>
               </Link>
