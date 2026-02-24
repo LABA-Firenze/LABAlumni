@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase'
 import { Navbar } from '@/components/Navbar'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
-import { Briefcase, Users, MessageSquare, Newspaper, GraduationCap, ArrowRight, FileCheck, Send, Search } from 'lucide-react'
+import { Briefcase, Users, MessageSquare, Newspaper, GraduationCap, ArrowRight, FileCheck, Send, Search, BookOpen } from 'lucide-react'
 import Link from 'next/link'
 
 export default function Home() {
@@ -115,9 +115,9 @@ export default function Home() {
       <section className="py-16 lg:py-24 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-center text-gray-900 mb-12">
-            Una piattaforma, due percorsi
+            Una piattaforma, tre percorsi
           </h2>
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Per Studenti */}
             <div className="relative overflow-hidden rounded-2xl border-2 border-primary-100 bg-gradient-to-br from-primary-50 to-white p-8 shadow-sm hover:shadow-md transition-shadow">
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary-200/20 rounded-full -translate-y-1/2 translate-x-1/2" />
@@ -175,6 +175,37 @@ export default function Home() {
                 </ul>
                 <Link href="/registrati" className="inline-flex items-center gap-2 mt-6 text-accent-600 font-semibold hover:text-accent-700 transition-colors">
                   Registra la tua azienda
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Per Docenti */}
+            <div className="relative overflow-hidden rounded-2xl border-2 border-amber-100 bg-gradient-to-br from-amber-50 to-white p-8 shadow-sm hover:shadow-md transition-shadow">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-200/20 rounded-full -translate-y-1/2 translate-x-1/2" />
+              <div className="relative">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 rounded-xl bg-amber-600 flex items-center justify-center">
+                    <BookOpen className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-amber-800">Per Docenti</h3>
+                </div>
+                <ul className="space-y-4">
+                  <li className="flex items-start gap-3">
+                    <MessageSquare className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                    <span className="text-gray-700">Inizia conversazioni con aziende e studenti</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <BookOpen className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                    <span className="text-gray-700">Proposte tesi e relatore</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Users className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                    <span className="text-gray-700">Candidati come relatore o corelatore</span>
+                  </li>
+                </ul>
+                <Link href="/registrazione/docente" className="inline-flex items-center gap-2 mt-6 text-amber-600 font-semibold hover:text-amber-700 transition-colors">
+                  Registrati come docente
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
