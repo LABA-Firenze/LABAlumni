@@ -64,7 +64,7 @@ export function Navbar() {
           {!loading && user && <HeaderSearch />}
 
           {!loading && user && (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 shrink-0 ml-auto">
               <Link
                 href={dashboardHref}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -111,10 +111,7 @@ export function Navbar() {
                 Proposte Tesi
               </Link>
               )}
-            </div>
-          )}
-
-          <div className="flex items-center gap-2">
+              <div className="flex items-center gap-0.5 pl-1">
             {!loading && (
               <>
                 {user ? (
@@ -172,7 +169,9 @@ export function Navbar() {
                 )}
               </>
             )}
-          </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </nav>

@@ -56,8 +56,8 @@ module.exports = {
         'scroll-horizontal': 'scrollHorizontal 30s linear infinite',
       },
       maxWidth: {
-        '8xl': '96rem',  // 1536px - layout principale
-        '9xl': '112rem', // 1792px - pagine extra larghe
+        '8xl': '96rem',   // 1536px - layout principale
+        '9xl': '100rem',  // 1600px - pagine larghe (evita troppo wide)
       },
       keyframes: {
         fadeIn: {
