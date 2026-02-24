@@ -6,7 +6,7 @@ import { useAuth } from '@/components/AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { BookOpen, Plus, FileText, Calendar, User, PlusCircle } from 'lucide-react'
+import { BookOpenIcon, DocumentTextIcon, CalendarIcon, UserIcon, PlusCircleIcon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import type { ThesisProposal } from '@/types/social'
 import type { Student, Profile } from '@/types/database'
@@ -106,14 +106,23 @@ export default function ThesisPage() {
   if (showSkeleton || authLoading) {
     return (
       <div className="space-y-6">
-        <div className="flex justify-between">
-          <div>
-            <div className="h-9 w-56 rounded-lg bg-gray-200 animate-pulse mb-2" />
-            <div className="h-5 w-80 rounded-lg bg-gray-200 animate-pulse" />
+        <Card variant="elevated" className="p-6 bg-gradient-to-br from-primary-50/60 to-white border-primary-100/60">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="space-y-2">
+              <div className="h-8 w-56 rounded-lg bg-gray-200/80 animate-pulse" />
+              <div className="h-4 w-80 rounded-lg bg-gray-200/60 animate-pulse" />
+            </div>
+            <div className="h-10 w-32 rounded-lg bg-gray-200/60 animate-pulse shrink-0" />
           </div>
-          <div className="h-10 w-36 rounded-lg bg-gray-200 animate-pulse" />
-        </div>
-        <div className="space-y-4">
+        </Card>
+        <Card variant="elevated" className="p-4 mb-6">
+          <div className="flex gap-2 flex-wrap">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-9 w-20 rounded-full bg-gray-200 animate-pulse" />
+            ))}
+          </div>
+        </Card>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {[1, 2, 3, 4].map((i) => (
             <SkeletonThesisCard key={i} />
           ))}
@@ -128,7 +137,7 @@ export default function ThesisPage() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                <BookOpen className="w-8 h-8 text-primary-600" />
+                <BookOpenIcon className="w-8 h-8 text-primary-600" />
                 Proposte di Tesi
               </h1>
               <p className="text-gray-600 mt-2">
@@ -138,7 +147,7 @@ export default function ThesisPage() {
             {role === 'student' && !hasActiveProposal && (
               <Link href="/tesi/nuova">
                 <Button variant="primary">
-                  <PlusCircle className="w-5 h-5 mr-2" />
+                  <PlusCircleIcon className="w-5 h-5 mr-2" />
                   Nuova Proposta
                 </Button>
               </Link>
@@ -167,8 +176,10 @@ export default function ThesisPage() {
 
         {/* Thesis Proposals Grid */}
         {thesisProposals.length === 0 ? (
-          <Card variant="elevated" className="p-12 text-center">
-            <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <Card variant="elevated" className="p-12 text-center bg-gradient-to-br from-primary-50/60 to-white border-primary-100/60">
+            <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-primary-100 flex items-center justify-center">
+              <BookOpenIcon className="w-12 h-12 text-primary-600" />
+            </div>
             <h3 className="text-xl font-semibold mb-2">
               {filterStatus === 'all' 
                 ? 'Nessuna proposta di tesi trovata'
@@ -198,12 +209,12 @@ export default function ThesisPage() {
                       <h3 className="text-xl font-bold text-gray-900 mb-2">{proposal.title}</h3>
                       <div className="flex items-center gap-4 text-sm text-gray-600">
                         <div className="flex items-center gap-2">
-                          <User className="w-4 h-4" />
+                          <UserIcon className="w-4 h-4" />
                           <span>{proposal.student?.profile?.full_name || proposal.student?.profile?.email || 'Studente'}</span>
                         </div>
                         {proposal.student?.course && (
                           <div className="flex items-center gap-2">
-                            <FileText className="w-4 h-4" />
+                            <DocumentTextIcon className="w-4 h-4" />
                             <span>{COURSE_CONFIG[proposal.student.course]?.name || proposal.student.course}</span>
                           </div>
                         )}
@@ -238,7 +249,7 @@ export default function ThesisPage() {
 
                     <div className="flex items-center justify-between pt-4 border-t border-gray-200">
                     <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <Calendar className="w-4 h-4" />
+                      <CalendarIcon className="w-4 h-4" />
                       <span>
                         Pubblicata il {new Date(proposal.created_at).toLocaleDateString('it-IT', {
                           day: 'numeric',

@@ -253,7 +253,7 @@ export default function StudentDashboard() {
             ) : posts.length === 0 ? (
               <div className="space-y-6">
                 {/* Stato vuoto motivazionale */}
-                <Card variant="elevated" className="p-10 text-center">
+                <Card variant="elevated" className="p-10 text-center bg-gradient-to-br from-primary-50/60 to-white border-primary-100/60">
                   <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-primary-100 flex items-center justify-center">
                     <UsersIcon className="w-8 h-8 text-primary-600" />
                   </div>

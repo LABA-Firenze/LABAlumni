@@ -7,7 +7,7 @@ import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
-import { Plus, Building2, Newspaper } from 'lucide-react'
+import { PlusIcon, BuildingOffice2Icon, NewspaperIcon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import type { CommunityPost } from '@/types/database'
 import { SkeletonBachecaCard } from '@/components/ui/Skeleton'
@@ -92,14 +92,14 @@ export default function CommunityPage() {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                <Newspaper className="w-8 h-8 text-primary-600" />
+                <NewspaperIcon className="w-8 h-8 text-primary-600" />
                 Bacheca
               </h1>
               <p className="text-gray-600 mt-2">Notizie e aggiornamenti dalle aziende</p>
             </div>
             {isCompany && (
               <Button variant="primary" onClick={() => setShowForm(true)}>
-                <Plus className="w-5 h-5 mr-2" />
+                <PlusIcon className="w-5 h-5 mr-2" />
                 Nuovo Post
               </Button>
             )}
@@ -154,8 +154,10 @@ export default function CommunityPage() {
             ))}
           </div>
         ) : posts.length === 0 ? (
-          <Card variant="elevated" className="text-center py-16">
-            <Newspaper className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <Card variant="elevated" className="text-center py-16 bg-gradient-to-br from-primary-50/60 to-white border-primary-100/60">
+            <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-primary-100 flex items-center justify-center">
+              <NewspaperIcon className="w-12 h-12 text-primary-600" />
+            </div>
             <h3 className="text-xl font-semibold mb-2">Nessun post pubblicato ancora</h3>
             <p className="text-gray-600">Le aziende potranno condividere notizie e aggiornamenti qui</p>
           </Card>
@@ -165,7 +167,7 @@ export default function CommunityPage() {
               <Card key={post.id} variant="elevated">
                 <div className="flex items-start gap-4 mb-4">
                   <div className="w-12 h-12 bg-primary-50 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Building2 className="w-6 h-6 text-primary" />
+                    <BuildingOffice2Icon className="w-6 h-6 text-primary-600" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">

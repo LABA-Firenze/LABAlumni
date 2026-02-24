@@ -94,23 +94,22 @@ export function SkeletonThesisCard() {
   )
 }
 
-/** Bacheca community post skeleton */
+/** Bacheca community post skeleton - match real Card structure (p-6, avatar, title, 2-3 lines content) */
 export function SkeletonBachecaCard() {
   return (
     <div className="rounded-2xl bg-white shadow-md shadow-gray-200/80 border border-gray-100 p-6">
       <div className="flex items-start gap-4 mb-4">
         <SkeletonAvatar className="w-12 h-12 shrink-0" />
-        <div className="flex-1 space-y-1">
-          <Skeleton className="h-5 w-48" />
-          <Skeleton className="h-4 w-24" />
+        <div className="flex-1 space-y-1 min-w-0">
+          <Skeleton className="h-5 w-40" />
+          <Skeleton className="h-4 w-20" />
         </div>
       </div>
-      <Skeleton className="h-8 w-3/4 mb-3" />
+      <Skeleton className="h-6 w-3/4 mb-3" />
       <div className="space-y-2">
         <Skeleton className="h-4 w-full" />
         <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-2/3" />
+        <Skeleton className="h-4 w-4/5" />
       </div>
     </div>
   )
@@ -161,29 +160,29 @@ export function SkeletonPortfolioItem() {
   )
 }
 
-/** Job/annuncio card skeleton - match Card annunci layout */
+/** Job/annuncio card skeleton - match Card annunci layout (line-clamp-2 desc, compact) */
 export function SkeletonJobCard() {
   return (
     <div className="rounded-2xl bg-white shadow-md shadow-gray-200/80 border border-gray-100 p-6">
       <div className="flex justify-between items-start">
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3 mb-2">
-            <Skeleton className="h-6 w-48" />
-            <Skeleton className="h-6 w-20 rounded-full" />
+            <Skeleton className="h-6 w-44" />
+            <Skeleton className="h-6 w-16 rounded-full shrink-0" />
           </div>
           <div className="flex items-center gap-4 mb-3">
-            <Skeleton className="h-4 w-36" />
-            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-4 w-32" />
             <Skeleton className="h-4 w-20" />
+            <Skeleton className="h-4 w-16" />
           </div>
-          <div className="space-y-2 mb-4">
+          <div className="space-y-1.5 mb-4">
             <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-4/5" />
+            <Skeleton className="h-4 w-5/6" />
           </div>
-          <div className="flex gap-2 mb-4">
-            <Skeleton className="h-6 w-16 rounded-full" />
-            <Skeleton className="h-6 w-20 rounded-full" />
-            <Skeleton className="h-6 w-24 rounded-full" />
+          <div className="flex gap-2 mb-4 flex-wrap">
+            <Skeleton className="h-5 w-14 rounded-full" />
+            <Skeleton className="h-5 w-16 rounded-full" />
+            <Skeleton className="h-5 w-20 rounded-full" />
           </div>
           <Skeleton className="h-10 w-24 rounded-full" />
         </div>

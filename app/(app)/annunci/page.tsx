@@ -7,7 +7,7 @@ import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
-import { Briefcase, MapPin, Clock } from 'lucide-react'
+import { BriefcaseIcon, MapPinIcon, ClockIcon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import { SkeletonJobCard } from '@/components/ui/Skeleton'
 import { useMinimumLoading } from '@/hooks/useMinimumLoading'
@@ -93,7 +93,7 @@ export default function JobsPage() {
     <div className="space-y-6">
         <Card variant="elevated" className="p-6 bg-gradient-to-br from-primary-50/60 to-white border-primary-100/60">
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <Briefcase className="w-8 h-8 text-primary-600" />
+            <BriefcaseIcon className="w-8 h-8 text-primary-600" />
             Tirocini e Stage
           </h1>
           <p className="text-gray-600 mt-2">Trova le opportunità giuste per te</p>
@@ -128,8 +128,10 @@ export default function JobsPage() {
             ))}
           </div>
         ) : filteredJobs.length === 0 ? (
-          <Card variant="elevated" className="text-center py-16">
-            <Briefcase className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <Card variant="elevated" className="text-center py-16 bg-gradient-to-br from-primary-50/60 to-white border-primary-100/60">
+            <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-primary-100 flex items-center justify-center">
+              <BriefcaseIcon className="w-12 h-12 text-primary-600" />
+            </div>
             <h3 className="text-xl font-semibold mb-2">Nessun tirocinio o stage trovato</h3>
             <p className="text-gray-600">Prova a modificare i filtri o controlla più tardi</p>
           </Card>
@@ -148,12 +150,12 @@ export default function JobsPage() {
                     
                     <div className="flex items-center gap-4 text-gray-600 text-sm mb-3">
                       <div className="flex items-center gap-1">
-                        <Briefcase className="w-4 h-4" />
+                        <BriefcaseIcon className="w-4 h-4" />
                         <span>{job.company.company_name}</span>
                       </div>
                       {job.location && (
                         <div className="flex items-center gap-1">
-                          <MapPin className="w-4 h-4" />
+                          <MapPinIcon className="w-4 h-4" />
                           <span>{job.location}</span>
                         </div>
                       )}
@@ -163,7 +165,7 @@ export default function JobsPage() {
                         </span>
                       )}
                       <div className="flex items-center gap-1">
-                        <Clock className="w-4 h-4" />
+                        <ClockIcon className="w-4 h-4" />
                         <span>{new Date(job.created_at).toLocaleDateString('it-IT')}</span>
                       </div>
                     </div>

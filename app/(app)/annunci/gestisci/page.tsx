@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
 import { Select } from '@/components/ui/Select'
-import { Plus, Edit, Trash2, Eye, EyeOff, Briefcase } from 'lucide-react'
+import { PlusIcon, PencilSquareIcon, TrashIcon, EyeIcon, EyeSlashIcon, BriefcaseIcon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import type { JobPost, CourseType } from '@/types/database'
 import { COURSE_CONFIG } from '@/types/database'
@@ -183,14 +183,14 @@ export default function ManageJobsPage() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <Briefcase className="w-8 h-8 text-primary-600" />
+              <BriefcaseIcon className="w-8 h-8 text-primary-600" />
               Tirocini e Stage
             </h1>
             <p className="text-gray-600 mt-2">Crea e gestisci le tue offerte di tirocinio e stage</p>
           </div>
           {!showForm && (
             <Button variant="primary" onClick={() => setShowForm(true)}>
-              <Plus className="w-5 h-5 mr-2" />
+              <PlusIcon className="w-5 h-5 mr-2" />
               Nuova Offerta
             </Button>
           )}
@@ -306,7 +306,10 @@ export default function ManageJobsPage() {
         {/* Jobs list */}
         <div className="space-y-4">
           {jobs.length === 0 ? (
-            <Card variant="elevated" className="text-center py-12">
+            <Card variant="elevated" className="text-center py-12 bg-gradient-to-br from-primary-50/60 to-white border-primary-100/60">
+              <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-primary-100 flex items-center justify-center">
+                <BriefcaseIcon className="w-12 h-12 text-primary-600" />
+              </div>
               <p className="text-gray-600">Non hai ancora creato offerte</p>
             </Card>
           ) : (
@@ -341,9 +344,9 @@ export default function ManageJobsPage() {
                       onClick={() => handleToggleActive(job.id, job.active)}
                     >
                       {job.active ? (
-                        <EyeOff className="w-4 h-4" />
+                        <EyeSlashIcon className="w-4 h-4" />
                       ) : (
-                        <Eye className="w-4 h-4" />
+                        <EyeIcon className="w-4 h-4" />
                       )}
                     </Button>
                     <Button
@@ -351,14 +354,14 @@ export default function ManageJobsPage() {
                       size="sm"
                       onClick={() => handleEdit(job)}
                     >
-                      <Edit className="w-4 h-4" />
+                      <PencilSquareIcon className="w-4 h-4" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDelete(job.id)}
                     >
-                      <Trash2 className="w-4 h-4 text-red-600" />
+                      <TrashIcon className="w-4 h-4 text-red-600" />
                     </Button>
                   </div>
                 </div>

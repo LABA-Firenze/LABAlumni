@@ -6,7 +6,7 @@ import { useAuth } from '@/components/AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { Briefcase, Users, User, Plus, TrendingUp, Sparkles } from 'lucide-react'
+import { BriefcaseIcon, UsersIcon, UserIcon, PlusIcon, ArrowTrendingUpIcon, SparklesIcon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import { APPLICATION_STATUS_CONFIG } from '@/lib/application-status'
 import type { Company, JobPost, Application } from '@/types/database'
@@ -159,13 +159,13 @@ export default function CompanyDashboard() {
           <div className="space-y-2">
             <Link href="/profilo" className="block">
               <Button variant="outline" className="w-full justify-start" size="sm">
-                <User className="w-4 h-4 shrink-0" />
+                <UserIcon className="w-4 h-4 shrink-0" />
                 Visualizza Profilo
               </Button>
             </Link>
             <Link href="/annunci/gestisci" className="block">
               <Button variant="primary" className="w-full justify-start" size="sm">
-                <Briefcase className="w-4 h-4 shrink-0" />
+                <BriefcaseIcon className="w-4 h-4 shrink-0" />
                 Gestisci Annunci
               </Button>
             </Link>
@@ -188,22 +188,22 @@ export default function CompanyDashboard() {
 
         <Card variant="elevated">
           <h3 className="font-semibold mb-4 flex items-center gap-3">
-            <Sparkles className="w-5 h-5 shrink-0 text-primary-600" />
+            <SparklesIcon className="w-5 h-5 shrink-0 text-primary-600" />
             Azioni Rapide
           </h3>
           <div className="space-y-2">
             <Link href="/post/azienda/nuovo" className="block">
               <Button variant="outline" className="w-full justify-start" size="sm">
-                <Plus className="w-4 h-4 shrink-0" />
+                <PlusIcon className="w-4 h-4 shrink-0" />
                 Nuovo Post
               </Button>
             </Link>
             <Link href="/annunci/gestisci" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
-              <Briefcase className="w-5 h-5 shrink-0" />
+              <BriefcaseIcon className="w-5 h-5 shrink-0" />
               <span>Gestisci Annunci</span>
             </Link>
             <Link href="/candidature/gestisci" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
-              <Users className="w-5 h-5 shrink-0" />
+              <UsersIcon className="w-5 h-5 shrink-0" />
               <span>Candidature</span>
             </Link>
           </div>
@@ -215,7 +215,7 @@ export default function CompanyDashboard() {
         <Card variant="interactive" padding={false} className="p-4 bg-gradient-to-r from-primary-50 via-primary-50/80 to-primary-100/90 border-primary-200/60 shadow-md">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 shrink-0 bg-gradient-to-br from-primary-500 to-primary-700 rounded-full flex items-center justify-center text-white">
-              <Briefcase className="w-5 h-5 shrink-0" />
+              <BriefcaseIcon className="w-5 h-5 shrink-0" />
             </div>
             <div className="flex-1">
               <Link href="/post/azienda/nuovo">
@@ -240,8 +240,10 @@ export default function CompanyDashboard() {
             ))}
           </div>
         ) : posts.length === 0 ? (
-          <Card variant="elevated" className="p-12 text-center">
-            <Briefcase className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <Card variant="elevated" className="p-12 text-center bg-gradient-to-br from-primary-50/60 to-white border-primary-100/60">
+            <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-primary-100 flex items-center justify-center">
+              <BriefcaseIcon className="w-12 h-12 text-primary-600" />
+            </div>
             <h3 className="text-xl font-semibold mb-2">Nessun post ancora</h3>
             <p className="text-gray-600 mb-6">Inizia a condividere contenuti con la community!</p>
             <Link href="/post/azienda/nuovo">
@@ -266,7 +268,7 @@ export default function CompanyDashboard() {
         <Card variant="elevated">
           <div className="flex items-start justify-between gap-3 mb-4">
             <h3 className="font-semibold flex items-center gap-3 flex-1 min-w-0">
-              <TrendingUp className="w-5 h-5 shrink-0 text-primary-600" />
+              <ArrowTrendingUpIcon className="w-5 h-5 shrink-0 text-primary-600" />
               <span className="break-words">Candidature Recenti</span>
             </h3>
             <Link href="/candidature/gestisci" className="shrink-0">

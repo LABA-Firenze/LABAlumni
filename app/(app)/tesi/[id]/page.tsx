@@ -6,7 +6,7 @@ import { useAuth } from '@/components/AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { BookOpen, Calendar, User, FileText, ArrowLeft, ThumbsUp, Check, X, Trash2 } from 'lucide-react'
+import { BookOpenIcon, CalendarIcon, UserIcon, DocumentTextIcon, ArrowLeftIcon, HandThumbUpIcon, CheckIcon, XMarkIcon, TrashIcon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import type { ThesisProposal } from '@/types/social'
 import type { Student, Profile } from '@/types/database'
@@ -226,8 +226,10 @@ export default function ThesisDetailPage() {
 
   if (!proposal) {
     return (
-      <Card variant="elevated" className="p-12 text-center">
-        <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+      <Card variant="elevated" className="p-12 text-center bg-gradient-to-br from-primary-50/60 to-white border-primary-100/60">
+        <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-primary-100 flex items-center justify-center">
+              <BookOpenIcon className="w-12 h-12 text-primary-600" />
+            </div>
         <h3 className="text-xl font-semibold mb-2">Proposta non trovata</h3>
         <p className="text-gray-600 mb-6">La proposta di tesi richiesta non esiste o è stata rimossa.</p>
         <Link href="/tesi">
@@ -244,7 +246,7 @@ export default function ThesisDetailPage() {
           onClick={() => router.back()}
           className="text-gray-600 hover:text-gray-900 mb-6 flex items-center gap-2"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeftIcon className="w-5 h-5" />
           Indietro
         </button>
 
@@ -256,17 +258,17 @@ export default function ThesisDetailPage() {
                 <h1 className="text-3xl font-bold text-gray-900 mb-4">{proposal.title}</h1>
                 <div className="flex items-center gap-6 text-sm text-gray-600">
                   <div className="flex items-center gap-2">
-                    <User className="w-5 h-5" />
+                    <UserIcon className="w-5 h-5" />
                     <span className="font-medium">{proposal.student?.profile?.full_name || proposal.student?.profile?.email || 'Studente'}</span>
                   </div>
                   {proposal.student?.course && (
                     <div className="flex items-center gap-2">
-                      <FileText className="w-5 h-5" />
+                      <DocumentTextIcon className="w-5 h-5" />
                       <span>{COURSE_CONFIG[proposal.student.course]?.name || proposal.student.course}</span>
                     </div>
                   )}
                   <div className="flex items-center gap-2">
-                    <Calendar className="w-5 h-5" />
+                    <CalendarIcon className="w-5 h-5" />
                     <span>
                       {new Date(proposal.created_at).toLocaleDateString('it-IT', {
                         day: 'numeric',
@@ -288,7 +290,7 @@ export default function ThesisDetailPage() {
             {/* Description */}
             <div>
               <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <BookOpen className="w-6 h-6 text-primary-600" />
+                <BookOpenIcon className="w-6 h-6 text-primary-600" />
                 Descrizione
               </h2>
               <div className="prose max-w-none">
@@ -329,7 +331,7 @@ export default function ThesisDetailPage() {
                       rel="noopener noreferrer"
                       className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                     >
-                      <FileText className="w-5 h-5 text-primary-600" />
+                      <DocumentTextIcon className="w-5 h-5 text-primary-600" />
                       <span className="text-gray-700">Documento {idx + 1}</span>
                     </a>
                   ))}
@@ -346,10 +348,10 @@ export default function ThesisDetailPage() {
                     <span>Invito come <strong>relatore</strong></span>
                     <div className="flex gap-2">
                       <Button variant="outline" size="sm" onClick={() => handleInvitationResponse('thesis_relatore_invitations', relatoreInv.id, true)} disabled={actionLoading}>
-                        <Check className="w-4 h-4 mr-1" /> Accetta
+                        <CheckIcon className="w-4 h-4 mr-1" /> Accetta
                       </Button>
                       <Button variant="outline" size="sm" onClick={() => handleInvitationResponse('thesis_relatore_invitations', relatoreInv.id, false)} disabled={actionLoading}>
-                        <X className="w-4 h-4 mr-1" /> Rifiuta
+                        <XMarkIcon className="w-4 h-4 mr-1" /> Rifiuta
                       </Button>
                     </div>
                   </div>
@@ -359,10 +361,10 @@ export default function ThesisDetailPage() {
                     <span>Invito come <strong>corelatore</strong></span>
                     <div className="flex gap-2">
                       <Button variant="outline" size="sm" onClick={() => handleInvitationResponse('thesis_corelatore_invitations', corelatoreInv.id, true)} disabled={actionLoading}>
-                        <Check className="w-4 h-4 mr-1" /> Accetta
+                        <CheckIcon className="w-4 h-4 mr-1" /> Accetta
                       </Button>
                       <Button variant="outline" size="sm" onClick={() => handleInvitationResponse('thesis_corelatore_invitations', corelatoreInv.id, false)} disabled={actionLoading}>
-                        <X className="w-4 h-4 mr-1" /> Rifiuta
+                        <XMarkIcon className="w-4 h-4 mr-1" /> Rifiuta
                       </Button>
                     </div>
                   </div>
@@ -375,7 +377,7 @@ export default function ThesisDetailPage() {
               <div className="space-y-3 p-4 rounded-lg bg-amber-50 border border-amber-200">
                 {!proposal.relatore_id && (!relatoreInv || relatoreInv.status !== 'pending') && !currentDocenteRelatoreApp && (
                   <Button variant="primary" onClick={handleApplyRelatore} disabled={actionLoading}>
-                    <ThumbsUp className="w-4 h-4 mr-2" /> Mi interessa come relatore
+                    <HandThumbUpIcon className="w-4 h-4 mr-2" /> Mi interessa come relatore
                   </Button>
                 )}
                 {!proposal.relatore_id && currentDocenteRelatoreApp && currentDocenteRelatoreApp.status === 'pending' && (
@@ -383,7 +385,7 @@ export default function ThesisDetailPage() {
                 )}
                 {!proposal.corelatore_id && (!corelatoreInv || corelatoreInv.status !== 'pending') && !currentDocenteCorelatoreApp && (
                   <Button variant="outline" onClick={handleApplyCorelatore} disabled={actionLoading}>
-                    <ThumbsUp className="w-4 h-4 mr-2" /> Mi interessa come corelatore
+                    <HandThumbUpIcon className="w-4 h-4 mr-2" /> Mi interessa come corelatore
                   </Button>
                 )}
                 {!proposal.corelatore_id && currentDocenteCorelatoreApp && currentDocenteCorelatoreApp.status === 'pending' && (
@@ -401,10 +403,10 @@ export default function ThesisDetailPage() {
                     <span><strong>Relatore:</strong> {docenteNames[app.docente_id] || 'Docente'}</span>
                     <div className="flex gap-2">
                       <Button variant="primary" size="sm" onClick={() => handleApplicationResponse('thesis_relatore_applications', app.id, true)} disabled={actionLoading}>
-                        <Check className="w-4 h-4 mr-1" /> Accetta
+                        <CheckIcon className="w-4 h-4 mr-1" /> Accetta
                       </Button>
                       <Button variant="outline" size="sm" onClick={() => handleApplicationResponse('thesis_relatore_applications', app.id, false)} disabled={actionLoading}>
-                        <X className="w-4 h-4 mr-1" /> Rifiuta
+                        <XMarkIcon className="w-4 h-4 mr-1" /> Rifiuta
                       </Button>
                     </div>
                   </div>
@@ -414,10 +416,10 @@ export default function ThesisDetailPage() {
                     <span><strong>Corelatore:</strong> {docenteNames[app.docente_id] || 'Docente'}</span>
                     <div className="flex gap-2">
                       <Button variant="primary" size="sm" onClick={() => handleApplicationResponse('thesis_corelatore_applications', app.id, true)} disabled={actionLoading}>
-                        <Check className="w-4 h-4 mr-1" /> Accetta
+                        <CheckIcon className="w-4 h-4 mr-1" /> Accetta
                       </Button>
                       <Button variant="outline" size="sm" onClick={() => handleApplicationResponse('thesis_corelatore_applications', app.id, false)} disabled={actionLoading}>
-                        <X className="w-4 h-4 mr-1" /> Rifiuta
+                        <XMarkIcon className="w-4 h-4 mr-1" /> Rifiuta
                       </Button>
                     </div>
                   </div>
@@ -432,7 +434,7 @@ export default function ThesisDetailPage() {
               <div className="flex flex-wrap justify-between items-center gap-3">
                 {isOwner && (
                   <Button variant="outline" onClick={handleDelete} disabled={actionLoading} className="text-red-600 border-red-300 hover:bg-red-50">
-                    <Trash2 className="w-4 h-4 mr-2" />
+                    <TrashIcon className="w-4 h-4 mr-2" />
                     Elimina proposta
                   </Button>
                 )}

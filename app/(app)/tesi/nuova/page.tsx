@@ -10,7 +10,8 @@ import { Button } from '@/components/ui/Button'
 import { Textarea } from '@/components/ui/Textarea'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
-import { Loader2, BookOpen, FileText, User, Users } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
+import { BookOpenIcon, DocumentTextIcon, UserCircleIcon, UsersIcon } from '@heroicons/react/24/solid'
 import { COURSE_CONFIG } from '@/types/database'
 import type { Docente } from '@/types/database'
 import type { Profile } from '@/types/database'
@@ -164,7 +165,7 @@ export default function NewThesisProposalPage() {
             ← Indietro
           </button>
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <BookOpen className="w-8 h-8 text-primary-600" />
+            <BookOpenIcon className="w-8 h-8 text-primary-600" />
             Nuova Proposta di Tesi
           </h1>
           <p className="text-gray-600 mt-2">Pubblica la tua proposta di tesi per trovare un relatore</p>
@@ -192,7 +193,7 @@ export default function NewThesisProposalPage() {
             {/* Relatore (opzionale) */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                <User className="w-4 h-4 inline mr-1.5 text-primary-600" />
+                <UserCircleIcon className="w-4 h-4 inline mr-1.5 text-primary-600" />
                 Relatore
               </label>
               <Select value={relatoreId} onChange={(e) => { setRelatoreId(e.target.value); if (e.target.value === corelatoreId) setCorelatoreId(''); }}>
@@ -209,7 +210,7 @@ export default function NewThesisProposalPage() {
             {/* Corelatore (opzionale) */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                <Users className="w-4 h-4 inline mr-1.5 text-primary-600" />
+                <UsersIcon className="w-4 h-4 inline mr-1.5 text-primary-600" />
                 Corelatore
               </label>
               <Select value={corelatoreId} onChange={(e) => setCorelatoreId(e.target.value)}>
@@ -307,7 +308,7 @@ export default function NewThesisProposalPage() {
                   </>
                 ) : (
                   <>
-                    <FileText className="w-4 h-4 mr-2" />
+                    <DocumentTextIcon className="w-4 h-4 mr-2" />
                     Pubblica Proposta
                   </>
                 )}

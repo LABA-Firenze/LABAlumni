@@ -7,7 +7,7 @@ import { useAuth } from '@/components/AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { Briefcase, MapPin, Clock, Building2, Globe, ArrowLeft } from 'lucide-react'
+import { BriefcaseIcon, MapPinIcon, ClockIcon, BuildingOffice2Icon, GlobeAltIcon, ArrowLeftIcon } from '@heroicons/react/24/solid'
 import { SkeletonJobCard } from '@/components/ui/Skeleton'
 import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 import type { Company } from '@/types/database'
@@ -77,7 +77,9 @@ export default function AziendaPage() {
   if (!company) {
     return (
       <div className="text-center py-16">
-        <Building2 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+        <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-primary-100 flex items-center justify-center">
+        <BuildingOffice2Icon className="w-12 h-12 text-primary-600" />
+      </div>
         <h2 className="text-xl font-semibold text-gray-900 mb-2">Azienda non trovata</h2>
         <Link href="/annunci">
           <Button variant="primary">Torna agli annunci</Button>
@@ -92,7 +94,7 @@ export default function AziendaPage() {
         href="/annunci"
         className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 text-sm font-medium"
       >
-        <ArrowLeft className="w-4 h-4" />
+        <ArrowLeftIcon className="w-4 h-4" />
         Torna agli annunci
       </Link>
 
@@ -102,7 +104,7 @@ export default function AziendaPage() {
             {company.logo_url ? (
               <img src={company.logo_url} alt="" className="w-full h-full object-cover" />
             ) : (
-              <Building2 className="w-10 h-10 text-primary-600" />
+              <BuildingOffice2Icon className="w-10 h-10 text-primary-600" />
             )}
           </div>
           <div className="flex-1 min-w-0">
@@ -121,13 +123,13 @@ export default function AziendaPage() {
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-primary-600 hover:underline"
                 >
-                  <Globe className="w-4 h-4" />
+                  <GlobeAltIcon className="w-4 h-4" />
                   Sito web
                 </a>
               )}
               {company.city && (
                 <span className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4" />
+                  <MapPinIcon className="w-4 h-4" />
                   {company.city}
                   {company.province && ` (${company.province})`}
                 </span>
@@ -140,8 +142,10 @@ export default function AziendaPage() {
       <div>
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Annunci attivi</h2>
         {jobs.length === 0 ? (
-          <Card variant="elevated" className="p-12 text-center">
-            <Briefcase className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+          <Card variant="elevated" className="p-12 text-center bg-gradient-to-br from-primary-50/60 to-white border-primary-100/60">
+            <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-primary-100 flex items-center justify-center">
+              <BriefcaseIcon className="w-10 h-10 text-primary-600" />
+            </div>
             <p className="text-gray-600">Nessun annuncio attivo al momento</p>
           </Card>
         ) : (
@@ -157,7 +161,7 @@ export default function AziendaPage() {
                       </span>
                       {job.location && (
                         <span className="flex items-center gap-1">
-                          <MapPin className="w-4 h-4" />
+                          <MapPinIcon className="w-4 h-4" />
                           {job.location}
                         </span>
                       )}
@@ -167,7 +171,7 @@ export default function AziendaPage() {
                         </span>
                       )}
                       <span className="flex items-center gap-1">
-                        <Clock className="w-4 h-4" />
+                        <ClockIcon className="w-4 h-4" />
                         {new Date(job.created_at).toLocaleDateString('it-IT')}
                       </span>
                     </div>

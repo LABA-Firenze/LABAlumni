@@ -6,7 +6,7 @@ import { useAuth } from '@/components/AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { Briefcase } from 'lucide-react'
+import { BriefcaseIcon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import { APPLICATION_STATUS_CONFIG } from '@/lib/application-status'
 import { SkeletonApplicationCard } from '@/components/ui/Skeleton'
@@ -79,8 +79,10 @@ export default function ApplicationsPage() {
         </div>
 
         {applications.length === 0 ? (
-          <Card variant="elevated" className="text-center py-12">
-            <Briefcase className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <Card variant="elevated" className="text-center py-12 bg-gradient-to-br from-primary-50/60 to-white border-primary-100/60">
+            <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-primary-100 flex items-center justify-center">
+              <BriefcaseIcon className="w-12 h-12 text-primary-600" />
+            </div>
             <p className="text-gray-600 text-lg mb-4">Non hai ancora inviato candidature</p>
             <Link href="/annunci">
               <Button variant="primary">Cerca Tirocini e Stage</Button>

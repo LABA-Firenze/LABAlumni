@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Textarea } from '@/components/ui/Textarea'
-import { Briefcase, MapPin, Clock, Building2 } from 'lucide-react'
+import { BriefcaseIcon, MapPinIcon, ClockIcon, BuildingOffice2Icon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import type { JobPost } from '@/types/database'
 import { COURSE_CONFIG } from '@/types/database'
@@ -132,12 +132,12 @@ export default function JobDetailPage() {
             
             <div className="flex flex-wrap items-center gap-4 text-gray-600 mb-4">
               <div className="flex items-center gap-2">
-                <Building2 className="w-5 h-5" />
+                <BuildingOffice2Icon className="w-5 h-5" />
                 <span className="font-medium">{job.company.company_name}</span>
               </div>
               {job.location && (
                 <div className="flex items-center gap-2">
-                  <MapPin className="w-5 h-5" />
+                  <MapPinIcon className="w-5 h-5" />
                   <span>{job.location}</span>
                 </div>
               )}

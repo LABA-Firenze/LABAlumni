@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import Link from 'next/link'
-import { Users, UserPlus, Check, X, Search, Building2, GraduationCap } from 'lucide-react'
+import { UsersIcon, UserPlusIcon, CheckIcon, XMarkIcon, MagnifyingGlassIcon, BuildingOffice2Icon, AcademicCapIcon } from '@heroicons/react/24/solid'
 import { COURSE_CONFIG, type CourseType } from '@/types/database'
 import type { Student, Profile } from '@/types/database'
 import type { StudentConnection } from '@/types/social'
@@ -247,7 +247,7 @@ export default function NetworkPage() {
         <Card variant="elevated" className="p-6 bg-gradient-to-br from-primary-50/60 to-white border-primary-100/60">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <Users className="w-8 h-8 text-primary-600" />
+              <UsersIcon className="w-8 h-8 text-primary-600" />
               Network
             </h1>
             <p className="text-gray-600 mt-2">Connettiti con studenti e scopri le aziende</p>
@@ -302,7 +302,7 @@ export default function NetworkPage() {
                         variant="primary"
                         onClick={() => handleAccept(conn.id)}
                       >
-                        <Check className="w-4 h-4 mr-1" />
+                        <CheckIcon className="w-4 h-4 mr-1" />
                         Accetta
                       </Button>
                       <Button
@@ -310,7 +310,7 @@ export default function NetworkPage() {
                         variant="outline"
                         onClick={() => handleReject(conn.id)}
                       >
-                        <X className="w-4 h-4 mr-1" />
+                        <XMarkIcon className="w-4 h-4 mr-1" />
                         Rifiuta
                       </Button>
                     </div>
@@ -325,7 +325,7 @@ export default function NetworkPage() {
         <Card variant="elevated" className="p-4 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <Input
                 type="text"
                 placeholder={tab === 'studenti' ? 'Cerca per nome o email...' : tab === 'aziende' ? 'Cerca aziende...' : 'Cerca docenti...'}
@@ -352,8 +352,10 @@ export default function NetworkPage() {
         {/* Companies Grid */}
         {tab === 'aziende' && (
           filteredCompanies.length === 0 ? (
-            <Card variant="elevated" className="p-12 text-center">
-              <Building2 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <Card variant="elevated" className="p-12 text-center bg-gradient-to-br from-primary-50/60 to-white border-primary-100/60">
+              <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-primary-100 flex items-center justify-center">
+              <BuildingOffice2Icon className="w-12 h-12 text-primary-600" />
+            </div>
               <h3 className="text-xl font-semibold mb-2">Nessuna azienda trovata</h3>
               <p className="text-gray-600">Prova a modificare la ricerca</p>
             </Card>
@@ -368,7 +370,7 @@ export default function NetworkPage() {
                           {company.logo_url ? (
                             <img src={company.logo_url} alt="" className="w-full h-full object-cover" />
                           ) : (
-                            <Building2 className="w-7 h-7 text-primary-600" />
+                            <BuildingOffice2Icon className="w-7 h-7 text-primary-600" />
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
@@ -392,8 +394,10 @@ export default function NetworkPage() {
         {/* Docenti Grid */}
         {tab === 'docenti' && (
           filteredDocenti.length === 0 ? (
-            <Card variant="elevated" className="p-12 text-center">
-              <GraduationCap className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <Card variant="elevated" className="p-12 text-center bg-gradient-to-br from-amber-50/60 to-white border-amber-100/60">
+              <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-amber-100 flex items-center justify-center">
+              <AcademicCapIcon className="w-12 h-12 text-amber-600" />
+            </div>
               <h3 className="text-xl font-semibold mb-2">Nessun docente trovato</h3>
               <p className="text-gray-600">Prova a modificare la ricerca</p>
             </Card>
@@ -408,7 +412,7 @@ export default function NetworkPage() {
                           {doc.avatar_url ? (
                             <img src={doc.avatar_url} alt="" className="w-full h-full object-cover" />
                           ) : (
-                            <GraduationCap className="w-7 h-7 text-amber-600" />
+                            <AcademicCapIcon className="w-7 h-7 text-amber-600" />
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
@@ -436,8 +440,10 @@ export default function NetworkPage() {
         {/* Students Grid */}
         {tab === 'studenti' && (
           students.length === 0 ? (
-            <Card variant="elevated" className="p-12 text-center">
-              <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <Card variant="elevated" className="p-12 text-center bg-gradient-to-br from-primary-50/60 to-white border-primary-100/60">
+              <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-primary-100 flex items-center justify-center">
+              <UsersIcon className="w-12 h-12 text-primary-600" />
+            </div>
               <h3 className="text-xl font-semibold mb-2">Nessuno studente trovato</h3>
               <p className="text-gray-600">Prova a modificare i filtri di ricerca</p>
             </Card>
@@ -481,7 +487,7 @@ export default function NetworkPage() {
                           size="sm"
                           onClick={() => handleConnect(student.id)}
                         >
-                          <UserPlus className="w-4 h-4 mr-2" />
+                          <UserPlusIcon className="w-4 h-4 mr-2" />
                           Connetti
                         </Button>
                       )}
@@ -503,7 +509,7 @@ export default function NetworkPage() {
                               if (conn) handleAccept(conn.id)
                             }}
                           >
-                            <Check className="w-4 h-4 mr-1" />
+                            <CheckIcon className="w-4 h-4 mr-1" />
                             Accetta
                           </Button>
                           <Button
@@ -517,14 +523,14 @@ export default function NetworkPage() {
                               if (conn) handleReject(conn.id)
                             }}
                           >
-                            <X className="w-4 h-4 mr-1" />
+                            <XMarkIcon className="w-4 h-4 mr-1" />
                             Rifiuta
                           </Button>
                         </div>
                       )}
                       {status === 'connected' && (
                         <Button variant="outline" className="flex-1" size="sm" disabled>
-                          <Check className="w-4 h-4 mr-2" />
+                          <CheckIcon className="w-4 h-4 mr-2" />
                           Connesso
                         </Button>
                       )}
