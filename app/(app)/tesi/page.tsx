@@ -72,9 +72,9 @@ export default function ThesisPage() {
   }
 
   const statusLabels = {
-    open: 'Aperta',
-    in_progress: 'In corso',
-    completed: 'Completata',
+    open: 'Aperte',
+    in_progress: 'In elaborazione',
+    completed: 'Completate',
     cancelled: 'Annullata',
   }
 
@@ -152,7 +152,7 @@ export default function ThesisPage() {
             <h3 className="text-xl font-semibold mb-2">
               {filterStatus === 'all' 
                 ? 'Nessuna proposta di tesi trovata'
-                : `Nessuna proposta ${statusLabels[filterStatus as keyof typeof statusLabels].toLowerCase()}`
+                : `Nessuna proposta ${filterStatus === 'open' ? 'aperta' : filterStatus === 'in_progress' ? 'in elaborazione' : 'completata'}`
               }
             </h3>
             <p className="text-gray-600 mb-6">
