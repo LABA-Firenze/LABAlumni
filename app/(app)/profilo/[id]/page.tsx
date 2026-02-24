@@ -397,8 +397,8 @@ export default function PublicProfilePage() {
     )
   }
 
-  // DOCENTE PROFILE (public view)
-  if (profile.role === 'docente' && docente) {
+  // DOCENTE PROFILE (public view) - mostra anche se docente row manca (solo profile)
+  if (profile.role === 'docente') {
     const fullName = profile.full_name || profile.email || 'Docente'
 
     return (
@@ -424,15 +424,17 @@ export default function PublicProfilePage() {
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">{fullName}</h1>
                 <ProfilePill role="docente" />
-                <p className="text-sm text-gray-600 mt-1">
-                  {docente.can_relatore && 'Relatore'}
-                  {docente.can_relatore && docente.can_corelatore && ' · '}
-                  {docente.can_corelatore && 'Corelatore'}
-                </p>
+                {docente && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    {docente.can_relatore && 'Relatore'}
+                    {docente.can_relatore && docente.can_corelatore && ' · '}
+                    {docente.can_corelatore && 'Corelatore'}
+                  </p>
+                )}
               </div>
             </div>
-            {docente.bio && <p className="text-gray-700">{docente.bio}</p>}
-            {docente.courses?.length > 0 && (
+            {docente?.bio && <p className="text-gray-700">{docente.bio}</p>}
+            {docente?.courses && docente.courses.length > 0 && (
               <div className="mt-4 flex flex-wrap gap-2">
                 {docente.courses.map((c: string) => (
                   <span key={c} className="px-2 py-1 bg-amber-100 text-amber-800 rounded-lg text-sm">
@@ -440,6 +442,9 @@ export default function PublicProfilePage() {
                   </span>
                 ))}
               </div>
+            )}
+            {!docente && (
+              <p className="text-gray-500 text-sm">Profilo docente. Contattabile dalla piattaforma per proposte di tesi.</p>
             )}
           </Card>
           <Link href="/tesi">
