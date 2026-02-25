@@ -150,6 +150,17 @@ export function logosYearFromEnrollment(payload: LogosEnrollmentPayload | null):
   return typeof y === 'number' && y >= 1 && y <= 5 ? y : null
 }
 
+/** Formatta anno accademico da pianoStudi: "A.A. 24/25" o "A.A. 25/26". Es. "A.A. 2019-2020" -> "A.A. 19/20", "2024-2025" -> "A.A. 24/25" */
+export function logosAcademicYearFromPianoStudi(pianoStudi?: string | null): string | null {
+  if (!pianoStudi || typeof pianoStudi !== 'string') return null
+  // Match: 2019-2020, 2019/2020, 20242025 (es. Anno accademico 20242025)
+  const m = pianoStudi.match(/(\d{4})\s*[-/]?\s*(\d{4})/) ?? pianoStudi.match(/(\d{4})(\d{4})/)
+  if (!m) return null
+  const y1 = m[1].slice(-2) // 2019 -> 19, 2024 -> 24
+  const y2 = m[2].slice(-2) // 2020 -> 20, 2025 -> 25
+  return `A.A. ${y1}/${y2}`
+}
+
 /** Email da usare per Supabase: preferisce email LABA se presente */
 export function logosPreferredEmail(payload: LogosStudentPayload): string {
   const email = payload.emailLABA || payload.emailPersonale || ''

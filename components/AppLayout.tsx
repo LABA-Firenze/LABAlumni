@@ -115,7 +115,10 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
                   <ProfilePill role={role} />
                 </div>
                 {student && (
-                  <p className="text-sm text-gray-600 mt-1">{COURSE_CONFIG[student.course]?.name || student.course}</p>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {COURSE_CONFIG[student.course]?.name || student.course}
+                    {student.academic_year && ` • ${student.academic_year}`}
+                  </p>
                 )}
                 {company && (
                   <p className="text-sm text-gray-600 mt-1">{company.company_name}</p>

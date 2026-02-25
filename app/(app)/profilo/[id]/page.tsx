@@ -317,6 +317,7 @@ export default function PublicProfilePage() {
                   <p className="text-gray-600 flex items-center gap-2 mt-1">
                     <GraduationCap className="w-4 h-4 shrink-0" />
                     {COURSE_CONFIG[student.course]?.name}
+                    {student.academic_year && ` • ${student.academic_year}`}
                     {year && ` • ${year}° anno`}
                   </p>
                   {student.bio && <p className="text-gray-700 mt-3 leading-relaxed">{student.bio}</p>}

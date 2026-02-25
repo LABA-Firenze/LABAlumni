@@ -32,6 +32,7 @@ export interface Student {
   linkedin_url: string | null
   website_url: string | null
   year: number | null
+  academic_year: string | null
   phone: string | null
   matricola: string | null
   last_year_update: string | null

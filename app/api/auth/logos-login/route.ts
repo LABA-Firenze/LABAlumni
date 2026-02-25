@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { logosGetStudent, logosGetEnrollment, logosPreferredEmail, logosFullName, logosCourseFromPianoStudi, logosYearFromEnrollment } from '@/lib/logos'
+import { logosGetStudent, logosGetEnrollment, logosPreferredEmail, logosFullName, logosCourseFromPianoStudi, logosYearFromEnrollment, logosAcademicYearFromPianoStudi } from '@/lib/logos'
 
 export async function POST(request: Request) {
   try {
@@ -28,6 +28,7 @@ export async function POST(request: Request) {
 
     const course = logosCourseFromPianoStudi(enrollment?.pianoStudi)
     const year = logosYearFromEnrollment(enrollment)
+    const academicYear = logosAcademicYearFromPianoStudi(enrollment?.pianoStudi)
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -63,6 +64,7 @@ export async function POST(request: Request) {
         id: existingId,
         course,
         year,
+        academic_year: academicYear,
         phone,
         matricola: matricola || null,
         updated_at: new Date().toISOString(),
@@ -90,6 +92,7 @@ export async function POST(request: Request) {
         id: newUser.user.id,
         course,
         year,
+        academic_year: academicYear,
         phone,
         matricola: matricola || null,
         last_year_update: new Date().toISOString(),
