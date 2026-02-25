@@ -19,6 +19,7 @@ import {
 import Link from 'next/link'
 import { getInitials } from '@/lib/avatar'
 import { COURSE_CONFIG, getProfileGradient } from '@/types/database'
+import { getStudentDisplayLabel } from '@/lib/staff-labels'
 import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 import { SkeletonProfileSidebar, SkeletonScopriSidebar } from './ui/Skeleton'
 import type { Student, Company, Docente } from '@/types/database'
@@ -117,8 +118,8 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
                 </div>
                 {student && (
                   <p className="text-sm text-gray-600 mt-1">
-                    {COURSE_CONFIG[student.course]?.name || student.course}
-                    {student.academic_year && ` • ${student.academic_year}`}
+                    {getStudentDisplayLabel(student)}
+                    {!student.display_label && student.academic_year && ` • ${student.academic_year}`}
                   </p>
                 )}
                 {company && (

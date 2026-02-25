@@ -51,7 +51,7 @@ export function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const dashboardHref = userRole === 'company' ? '/pannello/azienda' : userRole === 'docente' ? '/tesi' : '/pannello/studente'
+  const dashboardHref = userRole === 'admin' ? '/pannello/admin' : userRole === 'company' ? '/pannello/azienda' : userRole === 'docente' ? '/tesi' : '/pannello/studente'
   const annunciHref = userRole === 'company' ? '/annunci/gestisci' : '/annunci'
 
   const isActive = (href: string) => {

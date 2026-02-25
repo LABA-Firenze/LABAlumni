@@ -11,6 +11,7 @@ import Link from 'next/link'
 import type { ThesisProposal } from '@/types/social'
 import type { Student, Profile } from '@/types/database'
 import { COURSE_CONFIG } from '@/types/database'
+import { getStudentDisplayLabel } from '@/lib/staff-labels'
 import { SkeletonCard } from '@/components/ui/Skeleton'
 import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 
@@ -272,10 +273,10 @@ export default function ThesisDetailPage() {
                     <UserIcon className="w-4 h-4 text-gray-400" />
                     {proposal.student?.profile?.full_name || proposal.student?.profile?.email || 'Studente'}
                   </span>
-                  {proposal.student?.course && (
+                  {getStudentDisplayLabel(proposal.student) && (
                     <span className="flex items-center gap-1.5">
                       <DocumentTextIcon className="w-4 h-4 text-gray-400" />
-                      {COURSE_CONFIG[proposal.student.course]?.name || proposal.student.course}
+                      {getStudentDisplayLabel(proposal.student)}
                     </span>
                   )}
                   <span className="flex items-center gap-1.5">

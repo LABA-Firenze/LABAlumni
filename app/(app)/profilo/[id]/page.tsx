@@ -22,6 +22,7 @@ import type { Profile, Student, Company, Docente } from '@/types/database'
 import type { PortfolioItem } from '@/types/social'
 import { getInitials } from '@/lib/avatar'
 import { COURSE_CONFIG, getProfileGradient } from '@/types/database'
+import { getStudentDisplayLabel } from '@/lib/staff-labels'
 import { ProfilePill } from '@/components/ProfilePill'
 import { PostCard } from '@/components/PostCard'
 import { SkeletonProfileSidebar, SkeletonCard } from '@/components/ui/Skeleton'
@@ -129,9 +130,9 @@ export default function PublicProfilePage() {
         if (postsData?.length) {
           const { data: studentCourses } = await supabase
             .from('students')
-            .select('id, course')
+            .select('id, course, display_label')
             .eq('id', profileId)
-          const courseMap = Object.fromEntries((studentCourses || []).map((s: any) => [s.id, s.course]))
+          const courseMap = Object.fromEntries((studentCourses || []).map((s: any) => [s.id, getStudentDisplayLabel(s)]))
           const likedIds = user
             ? (await supabase.from('post_likes').select('post_id').eq('user_id', user.id).in('post_id', postsData.map((p: any) => p.id)))
             : { data: [] }
@@ -254,7 +255,7 @@ export default function PublicProfilePage() {
                   <div className="mt-1.5 flex justify-center">
                     <ProfilePill role="student" />
                   </div>
-                  <p className="text-sm text-gray-600 mt-1">{COURSE_CONFIG[student.course]?.name}</p>
+                  <p className="text-sm text-gray-600 mt-1">{getStudentDisplayLabel(student)}</p>
                 </div>
 
                 {!isOwnProfile && user && isCurrentUserStudent && (
@@ -317,9 +318,9 @@ export default function PublicProfilePage() {
                   <h1 className="text-2xl font-bold text-gray-900 mt-4">{fullName}</h1>
                   <p className="text-gray-600 flex items-center gap-2 mt-1">
                     <GraduationCap className="w-4 h-4 shrink-0" />
-                    {COURSE_CONFIG[student.course]?.name}
-                    {student.academic_year && ` • ${student.academic_year}`}
-                    {year && ` • ${year}° anno`}
+                    {getStudentDisplayLabel(student)}
+                    {!student.display_label && student.academic_year && ` • ${student.academic_year}`}
+                    {!student.display_label && year && ` • ${year}° anno`}
                   </p>
                   {student.bio && <p className="text-gray-700 mt-3 leading-relaxed">{student.bio}</p>}
                   {(student.portfolio_url || student.linkedin_url || student.website_url) && (

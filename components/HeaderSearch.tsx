@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase'
 import { Search, Building2, User, GraduationCap } from 'lucide-react'
 import { getInitials } from '@/lib/avatar'
 import { COURSE_CONFIG, getProfileGradient, type CourseType } from '@/types/database'
+import { getStudentDisplayLabel } from '@/lib/staff-labels'
 
 type SearchResult = 
   | { type: 'company'; id: string; company_name: string; logo_url: string | null }
@@ -62,13 +63,15 @@ export function HeaderSearch() {
 
       const studentIds = (studentsRes.data || []).map((p: any) => p.id)
       let studentCourses: Record<string, string> = {}
+      let studentCourseKeys: Record<string, string> = {}
       if (studentIds.length > 0) {
         const { data: studentsData } = await supabase
           .from('students')
-          .select('id, course')
+          .select('id, course, display_label')
           .in('id', studentIds)
-        studentsData?.forEach((s: { id: string; course: string }) => {
-          studentCourses[s.id] = s.course
+        studentsData?.forEach((s: { id: string; course?: string; display_label?: string | null }) => {
+          studentCourses[s.id] = getStudentDisplayLabel(s)
+          studentCourseKeys[s.id] = s.course || 'design'
         })
       }
 
@@ -77,8 +80,8 @@ export function HeaderSearch() {
         id: p.id,
         full_name: p.full_name,
         avatar_url: p.avatar_url,
-        course: studentCourses[p.id] ? (COURSE_CONFIG[studentCourses[p.id] as CourseType]?.name || studentCourses[p.id]) : undefined,
-        courseKey: studentCourses[p.id] as CourseType | undefined,
+        course: studentCourses[p.id] || undefined,
+        courseKey: (studentCourseKeys[p.id] || 'design') as CourseType,
       }))
 
       const docenti: SearchResult[] = (docentiRes.data || []).map((p: any) => ({

@@ -18,7 +18,9 @@ export default function DashboardRedirect() {
         .eq('id', user.id)
         .single()
         .then(({ data }: any) => {
-          if (data?.role === 'company') {
+          if (data?.role === 'admin') {
+            router.push('/pannello/admin')
+          } else if (data?.role === 'company') {
             router.push('/pannello/azienda')
           } else if (data?.role === 'docente') {
             router.push('/tesi')

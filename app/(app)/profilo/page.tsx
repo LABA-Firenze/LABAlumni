@@ -28,6 +28,7 @@ import type { Student, Company, Docente, Profile, CourseType } from '@/types/dat
 import type { PortfolioItem } from '@/types/social'
 import { getInitials } from '@/lib/avatar'
 import { COURSE_CONFIG, getProfileGradient } from '@/types/database'
+import { getStudentDisplayLabel } from '@/lib/staff-labels'
 import { ProfilePill } from '@/components/ProfilePill'
 import { SkeletonProfileSidebar, SkeletonCard, SkeletonPortfolioItem } from '@/components/ui/Skeleton'
 import { useMinimumLoading } from '@/hooks/useMinimumLoading'
@@ -265,8 +266,8 @@ export default function ProfilePage() {
                   </div>
                   {student && (
                     <p className="text-sm text-gray-600 mt-1">
-                      {COURSE_CONFIG[student.course]?.name}
-                      {student.academic_year && ` • ${student.academic_year}`}
+                      {getStudentDisplayLabel(student)}
+                      {!student.display_label && student.academic_year && ` • ${student.academic_year}`}
                     </p>
                   )}
                 </div>
@@ -324,9 +325,13 @@ export default function ProfilePage() {
                   <h1 className="text-2xl font-bold text-gray-900 mt-4">{fullName || 'Studente'}</h1>
                   <p className="text-gray-600 flex items-center gap-2 mt-1">
                     <GraduationCap className="w-4 h-4 shrink-0" />
-                    {student && COURSE_CONFIG[student.course]?.name}
-                    {student?.academic_year && ` • ${student.academic_year}`}
-                    {year && ` • ${year}° anno`}
+                    {student && (
+                      <>
+                        {getStudentDisplayLabel(student)}
+                        {!student.display_label && student.academic_year && ` • ${student.academic_year}`}
+                        {!student.display_label && year && ` • ${year}° anno`}
+                      </>
+                    )}
                   </p>
                   {bio && (
                     <p className="text-gray-700 mt-3 leading-relaxed">{bio}</p>

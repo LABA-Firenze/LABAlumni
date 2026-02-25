@@ -45,7 +45,7 @@ export async function updateStudentYears(supabase: any) {
     // Get all students
     const { data: students, error } = await supabase
       .from('students')
-      .select('id, year, course, last_year_update')
+      .select('id, year, course, display_label, last_year_update')
     
     if (error) throw error
     if (!students) return
@@ -53,6 +53,7 @@ export async function updateStudentYears(supabase: any) {
     const updates: Array<{ id: string; year: number; last_year_update: string }> = []
     
     for (const student of students) {
+      if (student.display_label || !student.course) continue // Skip staff (display_label) - no year update
       if (shouldUpdateYear(student.last_year_update)) {
         // Get course type from course enum
         // This is a simplified version - you'd need to map course to type

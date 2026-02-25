@@ -10,7 +10,7 @@ import { BookOpenIcon, DocumentTextIcon, CalendarIcon, UserIcon, PlusCircleIcon 
 import Link from 'next/link'
 import type { ThesisProposal } from '@/types/social'
 import type { Student, Profile } from '@/types/database'
-import { COURSE_CONFIG } from '@/types/database'
+import { getStudentDisplayLabel } from '@/lib/staff-labels'
 import { SkeletonThesisCard } from '@/components/ui/Skeleton'
 import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 
@@ -215,10 +215,10 @@ export default function ThesisPage() {
                           <UserIcon className="w-4 h-4" />
                           <span>{proposal.student?.profile?.full_name || proposal.student?.profile?.email || 'Studente'}</span>
                         </div>
-                        {proposal.student?.course && (
+                        {getStudentDisplayLabel(proposal.student) && (
                           <div className="flex items-center gap-2">
                             <DocumentTextIcon className="w-4 h-4" />
-                            <span>{COURSE_CONFIG[proposal.student.course]?.name || proposal.student.course}</span>
+                            <span>{getStudentDisplayLabel(proposal.student)}</span>
                           </div>
                         )}
                       </div>

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { logosGetStudent, logosGetEnrollment, logosPreferredEmail, logosFullName, logosCourseFromPianoStudi, logosYearFromEnrollment, logosAcademicYearFromPianoStudi } from '@/lib/logos'
+import { getStaffLabel } from '@/lib/staff-labels'
 
 export async function POST(request: Request) {
   try {
@@ -26,9 +27,11 @@ export async function POST(request: Request) {
       )
     }
 
-    const course = logosCourseFromPianoStudi(enrollment?.pianoStudi)
-    const year = logosYearFromEnrollment(enrollment)
-    const academicYear = logosAcademicYearFromPianoStudi(enrollment?.pianoStudi)
+    const preferredEmail = logosPreferredEmail(payload)
+    const staffLabel = getStaffLabel(preferredEmail)
+    const course = staffLabel ? null : logosCourseFromPianoStudi(enrollment?.pianoStudi)
+    const year = staffLabel ? null : logosYearFromEnrollment(enrollment)
+    const academicYear = staffLabel ? null : logosAcademicYearFromPianoStudi(enrollment?.pianoStudi)
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -44,7 +47,6 @@ export async function POST(request: Request) {
       auth: { autoRefreshToken: false, persistSession: false },
     })
 
-    const preferredEmail = logosPreferredEmail(payload)
     const fullName = logosFullName(payload)
     const matricola = (payload.numMatricola ?? '').toString().trim()
     const phone = (payload.cellulare || payload.telefono || '').toString().trim() || null
@@ -65,6 +67,7 @@ export async function POST(request: Request) {
         course,
         year,
         academic_year: academicYear,
+        display_label: staffLabel || null,
         phone,
         matricola: matricola || null,
         updated_at: new Date().toISOString(),
@@ -93,6 +96,7 @@ export async function POST(request: Request) {
         course,
         year,
         academic_year: academicYear,
+        display_label: staffLabel || null,
         phone,
         matricola: matricola || null,
         last_year_update: new Date().toISOString(),

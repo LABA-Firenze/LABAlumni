@@ -215,7 +215,7 @@ export function PostCard({ post, onUpdate }: PostCardProps) {
               <div className="flex gap-1 flex-wrap">
                 <span className="text-xs text-gray-500">Corso:</span>
                 <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs">
-                  {COURSE_CONFIG[post.student_course as CourseType]?.name || post.student_course}
+                  {post.student_course}
                 </span>
               </div>
             )}

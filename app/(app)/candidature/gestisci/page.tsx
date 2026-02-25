@@ -11,6 +11,7 @@ import Link from 'next/link'
 import { APPLICATION_STATUS_CONFIG } from '@/lib/application-status'
 import type { Application, JobPost, Student } from '@/types/database'
 import { COURSE_CONFIG } from '@/types/database'
+import { getStudentDisplayLabel } from '@/lib/staff-labels'
 import { SkeletonApplicationCard } from '@/components/ui/Skeleton'
 import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 
@@ -214,7 +215,7 @@ export default function ManageApplicationsPage() {
                         <div className="flex gap-4 text-sm">
                           <div>
                             <span className="text-gray-600">Corso: </span>
-                            <span className="font-medium">{COURSE_CONFIG[app.student.course]?.name || app.student.course}</span>
+                            <span className="font-medium">{getStudentDisplayLabel(app.student)}</span>
                           </div>
                           {app.student.year && (
                             <div>

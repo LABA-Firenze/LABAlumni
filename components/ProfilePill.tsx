@@ -1,11 +1,12 @@
 'use client'
 
-type RoleType = 'student' | 'company' | 'docente'
+type RoleType = 'student' | 'company' | 'docente' | 'admin'
 
 const ROLE_CONFIG: Record<RoleType, { label: string; className: string }> = {
   student: { label: 'Studente', className: 'bg-primary-100 text-primary-700 border-primary-200' },
   docente: { label: 'Docente', className: 'bg-amber-100 text-amber-800 border-amber-200' },
   company: { label: 'Azienda', className: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
+  admin: { label: 'Admin', className: 'bg-slate-100 text-slate-800 border-slate-200' },
 }
 
 interface ProfilePillProps {

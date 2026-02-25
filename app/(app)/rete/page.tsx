@@ -11,6 +11,7 @@ import Link from 'next/link'
 import { UsersIcon, UserPlusIcon, CheckIcon, XMarkIcon, MagnifyingGlassIcon, BuildingOffice2Icon, AcademicCapIcon } from '@heroicons/react/24/solid'
 import { getInitials } from '@/lib/avatar'
 import { COURSE_CONFIG, getProfileGradient, type CourseType } from '@/types/database'
+import { getStudentDisplayLabel } from '@/lib/staff-labels'
 import type { Student, Profile } from '@/types/database'
 import type { StudentConnection } from '@/types/social'
 import { SkeletonCard } from '@/components/ui/Skeleton'
@@ -294,7 +295,7 @@ export default function NetworkPage() {
                     <div>
                       <p className="font-medium">{student.profile?.full_name || 'Studente'}</p>
                       <p className="text-sm text-gray-600">
-                        {COURSE_CONFIG[student.course]?.name || student.course}
+                        {getStudentDisplayLabel(student)}
                       </p>
                     </div>
                     <div className="flex gap-2">
@@ -464,16 +465,16 @@ export default function NetworkPage() {
                           <h3 className="font-semibold text-lg group-hover:text-primary-600 transition-colors">
                             {student.profile?.full_name || 'Studente'}
                           </h3>
-                          <p className="text-sm text-gray-600">
-                            {COURSE_CONFIG[student.course]?.name || student.course}
-                          </p>
+                        <p className="text-sm text-gray-600">
+                          {getStudentDisplayLabel(student)}
+                        </p>
                           <span className="text-xs text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity mt-1 inline-block">
                             Vedi profilo e portfolio →
                           </span>
                         </div>
                       </div>
 
-                      {student.year && (
+                      {!student.display_label && student.year && (
                         <p className="text-sm text-gray-500 mb-4">
                           {student.year}° anno
                         </p>

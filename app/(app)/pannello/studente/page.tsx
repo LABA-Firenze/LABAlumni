@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button'
 import { BriefcaseIcon, UsersIcon, ArrowRightIcon, BuildingOffice2Icon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import type { Student, JobPost, Application } from '@/types/database'
+import { getStudentDisplayLabel } from '@/lib/staff-labels'
 import type { Post } from '@/types/social'
 import { PostCard } from '@/components/PostCard'
 import { SkeletonCard } from '@/components/ui/Skeleton'
@@ -139,12 +140,12 @@ export default function StudentDashboard() {
       if (data) {
         const { data: studentData } = await supabase
           .from('students')
-          .select('course')
+          .select('course, display_label')
           .eq('id', user.id)
           .single()
         setMyRequest({
           ...data,
-          student_course: studentData?.course,
+          student_course: studentData ? getStudentDisplayLabel(studentData) : undefined,
         } as Post)
       } else {
         setMyRequest(null)
@@ -226,10 +227,10 @@ export default function StudentDashboard() {
         if (studentUserIds.length > 0) {
           const { data: studentsData } = await supabase
             .from('students')
-            .select('id, course')
+            .select('id, course, display_label')
             .in('id', studentUserIds)
-          studentsData?.forEach((s: { id: string; course: string }) => {
-            studentCourses[s.id] = s.course
+          studentsData?.forEach((s: { id: string; course?: string; display_label?: string | null }) => {
+            studentCourses[s.id] = getStudentDisplayLabel(s)
           })
         }
 

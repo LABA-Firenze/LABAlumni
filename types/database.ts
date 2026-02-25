@@ -1,7 +1,7 @@
 // Export social types
 export * from './social'
 
-export type UserRole = 'student' | 'company' | 'docente'
+export type UserRole = 'student' | 'company' | 'docente' | 'admin'
 export type ApplicationStatus = 'pending' | 'accepted' | 'rejected'
 export type CourseType = 
   | 'graphic-design-multimedia'
@@ -25,7 +25,7 @@ export interface Profile {
 
 export interface Student {
   id: string
-  course: CourseType
+  course: CourseType | null
   bio: string | null
   portfolio_url: string | null
   twitter_url: string | null
@@ -35,6 +35,7 @@ export interface Student {
   academic_year: string | null
   phone: string | null
   matricola: string | null
+  display_label: string | null
   last_year_update: string | null
   created_at: string
   updated_at: string
