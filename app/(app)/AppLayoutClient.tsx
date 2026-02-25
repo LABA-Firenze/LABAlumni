@@ -44,10 +44,12 @@ export default function AppLayoutClient({
   }
 
   return (
-    <div className="min-h-screen bg-gray-100/80">
+    <div className="min-h-screen">
       <Navbar />
-      <div className={`mx-auto px-4 sm:px-6 lg:px-8 py-8 ${isWidePage ? 'max-w-9xl' : 'max-w-6xl'}`}>
-        {children}
+      <div className="bg-gray-100/90 rounded-b-2xl min-h-[calc(100vh-3.5rem)]">
+        <div className={`mx-auto px-4 sm:px-6 lg:px-8 py-8 ${isWidePage ? 'max-w-9xl' : 'max-w-6xl'}`}>
+          {children}
+        </div>
       </div>
     </div>
   )

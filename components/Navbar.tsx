@@ -62,7 +62,7 @@ export function Navbar() {
   }
 
   return (
-    <nav className="bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50 shadow-sm">
+    <nav className="bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50 shadow-sm rounded-b-2xl">
       <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-14 gap-4">
           <Link href={user ? dashboardHref : '/'} className="flex items-center shrink-0">

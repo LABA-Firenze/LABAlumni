@@ -470,7 +470,9 @@ export default function ThesisDetailPage() {
                 )}
                 <div className="flex gap-2 ml-auto">
                   <Link href="/tesi">
-                    <Button variant="outline" size="sm">Torna alle Proposte</Button>
+                    <span className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-full transition-colors">
+                      Torna alle Proposte
+                    </span>
                   </Link>
                 </div>
               </div>

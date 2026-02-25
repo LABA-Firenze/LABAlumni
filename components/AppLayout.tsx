@@ -92,9 +92,10 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
   const sidebarLoading = useMinimumLoading(sidebarLoadingRaw)
 
   return (
-    <div className="min-h-screen bg-gray-100/80">
+    <div className="min-h-screen">
       <Navbar />
-      <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="bg-gray-100/90 rounded-b-2xl min-h-[calc(100vh-3.5rem)]">
+        <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className={`grid gap-6 ${hasSidebars ? 'lg:grid-cols-12' : ''}`}>
           {/* Left Sidebar - solo se loggato */}
           {hasSidebars && (
@@ -227,6 +228,7 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
             )}
           </aside>
           )}
+        </div>
         </div>
       </div>
     </div>
