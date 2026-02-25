@@ -1,10 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { logosGetStudent, logosPreferredEmail, logosFullName } from '@/lib/logos'
-import type { CourseType } from '@/types/database'
-
-/** Corso di default per studenti creati da LOGOS (se LOGOS non fornisce il corso) */
-const DEFAULT_COURSE: CourseType = 'graphic-design-multimedia'
+import { logosGetStudent, logosGetEnrollment, logosPreferredEmail, logosFullName, logosCourseFromPianoStudi, logosYearFromEnrollment } from '@/lib/logos'
 
 export async function POST(request: Request) {
   try {
@@ -19,13 +15,19 @@ export async function POST(request: Request) {
       )
     }
 
-    const payload = await logosGetStudent(email, password)
+    const [payload, enrollment] = await Promise.all([
+      logosGetStudent(email, password),
+      logosGetEnrollment(email, password),
+    ])
     if (!payload) {
       return NextResponse.json(
         { error: 'Credenziali non valide o studente non trovato' },
         { status: 401 }
       )
     }
+
+    const course = logosCourseFromPianoStudi(enrollment?.pianoStudi)
+    const year = logosYearFromEnrollment(enrollment)
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -59,8 +61,8 @@ export async function POST(request: Request) {
       }).eq('id', existingId)
       await supabaseAdmin.from('students').upsert({
         id: existingId,
-        course: DEFAULT_COURSE,
-        year: null,
+        course,
+        year,
         phone,
         matricola: matricola || null,
         updated_at: new Date().toISOString(),
@@ -86,8 +88,8 @@ export async function POST(request: Request) {
 
       await supabaseAdmin.from('students').upsert({
         id: newUser.user.id,
-        course: DEFAULT_COURSE,
-        year: null,
+        course,
+        year,
         phone,
         matricola: matricola || null,
         last_year_update: new Date().toISOString(),

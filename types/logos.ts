@@ -49,3 +49,19 @@ export interface LogosOAuth2TokenResponse {
   error?: string
   error_description?: string
 }
+
+/** Payload GET /api/Enrollments (iscrizione, piano di studi, anno) */
+export interface LogosEnrollmentPayload {
+  pianoStudi?: string
+  annoAttuale?: number
+  stato?: string
+  classeLaurea?: string
+  [key: string]: unknown
+}
+
+export interface LogosEnrollmentsResponse {
+  success: boolean
+  errors?: LogosApiError[]
+  payload?: LogosEnrollmentPayload
+  errorSummary?: string
+}

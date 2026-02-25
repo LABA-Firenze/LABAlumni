@@ -6,7 +6,8 @@
  * - LOGOS_CLIENT_ID / LOGOS_CLIENT_SECRET: (opzionali) se richiesti da IdentityServer
  */
 
-import type { LogosOAuth2TokenResponse, LogosStudentsResponse, LogosStudentPayload } from '@/types/logos'
+import type { CourseType } from '@/types/database'
+import type { LogosEnrollmentPayload, LogosEnrollmentsResponse, LogosOAuth2TokenResponse, LogosStudentsResponse, LogosStudentPayload } from '@/types/logos'
 
 /** Lettura runtime delle env (evita inlining a build time su Railway) */
 function env(key: string): string | undefined {
@@ -100,6 +101,53 @@ export async function logosGetStudent(email: string, password: string): Promise<
   const data: LogosStudentsResponse = await res.json()
   if (!data.success || !data.payload) return null
   return data.payload
+}
+
+/**
+ * Recupera l'iscrizione (piano di studi, anno) dello studente da LOGOS.
+ */
+export async function logosGetEnrollment(email: string, password: string): Promise<LogosEnrollmentPayload | null> {
+  const baseUrl = getLogosApiUrl()
+  const url = `${baseUrl}/api/Enrollments`
+  let authHeader: string
+
+  const token = await logosLogin(email, password)
+  if (token) {
+    authHeader = `Bearer ${token}`
+  } else {
+    authHeader = `Basic ${Buffer.from(`${email}:${password}`, 'utf-8').toString('base64')}`
+  }
+
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: { Authorization: authHeader, Accept: 'application/json' },
+  })
+
+  if (!res.ok) return null
+  const data: LogosEnrollmentsResponse = await res.json()
+  if (!data.success || !data.payload) return null
+  return data.payload
+}
+
+/** Mappa pianoStudi LOGOS al nostro CourseType */
+export function logosCourseFromPianoStudi(pianoStudi?: string | null): CourseType {
+  if (!pianoStudi || typeof pianoStudi !== 'string') return 'graphic-design-multimedia'
+  const s = pianoStudi.toUpperCase()
+  if ((s.includes('GRAPHIC') && (s.includes('DESIGN') || s.includes('MULTIMEDIA'))) || s.includes('GRAPHIC DESIGN')) return 'graphic-design-multimedia'
+  if (s.includes('REGIA') || s.includes('VIDEOMAKING')) return 'regia-videomaking'
+  if (s.includes('FOTOGRAFIA')) return 'fotografia'
+  if (s.includes('FASHION')) return 'fashion-design'
+  if (s.includes('PITTURA')) return 'pittura'
+  if (s.includes('INTERIOR')) return 'interior-design'
+  if (s.includes('CINEMA') || s.includes('AUDIOVISIVI')) return 'cinema-audiovisivi'
+  if (s.includes('DESIGN')) return 'design'
+  return 'graphic-design-multimedia'
+}
+
+/** Anno corrente da enrollment */
+export function logosYearFromEnrollment(payload: LogosEnrollmentPayload | null): number | null {
+  const y = payload?.annoAttuale
+  return typeof y === 'number' && y >= 1 && y <= 5 ? y : null
 }
 
 /** Email da usare per Supabase: preferisce email LABA se presente */

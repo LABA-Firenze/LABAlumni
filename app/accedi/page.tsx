@@ -46,14 +46,23 @@ export default function LoginPage() {
     }
   }
 
-  /** Login docenti / aziende: solo Supabase */
+  /** Login docenti / aziende: solo Supabase. Gli studenti sono bloccati: devono usare il tab Studente. */
   const handleClassicSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
-      if (error) throw error
+      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+      if (signInError) throw signInError
+      if (!authData.user) throw new Error('Utente non trovato')
+      const { data: profile } = await supabase.from('profiles').select('role').eq('id', authData.user.id).single()
+      const { data: studentRow } = await supabase.from('students').select('id').eq('id', authData.user.id).single()
+      if (profile?.role === 'student' || studentRow) {
+        await supabase.auth.signOut()
+        setError('Gli studenti devono accedere con il tab Studente.')
+        setLoading(false)
+        return
+      }
       router.push('/pannello')
       router.refresh()
     } catch (err: unknown) {
