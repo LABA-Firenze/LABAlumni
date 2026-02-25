@@ -32,10 +32,20 @@ export interface LogosStudentsResponse {
   errorSummary?: string
 }
 
-/** Risposta attesa da un eventuale endpoint di login LOGOS (es. POST /api/Auth/Login) */
+/** Risposta da endpoint di login custom (es. POST /api/Auth/Login) */
 export interface LogosAuthResponse {
   success?: boolean
   token?: string
   accessToken?: string
+  access_token?: string
   errors?: LogosApiError[]
+}
+
+/** Risposta OAuth2 IdentityServer (connect/token, grant_type=password) */
+export interface LogosOAuth2TokenResponse {
+  access_token: string
+  token_type?: string
+  expires_in?: number
+  error?: string
+  error_description?: string
 }

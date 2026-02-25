@@ -1,12 +1,12 @@
 /**
- * Client per le API LOGOS (gestionale LABA).
+ * Client per le API LOGOS (LogosUni Laba API).
  * Variabili d'ambiente:
- * - LOGOS_API_URL: base URL API LOGOS (es. https://logos.laba.it/api)
- * - LOGOS_AUTH_URL: (opzionale) URL per login, es. POST che riceve email/password e restituisce token
- * - LOGOS_API_KEY: (opzionale) API key fissa se le API usano quella invece di user token
+ * - LOGOS_API_URL: base URL API (es. https://logosuni.laba.biz/logosuni.servicesv2)
+ * - LOGOS_AUTH_URL: (opzionale) URL token OAuth2 (es. https://logosuni.laba.biz/identityserver/connect/token)
+ * - LOGOS_CLIENT_ID / LOGOS_CLIENT_SECRET: (opzionali) se richiesti da IdentityServer
  */
 
-import type { LogosAuthResponse, LogosStudentsResponse, LogosStudentPayload } from '@/types/logos'
+import type { LogosOAuth2TokenResponse, LogosStudentsResponse, LogosStudentPayload } from '@/types/logos'
 
 function getLogosApiUrl(): string {
   const url = process.env.LOGOS_API_URL
@@ -20,23 +20,43 @@ function getLogosAuthUrl(): string | null {
 }
 
 /**
- * Esegue il login su LOGOS e restituisce un token da usare per le chiamate successive.
- * Se LOGOS_AUTH_URL non è impostato, restituisce null (si può usare Basic Auth con email:password).
+ * Ottiene un token da IdentityServer (OAuth2 password grant).
+ * Swagger: securityDefinitions.AccountsOauth.tokenUrl
  */
-export async function logosLogin(email: string, password: string): Promise<string | null> {
+async function logosGetOAuth2Token(email: string, password: string): Promise<string | null> {
   const authUrl = getLogosAuthUrl()
   if (!authUrl) return null
 
+  const body = new URLSearchParams({
+    grant_type: 'password',
+    username: email,
+    password,
+    scope: 'LogosUni.Laba.Api',
+  })
+  const clientId = process.env.LOGOS_CLIENT_ID
+  const clientSecret = process.env.LOGOS_CLIENT_SECRET
+  if (clientId) body.set('client_id', clientId)
+  if (clientSecret) body.set('client_secret', clientSecret)
+
   const res = await fetch(authUrl, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body.toString(),
   })
 
   if (!res.ok) return null
-  const data: LogosAuthResponse = await res.json()
-  const token = data.token ?? data.accessToken ?? null
-  return token
+  const data: LogosOAuth2TokenResponse = await res.json()
+  if (data.error || !data.access_token) return null
+  return data.access_token
+}
+
+/**
+ * Esegue il login su LOGOS e restituisce un token per le chiamate successive.
+ * Se LOGOS_AUTH_URL è impostato: OAuth2 password grant (IdentityServer connect/token).
+ * Altrimenti null → GET /api/Students con Basic Auth.
+ */
+export async function logosLogin(email: string, password: string): Promise<string | null> {
+  return logosGetOAuth2Token(email, password)
 }
 
 /**

@@ -68,7 +68,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <div className="flex items-center justify-center min-h-screen px-4 py-16">
+      <div className="flex justify-center items-start min-h-screen px-4 pt-24 pb-16">
         <div className="w-full max-w-md">
           <Card className="shadow-xl">
             <div className="text-center mb-6">
@@ -117,9 +117,13 @@ export default function LoginPage() {
                 required
                 placeholder="••••••••"
               />
-              {isStudentLogos && (
+              {isStudentLogos ? (
                 <p className="text-xs text-gray-500 text-center -mt-1">
                   Accedi con le credenziali che usi per l&apos;applicazione LABA.
+                </p>
+              ) : (
+                <p className="text-xs text-gray-500 text-center -mt-1">
+                  Crea il tuo account docente che utilizzerai sulla piattaforma.
                 </p>
               )}
               <Button type="submit" className="w-full group flex items-center justify-center" disabled={loading}>
@@ -131,13 +135,6 @@ export default function LoginPage() {
                 )}
               </Button>
             </form>
-
-            {isStudentLogos && (
-              <p className="text-xs text-gray-500 text-center mt-3">
-                Usa le stesse credenziali del portale LABA.<br />
-                Il primo accesso crea il tuo profilo su LABAlumni.
-              </p>
-            )}
           </Card>
 
           <Card className="shadow-xl mt-4 text-center py-4">
