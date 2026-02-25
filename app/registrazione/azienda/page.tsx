@@ -36,12 +36,19 @@ export default function CompanyRegisterPage() {
     setError('')
 
     if (step === 1) {
-      if (!companyName || !partitaIva || !referentName || !email || !password || !confirmPassword) {
-        setError('Compila tutti i campi obbligatori')
+      if (!companyName?.trim() || !referentName?.trim()) {
+        setError('Nome azienda e referente obbligatori')
         return false
       }
       if (partitaIva.replace(/\s/g, '').length !== 11) {
         setError('La Partita IVA deve essere di 11 cifre')
+        return false
+      }
+    }
+
+    if (step === 2) {
+      if (!email?.trim() || !password || !confirmPassword) {
+        setError('Email e password obbligatori')
         return false
       }
       if (password.length < 6) {
@@ -54,7 +61,7 @@ export default function CompanyRegisterPage() {
       }
     }
 
-    if (step === 2) {
+    if (step === 3) {
       if (!address || !city || !cap) {
         setError('Compila indirizzo, città e CAP')
         return false
@@ -81,7 +88,7 @@ export default function CompanyRegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!validateStep(1) || !validateStep(2)) return
+    if (!validateStep(1) || !validateStep(2) || !validateStep(3)) return
 
     setLoading(true)
     setError('')
@@ -189,7 +196,12 @@ export default function CompanyRegisterPage() {
               required
               placeholder="Nome e cognome della persona di riferimento"
             />
+          </div>
+        )
 
+      case 2:
+        return (
+          <div className="space-y-4">
             <Input
               label="Email Aziendale"
               type="email"
@@ -220,7 +232,7 @@ export default function CompanyRegisterPage() {
           </div>
         )
 
-      case 2:
+      case 3:
         return (
           <div className="space-y-4">
             <Input
@@ -267,7 +279,7 @@ export default function CompanyRegisterPage() {
           </div>
         )
 
-      case 3:
+      case 4:
         return (
           <div className="space-y-4">
             <Textarea
@@ -317,10 +329,10 @@ export default function CompanyRegisterPage() {
               </h1>
             </div>
             <p className="text-center text-gray-600">
-              Step {currentStep} di 3
+              Step {currentStep} di 4
             </p>
             <div className="mt-3 flex gap-1">
-              {[1, 2, 3].map((s) => (
+              {[1, 2, 3, 4].map((s) => (
                 <div
                   key={s}
                   className={`h-1 flex-1 rounded-full ${s <= currentStep ? 'bg-primary-600' : 'bg-gray-200'}`}
@@ -337,7 +349,7 @@ export default function CompanyRegisterPage() {
 
           <form
             onSubmit={
-              currentStep === 3
+              currentStep === 4
                 ? handleSubmit
                 : (e) => {
                     e.preventDefault()
@@ -359,7 +371,7 @@ export default function CompanyRegisterPage() {
                 Indietro
               </Button>
 
-              {currentStep < 3 ? (
+              {currentStep < 4 ? (
                 <Button type="submit" variant="primary" className="flex items-center gap-2">
                   Avanti
                   <ArrowRight className="w-4 h-4 shrink-0" />

@@ -20,6 +20,7 @@ import {
 } from 'lucide-react'
 import type { Profile, Student, Company, Docente } from '@/types/database'
 import type { PortfolioItem } from '@/types/social'
+import { getInitials } from '@/lib/avatar'
 import { COURSE_CONFIG, getProfileGradient } from '@/types/database'
 import { ProfilePill } from '@/components/ProfilePill'
 import { PostCard } from '@/components/PostCard'
@@ -246,7 +247,7 @@ export default function PublicProfilePage() {
                     {profile.avatar_url ? (
                       <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      fullName[0]?.toUpperCase() || 'S'
+                      {getInitials(fullName)}
                     )}
                   </div>
                   <h3 className="font-semibold text-lg">{fullName}</h3>
@@ -310,7 +311,7 @@ export default function PublicProfilePage() {
                     {profile.avatar_url ? (
                       <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      fullName[0]?.toUpperCase() || 'S'
+                      {getInitials(fullName)}
                     )}
                   </div>
                   <h1 className="text-2xl font-bold text-gray-900 mt-4">{fullName}</h1>
@@ -421,7 +422,7 @@ export default function PublicProfilePage() {
                 {profile.avatar_url ? (
                   <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  fullName[0]?.toUpperCase() || 'D'
+                  {getInitials(fullName)}
                 )}
               </div>
               <div>

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Search, Building2, User, GraduationCap } from 'lucide-react'
+import { getInitials } from '@/lib/avatar'
 import { COURSE_CONFIG, getProfileGradient, type CourseType } from '@/types/database'
 
 type SearchResult = 
@@ -185,7 +186,7 @@ export function HeaderSearch() {
                             <img src={r.avatar_url} alt="" className="w-full h-full object-cover" />
                           ) : (
                             <span className="font-semibold">
-                              {r.full_name?.[0]?.toUpperCase() || '?'}
+                              {getInitials(r.full_name)}
                             </span>
                           )}
                         </div>

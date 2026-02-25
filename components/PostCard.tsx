@@ -7,6 +7,7 @@ import { Card } from './ui/Card'
 import { Button } from './ui/Button'
 import { Heart, MessageCircle, Share2, Send, Trash2 } from 'lucide-react'
 import type { Post, PostComment } from '@/types/social'
+import { getInitials } from '@/lib/avatar'
 import { COURSE_CONFIG, getProfileGradient, type CourseType } from '@/types/database'
 
 interface PostCardProps {
@@ -152,7 +153,7 @@ export function PostCard({ post, onUpdate }: PostCardProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className={`w-10 h-10 bg-gradient-to-br ${getProfileGradient(post.request_from === 'company' ? 'company' : 'student', post.student_course as CourseType).circle} rounded-full flex items-center justify-center text-white font-semibold`}>
-              {post.user?.full_name?.[0]?.toUpperCase() || post.user?.id?.[0]?.toUpperCase() || 'U'}
+              {getInitials(post.user?.full_name || post.user?.id) || 'U'}
             </div>
             <div>
               <p className="font-semibold text-gray-900">
@@ -317,7 +318,7 @@ export function PostCard({ post, onUpdate }: PostCardProps) {
               comments.map((comment: any) => (
                 <div key={comment.id} className="flex gap-3">
                   <div className="w-8 h-8 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
-                  {comment.user?.full_name?.[0]?.toUpperCase() || comment.user?.id?.[0]?.toUpperCase() || 'U'}
+                  {getInitials(comment.user?.full_name || comment.user?.id) || 'U'}
                   </div>
                   <div className="flex-1">
                     <div className="bg-white rounded-lg p-3">
@@ -340,7 +341,7 @@ export function PostCard({ post, onUpdate }: PostCardProps) {
             <form onSubmit={handleSubmitComment} className="p-4 border-t border-gray-200 bg-white">
               <div className="flex gap-2">
                 <div className="w-8 h-8 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
-                  {user?.email?.[0]?.toUpperCase() || user?.id?.[0]?.toUpperCase() || 'U'}
+                  {getInitials(user?.email || user?.id) || 'U'}
                 </div>
                 <input
                   type="text"

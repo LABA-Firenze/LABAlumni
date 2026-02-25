@@ -17,6 +17,7 @@ import {
   ArrowTrendingUpIcon,
 } from '@heroicons/react/24/solid'
 import Link from 'next/link'
+import { getInitials } from '@/lib/avatar'
 import { COURSE_CONFIG, getProfileGradient } from '@/types/database'
 import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 import { SkeletonProfileSidebar, SkeletonScopriSidebar } from './ui/Skeleton'
@@ -108,7 +109,7 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
             <Card variant="glass" className="sticky top-24">
               <div className="text-center mb-4">
                 <div className={`w-20 h-20 bg-gradient-to-br ${getProfileGradient(role!, student?.course).circle} rounded-full mx-auto mb-3 flex items-center justify-center text-white text-2xl font-bold`}>
-                  {profileName?.[0]?.toUpperCase() || (student ? 'S' : company ? (company.company_name?.[0]?.toUpperCase() || 'A') : docente ? 'D' : '?')}
+                  {profileName ? getInitials(profileName) : (company ? (company.company_name?.[0]?.toUpperCase() || 'A') : '?')}
                 </div>
                 <h3 className="font-semibold text-lg uppercase">{profileName || user?.email?.split('@')[0]}</h3>
                 <div className="mt-1.5 flex justify-center">

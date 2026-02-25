@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/Button'
 import { Textarea } from '@/components/ui/Textarea'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
-import { Loader2 } from 'lucide-react'
+import { Loader2, ArrowRight, ArrowLeft } from 'lucide-react'
 import { BookOpenIcon, DocumentTextIcon, UserCircleIcon, UsersIcon } from '@heroicons/react/24/solid'
 import { COURSE_CONFIG } from '@/types/database'
 import type { Docente } from '@/types/database'
@@ -20,10 +20,13 @@ interface DocenteWithProfile extends Docente {
   profile: Profile
 }
 
+const TOTAL_STEPS = 3
+
 export default function NewThesisProposalPage() {
   const { user } = useAuth()
   const router = useRouter()
   const [role, setRole] = useState<string | null>(null)
+  const [currentStep, setCurrentStep] = useState(1)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [objectives, setObjectives] = useState('')
@@ -87,19 +90,34 @@ export default function NewThesisProposalPage() {
   const relatori = docenti.filter((d) => d.can_relatore)
   const correlatori = docenti.filter((d) => d.can_corelatore && d.id !== relatoreId)
 
+  const validateStep = (step: number): boolean => {
+    setError('')
+    if (step === 1) {
+      if (!title?.trim()) {
+        setError('Il titolo è obbligatorio')
+        return false
+      }
+      if (!description?.trim()) {
+        setError('La descrizione è obbligatoria')
+        return false
+      }
+    }
+    return true
+  }
+
+  const handleNext = () => {
+    if (validateStep(currentStep)) setCurrentStep(currentStep + 1)
+  }
+
+  const handlePrev = () => {
+    setCurrentStep(currentStep - 1)
+    setError('')
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!user) return
-
-    if (!title.trim()) {
-      setError('Il titolo è obbligatorio')
-      return
-    }
-
-    if (!description.trim()) {
-      setError('La descrizione è obbligatoria')
-      return
-    }
+    if (!validateStep(1)) return
 
     setLoading(true)
     setError('')
@@ -149,13 +167,107 @@ export default function NewThesisProposalPage() {
     }
   }
 
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div className="space-y-4">
+            <Input
+              label="Titolo della Proposta *"
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Es: La comunicazione visiva nel design contemporaneo"
+              required
+            />
+            <Textarea
+              label="Descrizione *"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Descrivi in dettaglio la tua proposta di tesi, il tema centrale, le motivazioni e il contesto..."
+              rows={6}
+              required
+            />
+            <p className="text-sm text-gray-500">
+              Fornisci una descrizione dettagliata che permetta ai relatori di capire l&apos;argomento e lo scope della tua tesi.
+            </p>
+          </div>
+        )
+      case 2:
+        return (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <UserCircleIcon className="w-4 h-4 inline mr-1.5 text-primary-600" />
+                Relatore
+              </label>
+              <Select value={relatoreId} onChange={(e) => { setRelatoreId(e.target.value); if (e.target.value === corelatoreId) setCorelatoreId(''); }}>
+                <option value="">Nessun relatore (i docenti potranno candidarsi)</option>
+                {relatori.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.profile?.full_name || d.profile?.email} {d.courses?.length ? `· ${d.courses.map((c: string) => COURSE_CONFIG[c as keyof typeof COURSE_CONFIG]?.name).filter(Boolean).join(', ')}` : ''}
+                  </option>
+                ))}
+              </Select>
+              <p className="text-sm text-gray-500 mt-1">Opzionale. Se selezioni un relatore, riceverà un invito da accettare.</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <UsersIcon className="w-4 h-4 inline mr-1.5 text-primary-600" />
+                Corelatore
+              </label>
+              <Select value={corelatoreId} onChange={(e) => setCorelatoreId(e.target.value)}>
+                <option value="">Nessun corelatore</option>
+                {correlatori.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.profile?.full_name || d.profile?.email} {d.courses?.length ? `· ${d.courses.map((c: string) => COURSE_CONFIG[c as keyof typeof COURSE_CONFIG]?.name).filter(Boolean).join(', ')}` : ''}
+                  </option>
+                ))}
+              </Select>
+              <p className="text-sm text-gray-500 mt-1">Opzionale. Max 1 relatore + 1 corelatore.</p>
+            </div>
+          </div>
+        )
+      case 3:
+        return (
+          <div className="space-y-4">
+            <Textarea
+              label="Obiettivi"
+              value={objectives}
+              onChange={(e) => setObjectives(e.target.value)}
+              placeholder="Elenca gli obiettivi principali della tua ricerca (opzionale ma consigliato)..."
+              rows={4}
+            />
+            <p className="text-sm text-gray-500">
+              Descrivi cosa vuoi ottenere con questa ricerca e quali risultati ti aspetti.
+            </p>
+
+            <Textarea
+              label="Metodologia"
+              value={methodology}
+              onChange={(e) => setMethodology(e.target.value)}
+              placeholder="Descrivi l'approccio metodologico che intendi utilizzare (opzionale)..."
+              rows={4}
+            />
+            <p className="text-sm text-gray-500">
+              Indica come procederai nella ricerca: metodi di analisi, strumenti, fasi del lavoro.
+            </p>
+          </div>
+        )
+      default:
+        return null
+    }
+  }
+
+  const isLastStep = currentStep === TOTAL_STEPS
+
   if (role && role !== 'student') {
     return null
   }
 
   return (
     <div>
-      
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
           <button
@@ -188,137 +300,65 @@ export default function NewThesisProposalPage() {
             </div>
           </Card>
         ) : (
-        <Card variant="elevated" className="p-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Relatore (opzionale) */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <UserCircleIcon className="w-4 h-4 inline mr-1.5 text-primary-600" />
-                Relatore
-              </label>
-              <Select value={relatoreId} onChange={(e) => { setRelatoreId(e.target.value); if (e.target.value === corelatoreId) setCorelatoreId(''); }}>
-                <option value="">Nessun relatore (i docenti potranno candidarsi)</option>
-                {relatori.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.profile?.full_name || d.profile?.email} {d.courses?.length ? `· ${d.courses.map((c: string) => COURSE_CONFIG[c as keyof typeof COURSE_CONFIG]?.name).filter(Boolean).join(', ')}` : ''}
-                  </option>
-                ))}
-              </Select>
-              <p className="text-sm text-gray-500 mt-1">Opzionale. Se selezioni un relatore, riceverà un invito da accettare. Altrimenti i docenti potranno candidarsi.</p>
+          <Card variant="elevated" className="p-6">
+            <p className="text-center text-gray-500 text-sm mb-6">Step {currentStep} di {TOTAL_STEPS}</p>
+            <div className="flex gap-1 mb-6">
+              {[1, 2, 3].map((s) => (
+                <div
+                  key={s}
+                  className={`h-1 flex-1 rounded-full ${s <= currentStep ? 'bg-primary-600' : 'bg-gray-200'}`}
+                />
+              ))}
             </div>
 
-            {/* Corelatore (opzionale) */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <UsersIcon className="w-4 h-4 inline mr-1.5 text-primary-600" />
-                Corelatore
-              </label>
-              <Select value={corelatoreId} onChange={(e) => setCorelatoreId(e.target.value)}>
-                <option value="">Nessun corelatore</option>
-                {correlatori.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.profile?.full_name || d.profile?.email} {d.courses?.length ? `· ${d.courses.map((c: string) => COURSE_CONFIG[c as keyof typeof COURSE_CONFIG]?.name).filter(Boolean).join(', ')}` : ''}
-                  </option>
-                ))}
-              </Select>
-              <p className="text-sm text-gray-500 mt-1">Opzionale. Max 1 relatore + 1 corelatore.</p>
-            </div>
+            <form onSubmit={isLastStep ? handleSubmit : (e) => { e.preventDefault(); handleNext(); }} className="space-y-6">
+              {renderStep()}
 
-            {/* Title */}
-            <div>
-              <Input
-                label="Titolo della Proposta *"
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Es: La comunicazione visiva nel design contemporaneo"
-                required
-              />
-            </div>
+              {error && (
+                <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+                  {error}
+                </div>
+              )}
 
-            {/* Description */}
-            <div>
-              <Textarea
-                label="Descrizione *"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Descrivi in dettaglio la tua proposta di tesi, il tema centrale, le motivazioni e il contesto..."
-                rows={6}
-                required
-              />
-              <p className="text-sm text-gray-500 mt-2">
-                Fornisci una descrizione dettagliata che permetta ai relatori di capire l&apos;argomento e lo scope della tua tesi.
-              </p>
-            </div>
-
-            {/* Objectives */}
-            <div>
-              <Textarea
-                label="Obiettivi"
-                value={objectives}
-                onChange={(e) => setObjectives(e.target.value)}
-                placeholder="Elenca gli obiettivi principali della tua ricerca (opzionale ma consigliato)..."
-                rows={4}
-              />
-              <p className="text-sm text-gray-500 mt-2">
-                Descrivi cosa vuoi ottenere con questa ricerca e quali risultati ti aspetti.
-              </p>
-            </div>
-
-            {/* Methodology */}
-            <div>
-              <Textarea
-                label="Metodologia"
-                value={methodology}
-                onChange={(e) => setMethodology(e.target.value)}
-                placeholder="Descrivi l'approccio metodologico che intendi utilizzare (opzionale)..."
-                rows={4}
-              />
-              <p className="text-sm text-gray-500 mt-2">
-                Indica come procederai nella ricerca: metodi di analisi, strumenti, fasi del lavoro.
-              </p>
-            </div>
-
-            {/* Error */}
-            {error && (
-              <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
-                {error}
-              </div>
-            )}
-
-            {/* Actions */}
-            <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => router.back()}
-                disabled={loading}
-              >
-                Annulla
-              </Button>
-              <Button
-                type="submit"
-                variant="primary"
-                disabled={loading || !title.trim() || !description.trim()}
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Pubblicando...
-                  </>
+              <div className="flex justify-between pt-4 border-t border-gray-200">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handlePrev}
+                  disabled={currentStep === 1 || loading}
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Indietro
+                </Button>
+                {!isLastStep ? (
+                  <Button type="submit" variant="primary">
+                    Avanti
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
                 ) : (
-                  <>
-                    <DocumentTextIcon className="w-4 h-4 mr-2" />
-                    Pubblica Proposta
-                  </>
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    disabled={loading || !title.trim() || !description.trim()}
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Pubblicando...
+                      </>
+                    ) : (
+                      <>
+                        <DocumentTextIcon className="w-4 h-4 mr-2" />
+                        Pubblica Proposta
+                      </>
+                    )}
+                  </Button>
                 )}
-              </Button>
-            </div>
-          </form>
-        </Card>
+              </div>
+            </form>
+          </Card>
         )}
       </div>
     </div>
   )
 }
-

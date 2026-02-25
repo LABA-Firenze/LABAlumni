@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import Link from 'next/link'
 import { UsersIcon, UserPlusIcon, CheckIcon, XMarkIcon, MagnifyingGlassIcon, BuildingOffice2Icon, AcademicCapIcon } from '@heroicons/react/24/solid'
+import { getInitials } from '@/lib/avatar'
 import { COURSE_CONFIG, getProfileGradient, type CourseType } from '@/types/database'
 import type { Student, Profile } from '@/types/database'
 import type { StudentConnection } from '@/types/social'
@@ -457,7 +458,7 @@ export default function NetworkPage() {
                     <Link href={`/profilo/${student.id}`} className="block group">
                       <div className="flex items-center gap-4 mb-4">
                         <div className={`w-16 h-16 bg-gradient-to-br ${getProfileGradient('student', student.course).circle} rounded-full flex items-center justify-center text-white text-xl font-bold overflow-hidden`}>
-                          {student.profile?.full_name?.[0]?.toUpperCase() || student.profile?.email?.[0]?.toUpperCase() || 'S'}
+                          {getInitials(student.profile?.full_name || student.profile?.email) || 'S'}
                         </div>
                         <div className="flex-1 min-w-0">
                           <h3 className="font-semibold text-lg group-hover:text-primary-600 transition-colors">

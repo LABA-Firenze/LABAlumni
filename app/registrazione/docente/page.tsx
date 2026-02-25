@@ -17,6 +17,8 @@ const COURSES = Object.entries(COURSE_CONFIG).map(([value, config]) => ({
   label: config.name,
 }))
 
+const TOTAL_STEPS = 5
+
 export default function DocenteRegisterPage() {
   const [currentStep, setCurrentStep] = useState(1)
   const [fullName, setFullName] = useState('')
@@ -40,15 +42,23 @@ export default function DocenteRegisterPage() {
   const validateStep = (step: number): boolean => {
     setError('')
     if (step === 1) {
-      if (!fullName || !email || !password || !confirmPassword) {
-        setError('Compila tutti i campi obbligatori')
+      if (!fullName?.trim()) {
+        setError('Nome e cognome obbligatorio')
+        return false
+      }
+    }
+    if (step === 2) {
+      if (!email?.trim()) {
+        setError('Email accademica obbligatoria')
         return false
       }
       if (!email.endsWith('@labafirenze.com')) {
         setError('L\'email deve essere del dominio @labafirenze.com')
         return false
       }
-      if (password.length < 6) {
+    }
+    if (step === 3) {
+      if (!password || password.length < 6) {
         setError('La password deve essere di almeno 6 caratteri')
         return false
       }
@@ -57,7 +67,7 @@ export default function DocenteRegisterPage() {
         return false
       }
     }
-    if (step === 2) {
+    if (step === 5) {
       if (!canRelatore && !canCorelatore) {
         setError('Indica almeno una disponibilità (Relatore o Corelatore)')
         return false
@@ -77,7 +87,7 @@ export default function DocenteRegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!validateStep(1) || !validateStep(2)) return
+    if (!validateStep(1) || !validateStep(2) || !validateStep(3) || !validateStep(5)) return
 
     setLoading(true)
     setError('')
@@ -116,6 +126,109 @@ export default function DocenteRegisterPage() {
     }
   }
 
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div className="space-y-4">
+            <Input
+              label="Nome e Cognome"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              required
+              placeholder="Mario Rossi"
+            />
+          </div>
+        )
+      case 2:
+        return (
+          <div className="space-y-4">
+            <Input
+              label="Email Accademica"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value.toLowerCase())}
+              required
+              placeholder="nome.cognome@labafirenze.com"
+            />
+            <p className="text-sm text-gray-500">Solo email del dominio @labafirenze.com</p>
+          </div>
+        )
+      case 3:
+        return (
+          <div className="space-y-4">
+            <Input
+              label="Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+              placeholder="Minimo 6 caratteri"
+            />
+            <Input
+              label="Conferma Password"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              placeholder="Ripeti la password"
+            />
+          </div>
+        )
+      case 4:
+        return (
+          <div className="space-y-4">
+            <Textarea
+              label="Bio (opzionale)"
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              rows={4}
+              placeholder="Breve presentazione..."
+            />
+          </div>
+        )
+      case 5:
+        return (
+          <div className="space-y-4">
+            <p className="text-sm font-medium text-gray-700">Corsi di competenza (opzionale)</p>
+            <div className="flex flex-wrap gap-2">
+              {COURSES.map((c) => (
+                <button
+                  key={c.value}
+                  type="button"
+                  onClick={() => toggleCourse(c.value)}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
+                    selectedCourses.includes(c.value)
+                      ? 'bg-primary-600 text-white border-primary-600'
+                      : 'bg-white text-gray-600 border-gray-200 hover:border-primary-300'
+                  }`}
+                >
+                  {c.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="space-y-3 pt-4 border-t">
+              <p className="text-sm font-medium text-gray-700">Disponibilità *</p>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" checked={canRelatore} onChange={(e) => setCanRelatore(e.target.checked)} className="rounded border-gray-300 text-primary-600" />
+                <span>Posso fare da Relatore</span>
+              </label>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" checked={canCorelatore} onChange={(e) => setCanCorelatore(e.target.checked)} className="rounded border-gray-300 text-primary-600" />
+                <span>Posso fare da Corelatore</span>
+              </label>
+            </div>
+          </div>
+        )
+      default:
+        return null
+    }
+  }
+
+  const isLastStep = currentStep === 5
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -126,9 +239,18 @@ export default function DocenteRegisterPage() {
               <GraduationCap className="w-8 h-8 text-primary-600" />
               Registrati come Docente
             </h1>
-            <p className="text-center text-gray-600">
+            <p className="text-center text-gray-600 mb-4">
               Diventa Relatore o Corelatore per le tesi degli studenti LABA
             </p>
+            <p className="text-center text-gray-500 text-sm">Step {currentStep} di {TOTAL_STEPS}</p>
+            <div className="mt-3 flex gap-1">
+              {[1, 2, 3, 4, 5].map((s) => (
+                <div
+                  key={s}
+                  className={`h-1 flex-1 rounded-full ${s <= currentStep ? 'bg-primary-600' : 'bg-gray-200'}`}
+                />
+              ))}
+            </div>
           </div>
 
           {error && (
@@ -137,58 +259,15 @@ export default function DocenteRegisterPage() {
             </div>
           )}
 
-          <form onSubmit={currentStep === 2 ? handleSubmit : (e) => { e.preventDefault(); handleNext(); }} className="space-y-6">
-            {currentStep === 1 && (
-              <div className="space-y-4">
-                <Input label="Nome e Cognome" value={fullName} onChange={(e) => setFullName(e.target.value)} required placeholder="Mario Rossi" />
-                <Input label="Email Accademica" type="email" value={email} onChange={(e) => setEmail(e.target.value.toLowerCase())} required placeholder="nome.cognome@labafirenze.com" />
-                <p className="text-sm text-gray-500 -mt-2">Solo email del dominio @labafirenze.com</p>
-                <Input label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} placeholder="Minimo 6 caratteri" />
-                <Input label="Conferma Password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required placeholder="Ripeti la password" />
-                <Textarea label="Bio (opzionale)" value={bio} onChange={(e) => setBio(e.target.value)} rows={3} placeholder="Breve presentazione..." />
-              </div>
-            )}
-
-            {currentStep === 2 && (
-              <div className="space-y-4">
-                <p className="text-sm font-medium text-gray-700">Corsi di competenza (opzionale)</p>
-                <div className="flex flex-wrap gap-2">
-                  {COURSES.map((c) => (
-                    <button
-                      key={c.value}
-                      type="button"
-                      onClick={() => toggleCourse(c.value)}
-                      className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
-                        selectedCourses.includes(c.value)
-                          ? 'bg-primary-600 text-white border-primary-600'
-                          : 'bg-white text-gray-600 border-gray-200 hover:border-primary-300'
-                      }`}
-                    >
-                      {c.label}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="space-y-3 pt-4 border-t">
-                  <p className="text-sm font-medium text-gray-700">Disponibilità</p>
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input type="checkbox" checked={canRelatore} onChange={(e) => setCanRelatore(e.target.checked)} className="rounded border-gray-300 text-primary-600" />
-                    <span>Posso fare da Relatore</span>
-                  </label>
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input type="checkbox" checked={canCorelatore} onChange={(e) => setCanCorelatore(e.target.checked)} className="rounded border-gray-300 text-primary-600" />
-                    <span>Posso fare da Corelatore</span>
-                  </label>
-                </div>
-              </div>
-            )}
+          <form onSubmit={isLastStep ? handleSubmit : (e) => { e.preventDefault(); handleNext(); }} className="space-y-6">
+            {renderStep()}
 
             <div className="flex justify-between pt-4 border-t">
               <Button type="button" variant="outline" onClick={handlePrev} disabled={currentStep === 1}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Indietro
               </Button>
-              {currentStep < 2 ? (
+              {!isLastStep ? (
                 <Button type="submit" variant="primary">
                   Avanti
                   <ArrowRight className="w-4 h-4 ml-2" />
