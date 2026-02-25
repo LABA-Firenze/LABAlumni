@@ -42,7 +42,7 @@ export default function NewCollaborationRequestPage() {
   useEffect(() => {
     if (user && role === 'student') {
       loadPortfolioItems()
-      checkWeeklyLimit()
+      checkMonthlyLimit()
     } else if (user && role === 'company') {
       router.push('/richieste/azienda/nuova')
     }
@@ -64,12 +64,12 @@ export default function NewCollaborationRequestPage() {
     setPortfolioItems(data || [])
   }
 
-  const checkWeeklyLimit = async () => {
+  const checkMonthlyLimit = async () => {
     if (!user) return
     setCheckingLimit(true)
     try {
-      const weekAgo = new Date()
-      weekAgo.setDate(weekAgo.getDate() - 7)
+      const monthAgo = new Date()
+      monthAgo.setDate(monthAgo.getDate() - 30)
 
       const { data } = await supabase
         .from('posts')
@@ -77,13 +77,13 @@ export default function NewCollaborationRequestPage() {
         .eq('user_id', user.id)
         .eq('type', 'collaboration_request')
         .eq('request_from', 'student')
-        .gte('created_at', weekAgo.toISOString())
+        .gte('created_at', monthAgo.toISOString())
         .order('created_at', { ascending: false })
 
       if (data && data.length >= 1) {
         setCanPost(false)
         const lastPost = new Date(data[0].created_at)
-        lastPost.setDate(lastPost.getDate() + 7)
+        lastPost.setDate(lastPost.getDate() + 30)
         setNextPostDate(lastPost.toLocaleDateString('it-IT'))
       } else {
         setCanPost(true)
@@ -101,7 +101,7 @@ export default function NewCollaborationRequestPage() {
     if (!user) return
 
     if (!canPost) {
-      setError('Hai già pubblicato una richiesta questa settimana. Puoi pubblicare di nuovo dopo il ' + nextPostDate)
+      setError('Hai già pubblicato una richiesta questo mese. Puoi pubblicare di nuovo dopo il ' + nextPostDate)
       return
     }
 
@@ -172,7 +172,7 @@ export default function NewCollaborationRequestPage() {
       {!canPost && (
           <div className="p-4 mb-6 rounded-2xl bg-amber-50 border border-amber-200 shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
             <p className="text-amber-800">
-              Hai già pubblicato una richiesta questa settimana. Puoi pubblicare di nuovo dopo il {nextPostDate}.
+              Hai già pubblicato una richiesta questo mese. Puoi pubblicare di nuovo dopo il {nextPostDate}.
             </p>
             <p className="text-sm text-amber-700 mt-2">Puoi allegare al massimo 1 progetto dal portfolio. Una nuova richiesta è possibile dopo tale data.</p>
           </div>

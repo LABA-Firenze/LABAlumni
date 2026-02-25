@@ -190,12 +190,23 @@ export default function ThesisDetailPage() {
     if (!confirm('Vuoi eliminare questa proposta? Potrai crearne una nuova dopo.')) return
     setActionLoading(true)
     try {
-      const { error } = await supabase.from('thesis_proposals').delete().eq('id', thesisId)
+      const { data, error } = await supabase
+        .from('thesis_proposals')
+        .delete()
+        .eq('id', thesisId)
+        .eq('student_id', user.id)
+        .select('id')
       if (error) throw error
+      if (!data?.length) {
+        alert('Impossibile eliminare la proposta. Verifica di essere il proprietario o riprova.')
+        return
+      }
       router.push('/tesi')
       router.refresh()
-    } catch (e) {
+    } catch (e: unknown) {
       console.error(e)
+      const msg = e && typeof e === 'object' && 'message' in e ? String((e as { message: string }).message) : 'Errore durante l\'eliminazione.'
+      alert(msg)
     } finally {
       setActionLoading(false)
     }
@@ -372,24 +383,50 @@ export default function ThesisDetailPage() {
               </div>
             )}
 
-            {/* Docente: Mi interessa (candidatura) per tesi senza relatore/corelatore - solo se nessun invito pendente */}
+            {/* Docente: Mi interessa (candidatura) per tesi senza relatore/corelatore - pulsante sempre visibile, disabilitato se richiesta già inviata */}
             {isDocente && proposal.status === 'open' && (
               <div className="space-y-3 p-4 rounded-lg bg-amber-50 border border-amber-200">
-                {!proposal.relatore_id && (!relatoreInv || relatoreInv.status !== 'pending') && !currentDocenteRelatoreApp && (
-                  <Button variant="primary" onClick={handleApplyRelatore} disabled={actionLoading}>
-                    <HandThumbUpIcon className="w-4 h-4 mr-2" /> Mi interessa come relatore
-                  </Button>
+                {!proposal.relatore_id && (!relatoreInv || relatoreInv.status !== 'pending') && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button
+                      variant="primary"
+                      onClick={handleApplyRelatore}
+                      disabled={actionLoading || !!currentDocenteRelatoreApp}
+                      className={currentDocenteRelatoreApp ? 'opacity-70 cursor-not-allowed' : ''}
+                    >
+                      <HandThumbUpIcon className="w-4 h-4 mr-2" /> Mi interessa come relatore
+                    </Button>
+                    {currentDocenteRelatoreApp && (
+                      <span className="text-amber-800 text-sm">
+                        {currentDocenteRelatoreApp.status === 'pending'
+                          ? 'Richiesta già inviata, in attesa di risposta dallo studente'
+                          : currentDocenteRelatoreApp.status === 'accepted'
+                            ? 'Candidatura accettata'
+                            : 'Candidatura rifiutata'}
+                      </span>
+                    )}
+                  </div>
                 )}
-                {!proposal.relatore_id && currentDocenteRelatoreApp && currentDocenteRelatoreApp.status === 'pending' && (
-                  <p className="text-amber-800 text-sm">Candidatura come relatore in attesa di risposta dallo studente</p>
-                )}
-                {!proposal.corelatore_id && (!corelatoreInv || corelatoreInv.status !== 'pending') && !currentDocenteCorelatoreApp && (
-                  <Button variant="outline" onClick={handleApplyCorelatore} disabled={actionLoading}>
-                    <HandThumbUpIcon className="w-4 h-4 mr-2" /> Mi interessa come corelatore
-                  </Button>
-                )}
-                {!proposal.corelatore_id && currentDocenteCorelatoreApp && currentDocenteCorelatoreApp.status === 'pending' && (
-                  <p className="text-amber-800 text-sm">Candidatura come corelatore in attesa di risposta dallo studente</p>
+                {!proposal.corelatore_id && (!corelatoreInv || corelatoreInv.status !== 'pending') && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={handleApplyCorelatore}
+                      disabled={actionLoading || !!currentDocenteCorelatoreApp}
+                      className={currentDocenteCorelatoreApp ? 'opacity-70 cursor-not-allowed' : ''}
+                    >
+                      <HandThumbUpIcon className="w-4 h-4 mr-2" /> Mi interessa come corelatore
+                    </Button>
+                    {currentDocenteCorelatoreApp && (
+                      <span className="text-amber-800 text-sm">
+                        {currentDocenteCorelatoreApp.status === 'pending'
+                          ? 'Richiesta già inviata, in attesa di risposta dallo studente'
+                          : currentDocenteCorelatoreApp.status === 'accepted'
+                            ? 'Candidatura accettata'
+                            : 'Candidatura rifiutata'}
+                      </span>
+                    )}
+                  </div>
                 )}
               </div>
             )}

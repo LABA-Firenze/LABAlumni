@@ -5,7 +5,7 @@ import { useAuth } from './AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { Card } from './ui/Card'
 import { Button } from './ui/Button'
-import { Heart, MessageCircle, Share2, Send } from 'lucide-react'
+import { Heart, MessageCircle, Share2, Send, Trash2 } from 'lucide-react'
 import type { Post, PostComment } from '@/types/social'
 import { COURSE_CONFIG, type CourseType } from '@/types/database'
 
@@ -23,6 +23,8 @@ export function PostCard({ post, onUpdate }: PostCardProps) {
   const [newComment, setNewComment] = useState('')
   const [loadingComments, setLoadingComments] = useState(false)
   const [submittingComment, setSubmittingComment] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const isOwner = user?.id === post.user_id
 
   useEffect(() => {
     if (showComments) {
@@ -86,6 +88,22 @@ export function PostCard({ post, onUpdate }: PostCardProps) {
     }
   }
 
+  const handleDeletePost = async () => {
+    if (!user || !isOwner || deleting) return
+    if (!confirm('Eliminare questa richiesta dalla vetrina? Potrai pubblicarne un\'altra quando vuoi (nel rispetto del limite mensile).')) return
+    setDeleting(true)
+    try {
+      const { error } = await supabase.from('posts').delete().eq('id', post.id).eq('user_id', user.id)
+      if (error) throw error
+      onUpdate?.()
+    } catch (err) {
+      console.error('Error deleting post:', err)
+      alert('Impossibile eliminare la richiesta. Riprova.')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!user || !newComment.trim()) return
@@ -143,6 +161,18 @@ export function PostCard({ post, onUpdate }: PostCardProps) {
               <p className="text-sm text-gray-500">{formatDate(post.created_at)}</p>
             </div>
           </div>
+          {isOwner && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDeletePost}
+              disabled={deleting}
+              className="text-red-600 border-red-200 hover:bg-red-50 shrink-0"
+            >
+              <Trash2 className="w-4 h-4 mr-1" />
+              {deleting ? 'Eliminazione...' : 'Elimina'}
+            </Button>
+          )}
         </div>
       </div>
 
