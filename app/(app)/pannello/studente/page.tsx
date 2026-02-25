@@ -158,7 +158,8 @@ export default function StudentDashboard() {
     if (!user) return
 
     try {
-      let postsData: (Post & { user?: Post['user']; portfolio_item?: Post['portfolio_item'] })[] | null = null
+      type PostWithRelations = (Post & { user?: Post['user']; portfolio_item?: Post['portfolio_item'] })[]
+      let postsData: PostWithRelations | null = null
       let error: unknown = null
 
       const fullSelect = `
@@ -184,7 +185,7 @@ export default function StudentDashboard() {
             .order('created_at', { ascending: false })
             .limit(20)
           if (!fallback.error) {
-            postsData = fallback.data as typeof postsData
+            postsData = fallback.data as unknown as PostWithRelations
             const portfolioIds = [...new Set((postsData || []).map(p => p.portfolio_item_id).filter(Boolean) as string[])]
             if (portfolioIds.length > 0) {
               const { data: portfolioItems } = await supabase
@@ -194,12 +195,12 @@ export default function StudentDashboard() {
               const portfolioMap = Object.fromEntries((portfolioItems || []).map((pi: { id: string; title: string; images: string[] }) => [pi.id, pi]))
               postsData = (postsData || []).map(p => ({
                 ...p,
-                portfolio_item: p.portfolio_item_id ? portfolioMap[p.portfolio_item_id] : undefined,
-              }))
+                portfolio_item: p.portfolio_item_id ? (portfolioMap[p.portfolio_item_id] as Post['portfolio_item']) : undefined,
+              })) as PostWithRelations
             }
           }
       } else {
-        postsData = result.data as typeof postsData
+        postsData = result.data as unknown as PostWithRelations
       }
 
       if (error && !postsData) throw error
