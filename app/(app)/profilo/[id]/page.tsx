@@ -22,7 +22,7 @@ import type { Profile, Student, Company, Docente } from '@/types/database'
 import type { PortfolioItem } from '@/types/social'
 import { getInitials } from '@/lib/avatar'
 import { COURSE_CONFIG, getProfileGradient } from '@/types/database'
-import { getStudentDisplayLabel } from '@/lib/staff-labels'
+import { getStudentDisplayLabel, getProfileDisplayLabel } from '@/lib/staff-labels'
 import { ProfilePill } from '@/components/ProfilePill'
 import { PostCard } from '@/components/PostCard'
 import { SkeletonProfileSidebar, SkeletonCard } from '@/components/ui/Skeleton'
@@ -253,9 +253,11 @@ export default function PublicProfilePage() {
                   </div>
                   <h3 className="font-semibold text-lg">{fullName}</h3>
                   <div className="mt-1.5 flex justify-center">
-                    <ProfilePill role="student" />
+                    <ProfilePill role={profile.role} displayLabel={getProfileDisplayLabel(student, profile?.email)} />
                   </div>
-                  <p className="text-sm text-gray-600 mt-1">{getStudentDisplayLabel(student)}</p>
+                  {!student?.display_label && (
+                    <p className="text-sm text-gray-600 mt-1">{getStudentDisplayLabel(student)}</p>
+                  )}
                 </div>
 
                 {!isOwnProfile && user && isCurrentUserStudent && (

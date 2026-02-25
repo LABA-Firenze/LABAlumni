@@ -28,7 +28,7 @@ import type { Student, Company, Docente, Profile, CourseType } from '@/types/dat
 import type { PortfolioItem } from '@/types/social'
 import { getInitials } from '@/lib/avatar'
 import { COURSE_CONFIG, getProfileGradient } from '@/types/database'
-import { getStudentDisplayLabel } from '@/lib/staff-labels'
+import { getStudentDisplayLabel, getProfileDisplayLabel } from '@/lib/staff-labels'
 import { ProfilePill } from '@/components/ProfilePill'
 import { SkeletonProfileSidebar, SkeletonCard, SkeletonPortfolioItem } from '@/components/ui/Skeleton'
 import { useMinimumLoading } from '@/hooks/useMinimumLoading'
@@ -262,12 +262,12 @@ export default function ProfilePage() {
                   </div>
                   <h3 className="font-semibold text-lg">{fullName || user?.email?.split('@')[0]}</h3>
                   <div className="mt-1.5 flex justify-center">
-                    <ProfilePill role={profile?.role} />
+                    <ProfilePill role={profile?.role} displayLabel={getProfileDisplayLabel(student, profile?.email || user?.email)} />
                   </div>
-                  {student && (
+                  {student && !student.display_label && (
                     <p className="text-sm text-gray-600 mt-1">
                       {getStudentDisplayLabel(student)}
-                      {!student.display_label && student.academic_year && ` • ${student.academic_year}`}
+                      {student.academic_year && ` • ${student.academic_year}`}
                     </p>
                   )}
                 </div>

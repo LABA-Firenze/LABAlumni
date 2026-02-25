@@ -11,10 +11,21 @@ const ROLE_CONFIG: Record<RoleType, { label: string; className: string }> = {
 
 interface ProfilePillProps {
   role: RoleType | string | null
+  /** Se presente, usa questa etichetta al posto del ruolo (es. staff: RESPONSABILE IT, ORIENTAMENTO) */
+  displayLabel?: string | null
   className?: string
 }
 
-export function ProfilePill({ role, className = '' }: ProfilePillProps) {
+export function ProfilePill({ role, displayLabel, className = '' }: ProfilePillProps) {
+  if (displayLabel) {
+    return (
+      <span
+        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border bg-slate-100 text-slate-800 border-slate-200 ${className}`}
+      >
+        {displayLabel}
+      </span>
+    )
+  }
   const r = role as RoleType
   if (!r || !ROLE_CONFIG[r]) return null
 

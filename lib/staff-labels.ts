@@ -18,6 +18,15 @@ export function getStaffLabel(email: string | null | undefined): string | null {
   return STAFF_EMAIL_LABELS[email.toLowerCase()] ?? null
 }
 
+/** Etichetta pill per profilo: display_label o staff label da email (Simone admin = RESPONSABILE IT) */
+export function getProfileDisplayLabel(
+  student: { display_label?: string | null } | null | undefined,
+  email: string | null | undefined
+): string | null {
+  if (student?.display_label) return student.display_label
+  return getStaffLabel(email)
+}
+
 /** Etichetta da mostrare per uno studente: display_label (staff) o corso */
 export function getStudentDisplayLabel(student: {
   display_label?: string | null

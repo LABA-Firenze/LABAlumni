@@ -19,7 +19,7 @@ import {
 import Link from 'next/link'
 import { getInitials } from '@/lib/avatar'
 import { COURSE_CONFIG, getProfileGradient } from '@/types/database'
-import { getStudentDisplayLabel } from '@/lib/staff-labels'
+import { getStudentDisplayLabel, getProfileDisplayLabel } from '@/lib/staff-labels'
 import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 import { SkeletonProfileSidebar, SkeletonScopriSidebar } from './ui/Skeleton'
 import type { Student, Company, Docente } from '@/types/database'
@@ -82,6 +82,10 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
       } else if (r === 'docente') {
         const { data: docData } = await supabase.from('docenti').select('*').eq('id', user.id).single()
         setDocente(docData)
+      } else if (r === 'admin') {
+        // Admin può avere display_label (es. Simone = RESPONSABILE IT) da record students
+        const { data: studentRes } = await supabase.from('students').select('*').eq('id', user.id).single()
+        setStudent(studentRes || null)
       }
       setSidebarReady(true)
     }
@@ -114,12 +118,12 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
                 </div>
                 <h3 className="font-semibold text-lg uppercase">{profileName || user?.email?.split('@')[0]}</h3>
                 <div className="mt-1.5 flex justify-center">
-                  <ProfilePill role={role} />
+                  <ProfilePill role={role} displayLabel={getProfileDisplayLabel(student, user?.email)} />
                 </div>
-                {student && (
+                {student && !student.display_label && (
                   <p className="text-sm text-gray-600 mt-1">
                     {getStudentDisplayLabel(student)}
-                    {!student.display_label && student.academic_year && ` • ${student.academic_year}`}
+                    {student.academic_year && ` • ${student.academic_year}`}
                   </p>
                 )}
                 {company && (
