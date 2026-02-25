@@ -8,14 +8,19 @@
 
 import type { LogosOAuth2TokenResponse, LogosStudentsResponse, LogosStudentPayload } from '@/types/logos'
 
+/** Lettura runtime delle env (evita inlining a build time su Railway) */
+function env(key: string): string | undefined {
+  return process.env[key]
+}
+
 function getLogosApiUrl(): string {
-  const url = process.env.LOGOS_API_URL
+  const url = env('LOGOS_API_URL')
   if (!url) throw new Error('LOGOS_API_URL non configurato')
   return url.replace(/\/$/, '')
 }
 
 function getLogosAuthUrl(): string | null {
-  const url = process.env.LOGOS_AUTH_URL
+  const url = env('LOGOS_AUTH_URL')
   return url ? url.replace(/\/$/, '') : null
 }
 
@@ -33,8 +38,8 @@ async function logosGetOAuth2Token(email: string, password: string): Promise<str
     password,
     scope: 'LogosUni.Laba.Api',
   })
-  const clientId = process.env.LOGOS_CLIENT_ID
-  const clientSecret = process.env.LOGOS_CLIENT_SECRET
+  const clientId = env('LOGOS_CLIENT_ID')
+  const clientSecret = env('LOGOS_CLIENT_SECRET')
   if (clientId) body.set('client_id', clientId)
   if (clientSecret) body.set('client_secret', clientSecret)
 

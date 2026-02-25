@@ -22,7 +22,7 @@ export default function RegistratiPage() {
             </p>
             <Link href="/accedi">
               <Button className="w-full">Vai ad Accedi</Button>
-            </Link>
+              </Link>
             <p className="text-gray-500 text-sm mt-6">
               Sei un <Link href="/registrazione/docente" className="text-primary-600 hover:underline">docente</Link>
               {' o un'}{' '}
@@ -32,7 +32,7 @@ export default function RegistratiPage() {
               ← Torna alla home
             </Link>
           </Card>
-        </div>
+          </div>
       </div>
     </div>
   )
