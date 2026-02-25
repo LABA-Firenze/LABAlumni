@@ -1,9 +1,23 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  safelist: [
+    // Colori corso/ruolo per cerchi e cover (getProfileGradient)
+    'from-gray-800', 'to-gray-900', 'via-gray-900', 'to-gray-950',
+    'from-amber-500', 'to-amber-600', 'via-amber-600', 'to-amber-700',
+    'from-violet-500', 'to-violet-700', 'via-violet-600',
+    'from-emerald-500', 'to-emerald-700', 'via-emerald-600',
+    'from-sky-500', 'to-sky-700', 'via-sky-600',
+    'from-pink-500', 'to-pink-700', 'via-pink-600',
+    'from-rose-500', 'to-rose-700', 'via-rose-600',
+    'from-indigo-500', 'to-indigo-700', 'via-indigo-600',
+    'from-teal-500', 'to-teal-700', 'via-teal-600',
+    'from-purple-500', 'to-purple-700', 'via-purple-600',
+  ],
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './types/**/*.{js,ts}',
   ],
   theme: {
     extend: {

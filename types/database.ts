@@ -123,6 +123,26 @@ export const COURSE_CONFIG: Record<CourseType, { name: string; type: 'triennio' 
   'cinema-audiovisivi': { name: 'Cinema e Audiovisivi', type: 'biennio', maxYear: 2 },
 }
 
+/** Colori per corso (sfondi iniziali e cover profilo). Aziende = nero, Docenti = arancione; studenti per corso. */
+export const COURSE_COLORS: Record<CourseType, { circle: string; cover: string }> = {
+  'graphic-design-multimedia': { circle: 'from-violet-500 to-violet-700', cover: 'from-violet-500 via-violet-600 to-violet-700' },
+  'regia-videomaking': { circle: 'from-emerald-500 to-emerald-700', cover: 'from-emerald-500 via-emerald-600 to-emerald-700' },
+  'fotografia': { circle: 'from-sky-500 to-sky-700', cover: 'from-sky-500 via-sky-600 to-sky-700' },
+  'fashion-design': { circle: 'from-pink-500 to-pink-700', cover: 'from-pink-500 via-pink-600 to-pink-700' },
+  'pittura': { circle: 'from-rose-500 to-rose-700', cover: 'from-rose-500 via-rose-600 to-rose-700' },
+  'design': { circle: 'from-indigo-500 to-indigo-700', cover: 'from-indigo-500 via-indigo-600 to-indigo-700' },
+  'interior-design': { circle: 'from-teal-500 to-teal-700', cover: 'from-teal-500 via-teal-600 to-teal-700' },
+  'cinema-audiovisivi': { circle: 'from-purple-500 to-purple-700', cover: 'from-purple-500 via-purple-600 to-purple-700' },
+}
+
+/** Gradient per cerchio iniziale e cover in base a ruolo (e corso se studente). Company = nero, Docente = arancione. */
+export function getProfileGradient(role: UserRole, course?: CourseType | null): { circle: string; cover: string } {
+  if (role === 'company') return { circle: 'from-gray-800 to-gray-900', cover: 'from-gray-800 via-gray-900 to-gray-950' }
+  if (role === 'docente') return { circle: 'from-amber-500 to-amber-600', cover: 'from-amber-500 via-amber-600 to-amber-700' }
+  const c = course && course in COURSE_COLORS ? COURSE_COLORS[course as CourseType] : COURSE_COLORS['graphic-design-multimedia']
+  return c
+}
+
 export function getCourseInfo(course: CourseType) {
   return COURSE_CONFIG[course]
 }

@@ -5,11 +5,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Search, Building2, User, GraduationCap } from 'lucide-react'
-import { COURSE_CONFIG, type CourseType } from '@/types/database'
+import { COURSE_CONFIG, getProfileGradient, type CourseType } from '@/types/database'
 
 type SearchResult = 
   | { type: 'company'; id: string; company_name: string; logo_url: string | null }
-  | { type: 'student'; id: string; full_name: string | null; avatar_url: string | null; course?: string }
+  | { type: 'student'; id: string; full_name: string | null; avatar_url: string | null; course?: string; courseKey?: CourseType }
   | { type: 'docente'; id: string; full_name: string | null; avatar_url: string | null }
 
 export function HeaderSearch() {
@@ -77,6 +77,7 @@ export function HeaderSearch() {
         full_name: p.full_name,
         avatar_url: p.avatar_url,
         course: studentCourses[p.id] ? (COURSE_CONFIG[studentCourses[p.id] as CourseType]?.name || studentCourses[p.id]) : undefined,
+        courseKey: studentCourses[p.id] as CourseType | undefined,
       }))
 
       const docenti: SearchResult[] = (docentiRes.data || []).map((p: any) => ({
@@ -165,11 +166,11 @@ export function HeaderSearch() {
                   >
                     {r.type === 'company' ? (
                       <>
-                        <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center shrink-0 overflow-hidden">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center shrink-0 overflow-hidden">
                           {r.logo_url ? (
                             <img src={r.logo_url} alt="" className="w-full h-full object-cover" />
                           ) : (
-                            <Building2 className="w-5 h-5 text-primary-600" />
+                            <Building2 className="w-5 h-5 text-white" />
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
@@ -179,11 +180,11 @@ export function HeaderSearch() {
                       </>
                     ) : r.type === 'student' ? (
                       <>
-                        <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center shrink-0 overflow-hidden">
+                        <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${getProfileGradient('student', r.courseKey).circle} flex items-center justify-center shrink-0 overflow-hidden text-white`}>
                           {r.avatar_url ? (
                             <img src={r.avatar_url} alt="" className="w-full h-full object-cover" />
                           ) : (
-                            <span className="text-primary-600 font-semibold">
+                            <span className="font-semibold">
                               {r.full_name?.[0]?.toUpperCase() || '?'}
                             </span>
                           )}
@@ -199,11 +200,11 @@ export function HeaderSearch() {
                       </>
                     ) : (
                       <>
-                        <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0 overflow-hidden">
+                        <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${getProfileGradient('docente').circle} flex items-center justify-center shrink-0 overflow-hidden text-white`}>
                           {r.avatar_url ? (
                             <img src={r.avatar_url} alt="" className="w-full h-full object-cover" />
                           ) : (
-                            <GraduationCap className="w-5 h-5 text-amber-600" />
+                            <GraduationCap className="w-5 h-5" />
                           )}
                         </div>
                         <div className="min-w-0 flex-1">

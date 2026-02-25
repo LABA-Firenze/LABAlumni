@@ -7,7 +7,7 @@ import { Card } from './ui/Card'
 import { Button } from './ui/Button'
 import { Heart, MessageCircle, Share2, Send, Trash2 } from 'lucide-react'
 import type { Post, PostComment } from '@/types/social'
-import { COURSE_CONFIG, type CourseType } from '@/types/database'
+import { COURSE_CONFIG, getProfileGradient, type CourseType } from '@/types/database'
 
 interface PostCardProps {
   post: Post
@@ -151,7 +151,7 @@ export function PostCard({ post, onUpdate }: PostCardProps) {
       <div className="p-4 pb-3 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white font-semibold">
+            <div className={`w-10 h-10 bg-gradient-to-br ${getProfileGradient(post.request_from === 'company' ? 'company' : 'student', post.student_course as CourseType).circle} rounded-full flex items-center justify-center text-white font-semibold`}>
               {post.user?.full_name?.[0]?.toUpperCase() || post.user?.id?.[0]?.toUpperCase() || 'U'}
             </div>
             <div>

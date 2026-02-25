@@ -26,7 +26,7 @@ import {
 import Link from 'next/link'
 import type { Student, Company, Docente, Profile, CourseType } from '@/types/database'
 import type { PortfolioItem } from '@/types/social'
-import { COURSE_CONFIG } from '@/types/database'
+import { COURSE_CONFIG, getProfileGradient } from '@/types/database'
 import { ProfilePill } from '@/components/ProfilePill'
 import { SkeletonProfileSidebar, SkeletonCard, SkeletonPortfolioItem } from '@/components/ui/Skeleton'
 import { useMinimumLoading } from '@/hooks/useMinimumLoading'
@@ -255,7 +255,7 @@ export default function ProfilePage() {
             <aside className="lg:col-span-3 space-y-6">
               <Card variant="elevated" className="sticky top-24">
                 <div className="text-center mb-4">
-                  <div className="w-20 h-20 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full mx-auto mb-3 flex items-center justify-center text-white text-2xl font-bold">
+                  <div className={`w-20 h-20 bg-gradient-to-br ${getProfileGradient('student', student?.course).circle} rounded-full mx-auto mb-3 flex items-center justify-center text-white text-2xl font-bold`}>
                     {fullName?.[0]?.toUpperCase() || (student ? 'S' : '?')}
                   </div>
                   <h3 className="font-semibold text-lg">{fullName || user?.email?.split('@')[0]}</h3>
@@ -312,9 +312,9 @@ export default function ProfilePage() {
             <main className="lg:col-span-6 space-y-4">
               {/* Cover + Avatar (stile Facebook) */}
               <Card variant="elevated" padding={false} className="overflow-hidden">
-                <div className="h-32 sm:h-40 bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700" />
+                <div className={`h-32 sm:h-40 bg-gradient-to-r ${getProfileGradient('student', student?.course).cover}`} />
                 <div className="px-6 pb-6 -mt-12 relative">
-                  <div className="w-24 h-24 rounded-full border-4 border-white bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+                  <div className={`w-24 h-24 rounded-full border-4 border-white bg-gradient-to-br ${getProfileGradient('student', student?.course).circle} flex items-center justify-center text-white text-3xl font-bold shadow-lg`}>
                     {fullName?.[0]?.toUpperCase() || 'S'}
                   </div>
                   <h1 className="text-2xl font-bold text-gray-900 mt-4">{fullName || 'Studente'}</h1>

@@ -148,7 +148,7 @@ export default function CompanyDashboard() {
       <aside className="lg:col-span-3 space-y-6 order-2 lg:order-1">
         <Card variant="elevated" className="lg:sticky lg:top-24">
           <div className="text-center mb-4">
-            <div className="w-20 h-20 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full mx-auto mb-3 flex items-center justify-center text-white text-2xl font-bold">
+            <div className="w-20 h-20 bg-gradient-to-br from-gray-800 to-gray-900 rounded-full mx-auto mb-3 flex items-center justify-center text-white text-2xl font-bold">
               {company?.company_name?.[0]?.toUpperCase() || 'A'}
             </div>
             <h3 className="font-semibold text-lg">{company?.company_name || 'Azienda'}</h3>

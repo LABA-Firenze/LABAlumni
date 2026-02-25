@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import Link from 'next/link'
 import { UsersIcon, UserPlusIcon, CheckIcon, XMarkIcon, MagnifyingGlassIcon, BuildingOffice2Icon, AcademicCapIcon } from '@heroicons/react/24/solid'
-import { COURSE_CONFIG, type CourseType } from '@/types/database'
+import { COURSE_CONFIG, getProfileGradient, type CourseType } from '@/types/database'
 import type { Student, Profile } from '@/types/database'
 import type { StudentConnection } from '@/types/social'
 import { SkeletonCard } from '@/components/ui/Skeleton'
@@ -366,11 +366,11 @@ export default function NetworkPage() {
                   <Card variant="elevated" className="overflow-hidden hover:shadow-lg transition-shadow h-full">
                     <div className="p-6">
                       <div className="flex items-center gap-4 mb-3">
-                        <div className="w-14 h-14 rounded-xl bg-primary-100 flex items-center justify-center shrink-0 overflow-hidden">
+                        <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center shrink-0 overflow-hidden">
                           {company.logo_url ? (
                             <img src={company.logo_url} alt="" className="w-full h-full object-cover" />
                           ) : (
-                            <BuildingOffice2Icon className="w-7 h-7 text-primary-600" />
+                            <BuildingOffice2Icon className="w-7 h-7 text-white" />
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
@@ -408,11 +408,11 @@ export default function NetworkPage() {
                   <Card variant="elevated" className="overflow-hidden hover:shadow-lg transition-shadow h-full">
                     <div className="p-6">
                       <div className="flex items-center gap-4 mb-3">
-                        <div className="w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center shrink-0 overflow-hidden">
+                        <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${getProfileGradient('docente').circle} flex items-center justify-center shrink-0 overflow-hidden text-white`}>
                           {doc.avatar_url ? (
                             <img src={doc.avatar_url} alt="" className="w-full h-full object-cover" />
                           ) : (
-                            <AcademicCapIcon className="w-7 h-7 text-amber-600" />
+                            <AcademicCapIcon className="w-7 h-7" />
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
@@ -456,7 +456,7 @@ export default function NetworkPage() {
                   <div className="p-6">
                     <Link href={`/profilo/${student.id}`} className="block group">
                       <div className="flex items-center gap-4 mb-4">
-                        <div className="w-16 h-16 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white text-xl font-bold overflow-hidden">
+                        <div className={`w-16 h-16 bg-gradient-to-br ${getProfileGradient('student', student.course).circle} rounded-full flex items-center justify-center text-white text-xl font-bold overflow-hidden`}>
                           {student.profile?.full_name?.[0]?.toUpperCase() || student.profile?.email?.[0]?.toUpperCase() || 'S'}
                         </div>
                         <div className="flex-1 min-w-0">
