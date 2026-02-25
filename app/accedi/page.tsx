@@ -117,6 +117,11 @@ export default function LoginPage() {
                 required
                 placeholder="••••••••"
               />
+              {isStudentLogos && (
+                <p className="text-xs text-gray-500 text-center -mt-1">
+                  Gli studenti accedono con le credenziali utilizzate per l&apos;applicazione LABA.
+                </p>
+              )}
               <Button type="submit" className="w-full group flex items-center justify-center" disabled={loading}>
                 {loading ? 'Accesso in corso...' : (
                   <>
@@ -129,19 +134,17 @@ export default function LoginPage() {
 
             {isStudentLogos && (
               <p className="text-xs text-gray-500 text-center mt-3">
-                Usa le stesse credenziali del portale LABA. Il primo accesso crea il tuo profilo su LABAlumni.
+                Usa le stesse credenziali del portale LABA.<br />
+                Il primo accesso crea il tuo profilo su LABAlumni.
               </p>
             )}
 
             <div className="mt-6 text-center space-y-2">
               <p className="text-gray-600 text-sm">
-                Non hai un account?{' '}
+                Non hai un account? Registrati come{' '}
                 <Link href="/registrazione/docente" className="text-primary-600 font-medium hover:underline">Docente</Link>
-                {' · '}
-                <Link href="/registrazione/azienda" className="text-primary-600 font-medium hover:underline">Azienda</Link>
-              </p>
-              <p className="text-gray-500 text-xs">
-                Gli studenti accedono con le credenziali LABA, senza registrazione.
+                {' o '}
+                <Link href="/registrazione/azienda" className="text-primary-600 font-medium hover:underline">Azienda</Link>.
               </p>
               <Link href="/" className="block text-gray-500 text-sm hover:text-primary-600 transition-colors mt-2">
                 ← Torna alla home
