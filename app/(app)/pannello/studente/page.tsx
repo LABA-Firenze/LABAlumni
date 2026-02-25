@@ -100,12 +100,13 @@ export default function StudentDashboard() {
   const loadMyRequest = async () => {
     if (!user) return
     try {
-      const { data } = await supabase
+      let data: Post | null = null
+      const res = await supabase
         .from('posts')
         .select(`
           *,
           user:profiles!posts_user_id_fkey(id, full_name, avatar_url, role),
-          portfolio_item:portfolio_items(id, title, images)
+          portfolio_item:portfolio_items!posts_portfolio_item_id_fkey(id, title, images)
         `)
         .eq('user_id', user.id)
         .eq('type', 'collaboration_request')
@@ -113,6 +114,28 @@ export default function StudentDashboard() {
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle()
+      if (res.error) {
+        const fallback = await supabase
+          .from('posts')
+          .select(`*, user:profiles!posts_user_id_fkey(id, full_name, avatar_url, role)`)
+          .eq('user_id', user.id)
+          .eq('type', 'collaboration_request')
+          .eq('request_from', 'student')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+        if (!fallback.error && fallback.data) {
+          const row = fallback.data as Post & { portfolio_item_id?: string }
+          if (row.portfolio_item_id) {
+            const { data: pi } = await supabase.from('portfolio_items').select('id, title, images').eq('id', row.portfolio_item_id).single()
+            data = { ...row, portfolio_item: pi || undefined } as Post
+          } else {
+            data = row as Post
+          }
+        }
+      } else {
+        data = res.data as Post | null
+      }
       if (data) {
         const { data: studentData } = await supabase
           .from('students')
@@ -135,17 +158,51 @@ export default function StudentDashboard() {
     if (!user) return
 
     try {
-      const { data: postsData, error } = await supabase
-        .from('posts')
-        .select(`
+      let postsData: (Post & { user?: Post['user']; portfolio_item?: Post['portfolio_item'] })[] | null = null
+      let error: unknown = null
+
+      const fullSelect = `
           *,
           user:profiles!posts_user_id_fkey(id, full_name, avatar_url, role),
-          portfolio_item:portfolio_items(id, title, images)
-        `)
+          portfolio_item:portfolio_items!posts_portfolio_item_id_fkey(id, title, images)
+        `
+      const result = await supabase
+        .from('posts')
+        .select(fullSelect)
         .order('created_at', { ascending: false })
         .limit(20)
 
-      if (error) throw error
+      if (result.error) {
+        error = result.error
+        // Fallback senza embed portfolio_item (evita 400 se la relazione non è riconosciuta)
+        const fallback = await supabase
+            .from('posts')
+            .select(`
+              *,
+              user:profiles!posts_user_id_fkey(id, full_name, avatar_url, role)
+            `)
+            .order('created_at', { ascending: false })
+            .limit(20)
+          if (!fallback.error) {
+            postsData = fallback.data as typeof postsData
+            const portfolioIds = [...new Set((postsData || []).map(p => p.portfolio_item_id).filter(Boolean) as string[])]
+            if (portfolioIds.length > 0) {
+              const { data: portfolioItems } = await supabase
+                .from('portfolio_items')
+                .select('id, title, images')
+                .in('id', portfolioIds)
+              const portfolioMap = Object.fromEntries((portfolioItems || []).map((pi: { id: string; title: string; images: string[] }) => [pi.id, pi]))
+              postsData = (postsData || []).map(p => ({
+                ...p,
+                portfolio_item: p.portfolio_item_id ? portfolioMap[p.portfolio_item_id] : undefined,
+              }))
+            }
+          }
+      } else {
+        postsData = result.data as typeof postsData
+      }
+
+      if (error && !postsData) throw error
 
       if (postsData) {
         if (!postsData.length) {
@@ -159,7 +216,6 @@ export default function StudentDashboard() {
         } else {
           setSuggestedJobs([])
         }
-        // Per collaboration_request da studenti, carica il corso
         const studentUserIds = [...new Set(
           postsData
             .filter(p => p.type === 'collaboration_request' && p.request_from !== 'company')
@@ -189,8 +245,8 @@ export default function StudentDashboard() {
           student_course: studentCourses[post.user_id],
         })) || [])
       }
-    } catch (error) {
-      console.error('Error loading feed:', error)
+    } catch (err) {
+      console.error('Error loading feed:', err)
     } finally {
       setPostLoading(false)
     }

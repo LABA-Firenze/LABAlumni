@@ -251,88 +251,76 @@ export default function ThesisDetailPage() {
   }
 
   return (
-    <div className="space-y-6">
-        {/* Back Button */}
+    <div className="space-y-6 max-w-4xl mx-auto">
+        {/* Back */}
         <button
           onClick={() => router.back()}
-          className="text-gray-600 hover:text-gray-900 mb-6 flex items-center gap-2"
+          className="text-gray-500 hover:text-gray-900 flex items-center gap-2 text-sm font-medium transition-colors"
         >
-          <ArrowLeftIcon className="w-5 h-5" />
+          <ArrowLeftIcon className="w-4 h-4" />
           Indietro
         </button>
 
-        <Card variant="elevated" className="overflow-hidden">
-          {/* Header */}
-          <div className="p-8 border-b border-gray-200 bg-gradient-to-r from-primary-50 to-primary-100 rounded-t-2xl">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1">
-                <h1 className="text-3xl font-bold text-gray-900 mb-4">{proposal.title}</h1>
-                <div className="flex items-center gap-6 text-sm text-gray-600">
-                  <div className="flex items-center gap-2">
-                    <UserIcon className="w-5 h-5" />
-                    <span className="font-medium">{proposal.student?.profile?.full_name || proposal.student?.profile?.email || 'Studente'}</span>
-                  </div>
+        <Card variant="elevated" className="overflow-hidden border border-gray-100 shadow-sm">
+          {/* Header: titolo e meta, pulito */}
+          <div className="px-6 sm:px-8 pt-6 sm:pt-8 pb-5 border-b border-gray-100">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div className="min-w-0 flex-1">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight mb-3">{proposal.title}</h1>
+                <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-gray-500">
+                  <span className="flex items-center gap-1.5">
+                    <UserIcon className="w-4 h-4 text-gray-400" />
+                    {proposal.student?.profile?.full_name || proposal.student?.profile?.email || 'Studente'}
+                  </span>
                   {proposal.student?.course && (
-                    <div className="flex items-center gap-2">
-                      <DocumentTextIcon className="w-5 h-5" />
-                      <span>{COURSE_CONFIG[proposal.student.course]?.name || proposal.student.course}</span>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-2">
-                    <CalendarIcon className="w-5 h-5" />
-                    <span>
-                      {new Date(proposal.created_at).toLocaleDateString('it-IT', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric'
-                      })}
+                    <span className="flex items-center gap-1.5">
+                      <DocumentTextIcon className="w-4 h-4 text-gray-400" />
+                      {COURSE_CONFIG[proposal.student.course]?.name || proposal.student.course}
                     </span>
-                  </div>
+                  )}
+                  <span className="flex items-center gap-1.5">
+                    <CalendarIcon className="w-4 h-4 text-gray-400" />
+                    {new Date(proposal.created_at).toLocaleDateString('it-IT', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric'
+                    })}
+                  </span>
                 </div>
               </div>
-              <span className={`px-4 py-2 rounded-full text-sm font-medium border ${statusColors[proposal.status as keyof typeof statusColors]}`}>
+              <span className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium ${statusColors[proposal.status as keyof typeof statusColors]}`}>
                 {statusLabels[proposal.status as keyof typeof statusLabels]}
               </span>
             </div>
           </div>
 
-          {/* Content */}
-          <div className="p-8 space-y-8">
-            {/* Description */}
-            <div>
-              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <BookOpenIcon className="w-6 h-6 text-primary-600" />
+          {/* Contenuto: sezioni con bordo laterale e meno peso visivo */}
+          <div className="px-6 sm:px-8 py-6 sm:py-8 space-y-8">
+            <section className="space-y-3">
+              <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-2">
+                <BookOpenIcon className="w-4 h-4 text-primary-500" />
                 Descrizione
               </h2>
-              <div className="prose max-w-none">
-                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{proposal.description}</p>
-              </div>
-            </div>
+              <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{proposal.description}</p>
+            </section>
 
-            {/* Objectives */}
             {proposal.objectives && (
-              <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Obiettivi</h2>
-                <div className="prose max-w-none">
-                  <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{proposal.objectives}</p>
-                </div>
-              </div>
+              <section className="space-y-3">
+                <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Obiettivi</h2>
+                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{proposal.objectives}</p>
+              </section>
             )}
 
-            {/* Methodology */}
             {proposal.methodology && (
-              <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Metodologia</h2>
-                <div className="prose max-w-none">
-                  <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{proposal.methodology}</p>
-                </div>
-              </div>
+              <section className="space-y-3">
+                <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Metodologia</h2>
+                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{proposal.methodology}</p>
+              </section>
             )}
 
-            {/* Documents */}
             {proposal.documents && proposal.documents.length > 0 && (
-              <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Documenti</h2>
+              <section className="space-y-3">
+                <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Documenti</h2>
                 <div className="space-y-2">
                   {proposal.documents.map((doc, idx) => (
                     <a
@@ -340,20 +328,20 @@ export default function ThesisDetailPage() {
                       href={doc}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                      className="flex items-center gap-2 py-2.5 px-3 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-colors"
                     >
-                      <DocumentTextIcon className="w-5 h-5 text-primary-600" />
-                      <span className="text-gray-700">Documento {idx + 1}</span>
+                      <DocumentTextIcon className="w-4 h-4 text-primary-500 shrink-0" />
+                      <span>Documento {idx + 1}</span>
                     </a>
                   ))}
                 </div>
-              </div>
+              </section>
             )}
 
             {/* Docente: Inviti in attesa (relatore/corelatore) */}
             {isDocente && (relatoreInvitationForMe || corelatoreInvitationForMe) && (
-              <div className="space-y-4 p-4 rounded-lg bg-primary-50 border border-primary-200">
-                <h2 className="text-lg font-bold text-gray-900">Inviti in attesa</h2>
+              <section className="space-y-3 p-4 rounded-xl bg-primary-50/80 border border-primary-100">
+                <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Inviti in attesa</h2>
                 {relatoreInvitationForMe && relatoreInv?.status === 'pending' && (
                   <div className="flex items-center justify-between p-3 bg-white rounded-lg border">
                     <span>Invito come <strong>relatore</strong></span>
@@ -380,12 +368,12 @@ export default function ThesisDetailPage() {
                     </div>
                   </div>
                 )}
-              </div>
+              </section>
             )}
 
-            {/* Docente: Mi interessa (candidatura) per tesi senza relatore/corelatore - pulsante sempre visibile, disabilitato se richiesta già inviata */}
+            {/* Docente: Mi interessa (candidatura) */}
             {isDocente && proposal.status === 'open' && (
-              <div className="space-y-3 p-4 rounded-lg bg-amber-50 border border-amber-200">
+              <section className="space-y-3 p-4 rounded-xl bg-amber-50/80 border border-amber-100">
                 {!proposal.relatore_id && (!relatoreInv || relatoreInv.status !== 'pending') && (
                   <div className="flex flex-wrap items-center gap-2">
                     <Button
@@ -428,13 +416,13 @@ export default function ThesisDetailPage() {
                     )}
                   </div>
                 )}
-              </div>
+              </section>
             )}
 
             {/* Studente: Candidature in attesa */}
             {isOwner && (relatoreApps.some((a) => a.status === 'pending') || corelatoreApps.some((a) => a.status === 'pending')) && (
-              <div className="space-y-4 p-4 rounded-lg bg-green-50 border border-green-200">
-                <h2 className="text-lg font-bold text-gray-900">Candidature in attesa</h2>
+              <section className="space-y-3 p-4 rounded-xl bg-green-50/80 border border-green-100">
+                <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Candidature in attesa</h2>
                 {relatoreApps.filter((a) => a.status === 'pending').map((app) => (
                   <div key={app.id} className="flex items-center justify-between p-3 bg-white rounded-lg border">
                     <span><strong>Relatore:</strong> {docenteNames[app.docente_id] || 'Docente'}</span>
@@ -461,23 +449,28 @@ export default function ThesisDetailPage() {
                     </div>
                   </div>
                 ))}
-              </div>
+              </section>
             )}
           </div>
 
-          {/* Footer Actions */}
+          {/* Footer azioni: elimina sobrio + torna indietro */}
           {(isOwner || isDocente) && (
-            <div className="p-6 border-t border-gray-200 bg-gray-50">
-              <div className="flex flex-wrap justify-between items-center gap-3">
+            <div className="px-6 sm:px-8 py-5 border-t border-gray-100 bg-gray-50/50">
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 {isOwner && (
-                  <Button variant="outline" onClick={handleDelete} disabled={actionLoading} className="text-red-600 border-red-300 hover:bg-red-50">
-                    <TrashIcon className="w-4 h-4 mr-2" />
-                    Elimina proposta
-                  </Button>
+                  <button
+                    type="button"
+                    onClick={handleDelete}
+                    disabled={actionLoading}
+                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-500 hover:text-red-600 transition-colors disabled:opacity-50"
+                  >
+                    <TrashIcon className="w-4 h-4" />
+                    {actionLoading ? 'Eliminazione...' : 'Elimina proposta'}
+                  </button>
                 )}
-                <div className="flex gap-3 ml-auto">
+                <div className="flex gap-2 ml-auto">
                   <Link href="/tesi">
-                    <Button variant="outline">Torna alle Proposte</Button>
+                    <Button variant="outline" size="sm">Torna alle Proposte</Button>
                   </Link>
                 </div>
               </div>
