@@ -30,6 +30,7 @@ export default function NewCollaborationRequestPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [checkingLimit, setCheckingLimit] = useState(true)
+  const [studentYear, setStudentYear] = useState<number | null | 'loading'>('loading')
 
   useEffect(() => {
     if (!user) {
@@ -41,6 +42,8 @@ export default function NewCollaborationRequestPage() {
 
   useEffect(() => {
     if (user && role === 'student') {
+      supabase.from('students').select('year').eq('id', user.id).single()
+        .then(({ data }) => setStudentYear(data?.year ?? null), () => setStudentYear(null))
       loadPortfolioItems()
       checkMonthlyLimit()
     } else if (user && role === 'company') {
@@ -143,7 +146,7 @@ export default function NewCollaborationRequestPage() {
     }
   }
 
-  if (!user || role === null || (role === 'student' && checkingLimit)) {
+  if (!user || role === null || (role === 'student' && (checkingLimit || studentYear === 'loading'))) {
     return (
       <div className="flex justify-center py-24">
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600" />
@@ -153,6 +156,27 @@ export default function NewCollaborationRequestPage() {
 
   if (role === 'company') {
     return null
+  }
+
+  if (role === 'student' && studentYear !== 'loading' && (studentYear === null || studentYear < 2)) {
+    return (
+      <div className="space-y-6 max-w-2xl mx-auto px-4 py-8">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+            <Briefcase className="w-8 h-8 text-primary-600" />
+            Dai visibilità al tuo talento
+          </h1>
+        </div>
+        <div className="p-6 rounded-2xl bg-amber-50 border border-amber-200 text-center">
+          <p className="text-lg text-amber-900 mb-4">
+            Le richieste di tirocinio o stage sono disponibili dal 2° anno. Al momento non puoi pubblicare una richiesta.
+          </p>
+          <Link href="/pannello/studente">
+            <Button variant="outline">Torna al pannello</Button>
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   const GIORNI_SHORT = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab']

@@ -37,6 +37,16 @@ export default function NewThesisProposalPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [existingProposal, setExistingProposal] = useState<{ id: string; title: string } | null>(null)
+  const [studentYear, setStudentYear] = useState<number | null | 'loading'>('loading')
+
+  useEffect(() => {
+    if (user && role === 'student') {
+      supabase.from('students').select('year').eq('id', user.id).single()
+        .then(({ data }) => setStudentYear(data?.year ?? null), () => setStudentYear(null))
+    } else if (role !== 'student') {
+      setStudentYear('loading')
+    }
+  }, [user, role])
 
   useEffect(() => {
     if (user) {
@@ -261,7 +271,6 @@ export default function NewThesisProposalPage() {
   }
 
   const isLastStep = currentStep === TOTAL_STEPS
-
   if (role && role !== 'student') {
     return null
   }
@@ -283,7 +292,24 @@ export default function NewThesisProposalPage() {
           <p className="text-gray-600 mt-2">Pubblica la tua proposta di tesi per trovare un relatore</p>
         </div>
 
-        {existingProposal ? (
+        {role === 'student' && studentYear === 'loading' ? (
+          <Card variant="elevated" className="p-6 text-center">
+            <div className="flex justify-center py-8">
+              <Loader2 className="w-10 h-10 animate-spin text-primary-600" />
+            </div>
+          </Card>
+        ) : role === 'student' && typeof studentYear === 'number' && studentYear < 3 ? (
+          <Card variant="elevated" className="p-6 text-center">
+            <div className="space-y-4">
+              <p className="text-lg text-gray-700">
+                La proposta di tesi è disponibile solo dal 3° anno (o fuori corso). Al momento non puoi inviare una proposta.
+              </p>
+              <Button variant="outline" onClick={() => router.push('/tesi')}>
+                Torna alle proposte
+              </Button>
+            </div>
+          </Card>
+        ) : existingProposal ? (
           <Card variant="elevated" className="p-6 text-center">
             <div className="space-y-4">
               <p className="text-lg text-gray-700">

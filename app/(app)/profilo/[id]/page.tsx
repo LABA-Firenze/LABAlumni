@@ -247,7 +247,7 @@ export default function PublicProfilePage() {
                     {profile.avatar_url ? (
                       <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      {getInitials(fullName)}
+                      <span>{getInitials(fullName)}</span>
                     )}
                   </div>
                   <h3 className="font-semibold text-lg">{fullName}</h3>
@@ -311,7 +311,7 @@ export default function PublicProfilePage() {
                     {profile.avatar_url ? (
                       <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      {getInitials(fullName)}
+                      <span>{getInitials(fullName)}</span>
                     )}
                   </div>
                   <h1 className="text-2xl font-bold text-gray-900 mt-4">{fullName}</h1>
@@ -422,7 +422,7 @@ export default function PublicProfilePage() {
                 {profile.avatar_url ? (
                   <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  {getInitials(fullName)}
+                  <span>{getInitials(fullName)}</span>
                 )}
               </div>
               <div>

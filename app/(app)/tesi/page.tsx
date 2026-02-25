@@ -25,6 +25,7 @@ export default function ThesisPage() {
   const [loading, setLoading] = useState(true)
   const [filterStatus, setFilterStatus] = useState<string>('open')
   const [role, setRole] = useState<string | null>(null)
+  const [studentYear, setStudentYear] = useState<number | null>(null)
   const [hasActiveProposal, setHasActiveProposal] = useState(false)
   const showSkeleton = useMinimumLoading(loading)
 
@@ -49,8 +50,10 @@ export default function ThesisPage() {
   useEffect(() => {
     if (!user || role !== 'student') {
       setHasActiveProposal(false)
+      setStudentYear(null)
       return
     }
+    supabase.from('students').select('year').eq('id', user.id).single().then(({ data }) => setStudentYear(data?.year ?? null))
     supabase
       .from('thesis_proposals')
       .select('id')
@@ -144,7 +147,7 @@ export default function ThesisPage() {
                 {role === 'student' ? 'Pubblica la tua proposta o esplora quelle esistenti' : 'Esplora le proposte aperte e candidati come relatore'}
               </p>
             </div>
-            {role === 'student' && !hasActiveProposal && (
+            {role === 'student' && !hasActiveProposal && studentYear !== null && studentYear >= 3 && (
               <Link href="/tesi/nuova">
                 <Button variant="primary">
                   <PlusCircleIcon className="w-5 h-5 mr-2" />
@@ -192,7 +195,7 @@ export default function ThesisPage() {
                 : 'Nessuna proposta al momento. Potrai candidarti come relatore quando gli studenti ne pubblicheranno.'
               }
             </p>
-            {filterStatus === 'open' && role === 'student' && !hasActiveProposal && (
+            {filterStatus === 'open' && role === 'student' && !hasActiveProposal && studentYear !== null && studentYear >= 3 && (
               <Link href="/tesi/nuova">
                 <Button variant="primary">Pubblica la Prima Proposta</Button>
               </Link>

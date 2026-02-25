@@ -273,6 +273,7 @@ export default function StudentDashboard() {
   return (
     <div className="space-y-4">
             {/* Hero / Pubblicazione - CTA diretta */}
+            {student && student.year !== null && student.year >= 2 ? (
             <Card variant="elevated" className="p-5 border border-gray-100">
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <div className="flex-1">
@@ -291,6 +292,20 @@ export default function StudentDashboard() {
                 </Link>
               </div>
             </Card>
+            ) : student && student.year === 1 ? (
+            <Card variant="elevated" className="p-5 border border-amber-100 bg-amber-50/50">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Le richieste di stage sono disponibili dal 2° anno
+                  </h3>
+                  <p className="text-sm text-gray-600 mt-0.5">
+                    Al momento puoi esplorare le opportunità e completare il tuo profilo
+                  </p>
+                </div>
+              </div>
+            </Card>
+            ) : null}
 
             {/* La tua richiesta in vetrina */}
             {myRequest && (
