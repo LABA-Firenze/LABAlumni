@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     const payload = await logosGetStudent(email, password)
     if (!payload) {
       return NextResponse.json(
-        { error: 'Credenziali non valide o studente non trovato su LOGOS' },
+        { error: 'Credenziali non valide o studente non trovato' },
         { status: 401 }
       )
     }
@@ -100,7 +100,7 @@ export async function POST(request: Request) {
   } catch (e) {
     console.error('logos-login error:', e)
     return NextResponse.json(
-      { error: e instanceof Error ? e.message : 'Errore durante l\'accesso con LOGOS' },
+      { error: e instanceof Error ? e.message : 'Errore durante l\'accesso' },
       { status: 500 }
     )
   }

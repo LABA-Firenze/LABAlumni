@@ -31,7 +31,7 @@ export default function LoginPage() {
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
-        setError(data.error || 'Accesso con LOGOS non riuscito')
+        setError(data.error || 'Accesso non riuscito')
         setLoading(false)
         return
       }
@@ -83,7 +83,7 @@ export default function LoginPage() {
                 className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-sm font-medium transition-colors ${isStudentLogos ? 'bg-white text-primary-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
               >
                 <GraduationCap className="w-4 h-4" />
-                Studente (LOGOS)
+                Studente
               </button>
               <button
                 type="button"
@@ -129,7 +129,7 @@ export default function LoginPage() {
 
             {isStudentLogos && (
               <p className="text-xs text-gray-500 text-center mt-3">
-                Usa le stesse credenziali del portale LABA (LOGOS). Il primo accesso crea il tuo profilo su LABAlumni.
+                Usa le stesse credenziali del portale LABA. Il primo accesso crea il tuo profilo su LABAlumni.
               </p>
             )}
 
@@ -141,7 +141,7 @@ export default function LoginPage() {
                 <Link href="/registrazione/azienda" className="text-primary-600 font-medium hover:underline">Azienda</Link>
               </p>
               <p className="text-gray-500 text-xs">
-                Gli studenti accedono solo con credenziali LABA (LOGOS), senza registrazione.
+                Gli studenti accedono con le credenziali LABA, senza registrazione.
               </p>
               <Link href="/" className="block text-gray-500 text-sm hover:text-primary-600 transition-colors mt-2">
                 ← Torna alla home
