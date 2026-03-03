@@ -13,6 +13,7 @@ import {
   ShieldCheckIcon,
   ArrowPathIcon,
   UserCircleIcon,
+  TrashIcon,
 } from '@heroicons/react/24/solid'
 import { resetTour } from '@/components/GuidedTour'
 
@@ -31,6 +32,9 @@ export default function ImpostazioniPage() {
   })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [deleteConfirm, setDeleteConfirm] = useState('')
+  const [deleting, setDeleting] = useState(false)
+  const [userRole, setUserRole] = useState<string | null>(null)
 
   useEffect(() => {
     if (!user) {
@@ -44,11 +48,12 @@ export default function ImpostazioniPage() {
     if (!user) return
     const { data: profile } = await supabase
       .from('profiles')
-      .select('avatar_url, full_name')
+      .select('avatar_url, full_name, role')
       .eq('id', user.id)
       .single()
     setAvatarUrl(profile?.avatar_url ?? null)
     setFullName(profile?.full_name ?? '')
+    setUserRole(profile?.role ?? null)
     const { data } = await supabase
       .from('user_preferences')
       .select('*')
@@ -86,6 +91,37 @@ export default function ImpostazioniPage() {
   const handleResetTour = () => {
     resetTour()
     alert('Tour resettato. Ricarica la pagina per vederlo di nuovo.')
+  }
+
+  const handleDeleteAccount = async () => {
+    if (!user) return
+    if (deleteConfirm.toLowerCase().trim() !== 'elimina') {
+      alert('Scrivi "elimina" per confermare')
+      return
+    }
+    if (!confirm('Sei sicuro? Questa azione non può essere annullata.')) return
+
+    setDeleting(true)
+    try {
+      const res = await fetch('/api/user/delete-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ confirm: deleteConfirm }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        alert(data.error || 'Errore durante l\'eliminazione')
+        setDeleting(false)
+        return
+      }
+      await supabase.auth.signOut()
+      router.push('/')
+      router.refresh()
+    } catch (e: any) {
+      alert(e.message || 'Errore')
+    } finally {
+      setDeleting(false)
+    }
   }
 
   const handleAvatarUpdate = async (url: string | null) => {
@@ -238,6 +274,46 @@ export default function ImpostazioniPage() {
           Ripeti tour guidato
         </Button>
       </Card>
+
+      {/* Elimina account - non per admin */}
+      {userRole && userRole !== 'admin' && (
+        <Card variant="elevated" className="p-6 border-red-100">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
+              <TrashIcon className="w-5 h-5 text-red-600" />
+            </div>
+            <h2 className="text-lg font-semibold text-gray-900">Elimina account</h2>
+          </div>
+          <p className="text-gray-600 text-sm mb-3">
+            Eliminando il tuo account verranno rimossi in modo permanente profilo, messaggi, lavori nel portfolio e tutti i dati associati.
+          </p>
+          {userRole === 'student' && (
+            <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 mb-4">
+              <p className="text-sm text-amber-800">
+                <strong>Attenzione studenti LABA:</strong> se accedi con le credenziali Logos (email e password LABA), eliminando l&apos;account sarai rimosso dalla piattaforma. Se farai nuovamente l&apos;accesso con le stesse credenziali, verrai registrato automaticamente di nuovo.
+              </p>
+            </div>
+          )}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <input
+              type="text"
+              placeholder='Scrivi "elimina" per confermare'
+              value={deleteConfirm}
+              onChange={(e) => setDeleteConfirm(e.target.value)}
+              className="flex-1 rounded-xl border border-gray-200 px-4 py-2 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              disabled={deleting}
+            />
+            <Button
+              variant="outline"
+              onClick={handleDeleteAccount}
+              disabled={deleting || deleteConfirm.toLowerCase().trim() !== 'elimina'}
+              className="border-red-300 text-red-600 hover:bg-red-50 shrink-0"
+            >
+              {deleting ? 'Eliminazione...' : 'Elimina account'}
+            </Button>
+          </div>
+        </Card>
+      )}
 
       {/* Salva */}
       <Button variant="primary" onClick={save} disabled={saving} className="w-full py-3 rounded-xl font-medium">

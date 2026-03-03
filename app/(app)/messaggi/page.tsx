@@ -348,7 +348,7 @@ export default function MessagesPage() {
                       return (
                         <div
                           key={msg.id}
-                          className={`flex gap-2 ${isMe ? 'justify-end flex-row-reverse' : 'justify-start'}`}
+                          className={`flex gap-2 items-end ${isMe ? 'justify-end flex-row-reverse' : 'justify-start'}`}
                         >
                           <div className={`w-9 h-9 rounded-full shrink-0 flex items-center justify-center text-white text-sm font-bold overflow-hidden bg-gradient-to-br ${gradient.circle}`}>
                             {sender?.avatar_url ? (

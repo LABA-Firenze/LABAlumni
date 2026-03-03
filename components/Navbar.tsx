@@ -19,11 +19,13 @@ import {
   Cog6ToothIcon,
 } from '@heroicons/react/24/solid'
 import { openFloatingChat } from './FloatingChat'
+import { useUnreadMessagesCount } from '@/hooks/useUnreadMessagesCount'
 import { HeaderSearch } from './HeaderSearch'
 import { NotificationsBell } from './NotificationsBell'
 
 export function Navbar() {
   const { user, loading, signOut } = useAuth()
+  const unreadMessages = useUnreadMessagesCount(user?.id)
   const pathname = usePathname()
   const [userRole, setUserRole] = useState<string | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -165,11 +167,16 @@ export function Navbar() {
                             setMenuOpen(false)
                             openFloatingChat()
                           }}
-                          className="flex items-center gap-3 w-full px-4 py-3 text-left text-gray-700 hover:bg-gray-50"
+                          className="flex items-center gap-3 w-full px-4 py-3 text-left text-gray-700 hover:bg-gray-50 relative"
                           data-tour="messaggi"
                         >
                           <ChatBubbleLeftRightIcon className="w-5 h-5 shrink-0 text-gray-500" />
                           <span>Messaggi</span>
+                          {unreadMessages > 0 && (
+                            <span className="ml-auto min-w-[20px] h-5 px-1 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center">
+                              {unreadMessages > 99 ? '99+' : unreadMessages}
+                            </span>
+                          )}
                         </button>
                         <div className="border-t border-gray-100 my-1" />
                         <button

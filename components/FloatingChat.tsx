@@ -10,6 +10,7 @@ import { Button } from './ui/Button'
 import type { Message, Profile } from '@/types/database'
 import { isStaffEmail } from '@/lib/staff-labels'
 import { useMessagesRealtime } from '@/hooks/useMessagesRealtime'
+import { useUnreadMessagesCount } from '@/hooks/useUnreadMessagesCount'
 
 const OPEN_CHAT_EVENT = 'floating-chat-open'
 
@@ -114,6 +115,7 @@ export function FloatingChat() {
   useMessagesRealtime(open ? user?.id : undefined, loadData)
 
   const canMessageAnyone = userRole === 'company' || isStaffEmail(user?.email)
+  const unreadCount = useUnreadMessagesCount(user?.id)
   const conversationList = Array.from(conversations.values())
     .filter((conv) => {
       // Studenti: vedono conversazioni con aziende E con staff (Simone, Alessia, Matteo)
@@ -201,10 +203,15 @@ export function FloatingChat() {
     <>
       <button
         onClick={() => setOpen(!open)}
-        className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-primary-600 hover:bg-primary-700 text-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105"
+        className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-primary-600 hover:bg-primary-700 text-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105 relative"
         aria-label="Messaggi"
       >
         <MessageCircle className="w-7 h-7" />
+        {unreadCount > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 min-w-[20px] h-5 px-1 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center">
+            {unreadCount > 99 ? '99+' : unreadCount}
+          </span>
+        )}
       </button>
 
       {open && (
@@ -261,8 +268,8 @@ export function FloatingChat() {
                             {conv.user.full_name || conv.user.email}
                           </p>
                           {conv.lastMessage && (
-                            <p className="text-xs text-gray-500 truncate">
-                              {conv.lastMessage.subject}
+                            <p className={`text-xs truncate ${conv.unread > 0 ? 'font-semibold text-gray-900' : 'text-gray-500'}`}>
+                              {conv.lastMessage.content}
                             </p>
                           )}
                         </div>
@@ -343,7 +350,7 @@ export function FloatingChat() {
                   return (
                     <div
                       key={msg.id}
-                      className={`flex gap-2 ${isMe ? 'justify-end flex-row-reverse' : 'justify-start'}`}
+                      className={`flex gap-2 items-end ${isMe ? 'justify-end flex-row-reverse' : 'justify-start'}`}
                     >
                       <div className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-white text-xs font-bold overflow-hidden bg-gradient-to-br ${gradient.circle}`}>
                         {sender?.avatar_url ? (
