@@ -10,6 +10,8 @@ import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
 import { Select } from '@/components/ui/Select'
 import { Send, Mail, User, Building2, Search } from 'lucide-react'
+import { getInitials } from '@/lib/avatar'
+import { getProfileGradient } from '@/types/database'
 import type { Message, Profile } from '@/types/database'
 import { isStaffEmail } from '@/lib/staff-labels'
 import { Skeleton, SkeletonCard } from '@/components/ui/Skeleton'
@@ -166,12 +168,13 @@ export default function MessagesPage() {
 
     setSending(true)
     try {
+      const replySubject = selectedMessages[0]?.subject || 'Messaggio'
       await supabase
         .from('messages')
         .insert({
           sender_id: user.id,
           recipient_id: selectedConversation,
-          subject: conversationMessage.subject,
+          subject: replySubject,
           content: conversationMessage.content,
         })
 
@@ -334,42 +337,46 @@ export default function MessagesPage() {
                   </p>
                 </div>
 
-                <div className="space-y-4 mb-6 max-h-[400px] overflow-y-auto">
+                <div className="space-y-4 mb-6 max-h-[500px] overflow-y-auto">
                   {selectedMessages.length === 0 ? (
                     <p className="text-gray-500 text-center py-8">Nessun messaggio</p>
                   ) : (
-                    selectedMessages.map((msg) => (
-                      <div
-                        key={msg.id}
-                        className={`flex ${msg.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
-                      >
+                    selectedMessages.map((msg) => {
+                      const isMe = msg.sender_id === user?.id
+                      const sender = msg.sender as Profile
+                      const gradient = getProfileGradient(sender?.role || 'student')
+                      return (
                         <div
-                          className={`max-w-[80%] rounded-lg p-4 ${
-                            msg.sender_id === user?.id
-                              ? 'bg-primary text-white'
-                              : 'bg-gray-100 text-gray-900'
-                          }`}
+                          key={msg.id}
+                          className={`flex gap-2 ${isMe ? 'justify-end flex-row-reverse' : 'justify-start'}`}
                         >
-                          <div className="font-semibold mb-1">{msg.subject}</div>
-                          <div className="text-sm whitespace-pre-wrap">{msg.content}</div>
-                          <div className={`text-xs mt-2 ${
-                            msg.sender_id === user?.id ? 'text-white/70' : 'text-gray-500'
-                          }`}>
-                            {new Date(msg.created_at).toLocaleString('it-IT')}
+                          <div className={`w-9 h-9 rounded-full shrink-0 flex items-center justify-center text-white text-sm font-bold overflow-hidden bg-gradient-to-br ${gradient.circle}`}>
+                            {sender?.avatar_url ? (
+                              <img src={sender.avatar_url} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              getInitials(sender?.full_name || sender?.email)
+                            )}
+                          </div>
+                          <div
+                            className={`max-w-[75%] rounded-lg p-4 ${
+                              isMe ? 'bg-primary text-white' : 'bg-gray-100 text-gray-900'
+                            }`}
+                          >
+                            {selectedMessages[0]?.id === msg.id && (
+                              <div className="font-semibold mb-1">{msg.subject}</div>
+                            )}
+                            <div className="text-sm whitespace-pre-wrap">{msg.content}</div>
+                            <div className={`text-xs mt-2 ${isMe ? 'text-white/70' : 'text-gray-500'}`}>
+                              {new Date(msg.created_at).toLocaleString('it-IT')}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))
+                      )
+                    })
                   )}
                 </div>
 
                 <form onSubmit={handleSendConversationMessage} className="space-y-4">
-                  <Input
-                    placeholder="Oggetto"
-                    value={conversationMessage.subject}
-                    onChange={(e) => setConversationMessage({ ...conversationMessage, subject: e.target.value })}
-                    required
-                  />
                   <Textarea
                     rows={4}
                     placeholder="Scrivi un messaggio..."

@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from 'react'
 import { useAuth } from './AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { MessageCircle, X, Send, User, Building2, Search } from 'lucide-react'
+import { getInitials } from '@/lib/avatar'
+import { getProfileGradient } from '@/types/database'
 import { Button } from './ui/Button'
 import type { Message, Profile } from '@/types/database'
 import { isStaffEmail } from '@/lib/staff-labels'
@@ -147,10 +149,11 @@ export function FloatingChat() {
     if (!user || !selectedConversation) return
     setSending(true)
     try {
+      const replySubject = selectedMessages[0]?.subject || 'Messaggio'
       await supabase.from('messages').insert({
         sender_id: user.id,
         recipient_id: selectedConversation,
-        subject: conversationMessage.subject,
+        subject: replySubject,
         content: conversationMessage.content,
       })
       setConversationMessage({ subject: '', content: '' })
@@ -205,7 +208,7 @@ export function FloatingChat() {
       </button>
 
       {open && (
-        <div className="fixed bottom-24 right-6 z-50 w-[380px] max-w-[calc(100vw-3rem)] bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden flex flex-col max-h-[520px]">
+        <div className="fixed bottom-24 right-6 z-50 w-[380px] max-w-[calc(100vw-3rem)] bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden flex flex-col max-h-[600px]">
           <div className="bg-primary-600 text-white px-4 py-3 flex items-center justify-between shrink-0">
             <h3 className="font-semibold">Messaggi</h3>
             <button
@@ -333,45 +336,44 @@ export function FloatingChat() {
                 </span>
               </div>
               <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
-                {selectedMessages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`flex ${msg.sender_id === user.id ? 'justify-end' : 'justify-start'}`}
-                  >
+                {selectedMessages.map((msg) => {
+                  const isMe = msg.sender_id === user.id
+                  const sender = msg.sender as Profile
+                  const gradient = getProfileGradient(sender?.role || 'student')
+                  return (
                     <div
-                      className={`max-w-[85%] rounded-lg px-3 py-2 ${
-                        msg.sender_id === user.id
-                          ? 'bg-primary-600 text-white'
-                          : 'bg-gray-100 text-gray-900'
-                      }`}
+                      key={msg.id}
+                      className={`flex gap-2 ${isMe ? 'justify-end flex-row-reverse' : 'justify-start'}`}
                     >
-                      <p className="text-xs font-medium opacity-90">{msg.subject}</p>
-                      <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                      <p
-                        className={`text-xs mt-1 ${
-                          msg.sender_id === user.id ? 'text-white/80' : 'text-gray-500'
+                      <div className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-white text-xs font-bold overflow-hidden bg-gradient-to-br ${gradient.circle}`}>
+                        {sender?.avatar_url ? (
+                          <img src={sender.avatar_url} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          getInitials(sender?.full_name || sender?.email)
+                        )}
+                      </div>
+                      <div
+                        className={`max-w-[75%] rounded-lg px-3 py-2 ${
+                          isMe ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-900'
                         }`}
                       >
-                        {new Date(msg.created_at).toLocaleString('it-IT')}
-                      </p>
+                        {selectedMessages[0]?.id === msg.id && (
+                          <p className="text-xs font-medium opacity-90">{msg.subject}</p>
+                        )}
+                        <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                        <p className={`text-xs mt-1 ${isMe ? 'text-white/80' : 'text-gray-500'}`}>
+                          {new Date(msg.created_at).toLocaleString('it-IT')}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
                 <div ref={messagesEndRef} />
               </div>
               <form
                 onSubmit={handleSendConversation}
                 className="p-3 border-t border-gray-100 shrink-0 space-y-2"
               >
-                <input
-                  placeholder="Oggetto"
-                  value={conversationMessage.subject}
-                  onChange={(e) =>
-                    setConversationMessage((prev) => ({ ...prev, subject: e.target.value }))
-                  }
-                  className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
-                  required
-                />
                 <textarea
                   placeholder="Scrivi un messaggio..."
                   value={conversationMessage.content}
