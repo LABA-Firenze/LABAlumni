@@ -197,7 +197,7 @@ export default function Home() {
                   </li>
                   <li className="flex items-start gap-3">
                     <BookOpen className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-                    <span className="text-gray-700">Proposte tesi e relatore</span>
+                    <span className="text-gray-700">Tesi di laurea e relatore</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Users className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />

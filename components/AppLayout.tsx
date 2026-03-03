@@ -160,7 +160,7 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
                   <Link href="/tesi" className="block">
                     <Button variant="primary" className="w-full justify-start" size="sm">
                       <BookOpenIcon className="w-4 h-4 shrink-0" />
-                      Proposte Tesi
+                      Tesi di laurea
                     </Button>
                   </Link>
                 )}
@@ -219,7 +219,7 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
                   {role !== 'company' && (
                   <Link href="/tesi" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
                     <BookOpenIcon className="w-5 h-5 shrink-0" />
-                    <span>Proposte Tesi</span>
+                    <span>Tesi di laurea</span>
                   </Link>
                   )}
                   <Link href={role === 'company' ? '/annunci/gestisci' : '/annunci'} className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">

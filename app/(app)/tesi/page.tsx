@@ -151,62 +151,64 @@ export default function ThesisPage() {
             <div>
               <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
                 <BookOpenIcon className="w-8 h-8 text-primary-600" />
-                Proposte di Tesi
+                Tesi di laurea
               </h1>
               <p className="text-gray-600 mt-2">
-                {role === 'student' ? 'Pubblica la tua proposta o esplora quelle esistenti' : 'Esplora le proposte aperte e candidati come relatore'}
+                {role === 'student' ? 'Pubblica la tua tesi di laurea o esplora quelle esistenti' : 'Esplora le tesi di laurea aperte e candidati come relatore'}
               </p>
             </div>
             {role === 'student' && !hasActiveProposal && studentYear !== null && studentYear >= 3 && (
               <Link href="/tesi/nuova">
                 <Button variant="primary">
                   <PlusCircleIcon className="w-5 h-5 mr-2" />
-                  Nuova Proposta
+                  Nuova tesi di laurea
                 </Button>
               </Link>
             )}
           </div>
         </Card>
 
-        {/* Scope + Status Filters */}
-        <Card variant="elevated" className="p-4 mb-6 space-y-4">
-          <div>
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Cosa vuoi vedere</p>
-            <div className="flex gap-2 flex-wrap">
-              <button
-                onClick={() => setFilterScope('mine')}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  filterScope === 'mine' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                Le tue proposte
-              </button>
-              <button
-                onClick={() => setFilterScope('all')}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  filterScope === 'all' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                In bacheca
-              </button>
+        {/* Status Filters + Scope on right */}
+        <Card variant="elevated" className="p-4 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Stato</p>
+              <div className="flex gap-2 flex-wrap">
+                {(['all', 'open', 'in_progress', 'completed'] as const).map((status) => (
+                  <button
+                    key={status}
+                    onClick={() => setFilterStatus(status)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                      filterStatus === status
+                        ? 'bg-primary-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {status === 'all' ? 'Tutte' : statusLabels[status]}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-          <div>
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Stato</p>
-            <div className="flex gap-2 flex-wrap">
-              {(['all', 'open', 'in_progress', 'completed'] as const).map((status) => (
+            <div className="sm:text-right">
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Cosa vuoi vedere</p>
+              <div className="flex gap-2 flex-wrap sm:justify-end">
                 <button
-                  key={status}
-                  onClick={() => setFilterStatus(status)}
+                  onClick={() => setFilterScope('mine')}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                    filterStatus === status
-                      ? 'bg-primary-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    filterScope === 'mine' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  {status === 'all' ? 'Tutte' : statusLabels[status]}
+                  Le tue tesi di laurea
                 </button>
-              ))}
+                <button
+                  onClick={() => setFilterScope('all')}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    filterScope === 'all' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  In bacheca
+                </button>
+              </div>
             </div>
           </div>
         </Card>
@@ -219,23 +221,23 @@ export default function ThesisPage() {
             </div>
             <h3 className="text-xl font-semibold mb-2">
               {filterScope === 'mine'
-                ? 'Non hai ancora proposte'
+                ? 'Non hai ancora tesi di laurea'
                 : filterStatus === 'all'
-                  ? 'Nessuna proposta di tesi trovata'
-                  : `Nessuna proposta ${filterStatus === 'open' ? 'aperta' : filterStatus === 'in_progress' ? 'in elaborazione' : 'completata'}`
+                  ? 'Nessuna tesi di laurea trovata'
+                  : `Nessuna tesi di laurea ${filterStatus === 'open' ? 'aperta' : filterStatus === 'in_progress' ? 'in elaborazione' : 'completata'}`
               }
             </h3>
             <p className="text-gray-600 mb-6">
               {filterScope === 'mine'
-                ? (role === 'student' ? 'Pubblica la tua prima proposta di tesi.' : 'Nessuna proposta in cui sei relatore o corelatore.')
+                ? (role === 'student' ? 'Pubblica la tua prima tesi di laurea.' : 'Nessuna tesi di laurea in cui sei relatore o corelatore.')
                 : role === 'student'
-                  ? (filterStatus === 'open' ? 'Sii il primo a pubblicare una proposta di tesi!' : 'Prova a cambiare filtro o pubblica una nuova proposta')
-                  : 'Nessuna proposta al momento. Potrai candidarti come relatore quando gli studenti ne pubblicheranno.'
+                  ? (filterStatus === 'open' ? 'Sii il primo a pubblicare una tesi di laurea!' : 'Prova a cambiare filtro o pubblica una nuova tesi di laurea')
+                  : 'Nessuna tesi di laurea al momento. Potrai candidarti come relatore quando gli studenti ne pubblicheranno.'
               }
             </p>
             {(filterStatus === 'open' || filterScope === 'mine') && role === 'student' && !hasActiveProposal && studentYear !== null && studentYear >= 3 && (
               <Link href="/tesi/nuova">
-                <Button variant="primary">Pubblica la Prima Proposta</Button>
+                <Button variant="primary">Pubblica la Prima Tesi di laurea</Button>
               </Link>
             )}
           </Card>

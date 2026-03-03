@@ -150,7 +150,7 @@ export default function NewThesisProposalPage() {
 
       if (insertError) throw insertError
       const thesisId = thesisData?.id
-      if (!thesisId) throw new Error('Errore creazione proposta')
+      if (!thesisId) throw new Error('Errore creazione tesi di laurea')
 
       if (relatoreId) {
         await supabase.from('thesis_relatore_invitations').insert({
@@ -171,7 +171,7 @@ export default function NewThesisProposalPage() {
       router.refresh()
     } catch (err: any) {
       console.error('Error creating thesis proposal:', err)
-      setError(err.message || 'Errore durante la creazione della proposta')
+      setError(err.message || 'Errore durante la creazione della tesi di laurea')
     } finally {
       setLoading(false)
     }
@@ -183,7 +183,7 @@ export default function NewThesisProposalPage() {
         return (
           <div className="space-y-4">
             <Input
-              label="Titolo della Proposta *"
+              label="Titolo della tesi di laurea *"
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -194,7 +194,7 @@ export default function NewThesisProposalPage() {
               label="Descrizione *"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Descrivi in dettaglio la tua proposta di tesi, il tema centrale, le motivazioni e il contesto..."
+              placeholder="Descrivi in dettaglio la tua tesi di laurea, il tema centrale, le motivazioni e il contesto..."
               rows={6}
               required
             />
@@ -287,9 +287,9 @@ export default function NewThesisProposalPage() {
           </button>
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
             <BookOpenIcon className="w-8 h-8 text-primary-600" />
-            Nuova Proposta di Tesi
+            Nuova Tesi di laurea
           </h1>
-          <p className="text-gray-600 mt-2">Pubblica la tua proposta di tesi per trovare un relatore</p>
+          <p className="text-gray-600 mt-2">Pubblica la tua tesi di laurea per trovare un relatore</p>
         </div>
 
         {role === 'student' && studentYear === 'loading' ? (
@@ -302,10 +302,10 @@ export default function NewThesisProposalPage() {
           <Card variant="elevated" className="p-6 text-center">
             <div className="space-y-4">
               <p className="text-lg text-gray-700">
-                La proposta di tesi è disponibile solo dal 3° anno (o fuori corso). Al momento non puoi inviare una proposta.
+                La tesi di laurea è disponibile solo dal 3° anno (o fuori corso). Al momento non puoi inviare una tesi di laurea.
               </p>
               <Button variant="outline" onClick={() => router.push('/tesi')}>
-                Torna alle proposte
+                Torna alle tesi di laurea
               </Button>
             </div>
           </Card>
@@ -313,14 +313,14 @@ export default function NewThesisProposalPage() {
           <Card variant="elevated" className="p-6 text-center">
             <div className="space-y-4">
               <p className="text-lg text-gray-700">
-                Hai già una proposta di tesi attiva. Per crearne una nuova, elimina prima quella esistente.
+                Hai già una tesi di laurea attiva. Per crearne una nuova, elimina prima quella esistente.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link href={`/tesi/${existingProposal.id}`} className="inline-flex">
-                  <Button variant="primary">Vai alla tua proposta</Button>
+                  <Button variant="primary">Vai alla tua tesi di laurea</Button>
                 </Link>
                 <Button variant="outline" onClick={() => router.push('/tesi')}>
-                  Torna alle proposte
+                  Torna alle tesi di laurea
                 </Button>
               </div>
             </div>
@@ -375,7 +375,7 @@ export default function NewThesisProposalPage() {
                     ) : (
                       <>
                         <DocumentTextIcon className="w-4 h-4 mr-2" />
-                        Pubblica Proposta
+                        Pubblica Tesi di laurea
                       </>
                     )}
                   </Button>

@@ -463,7 +463,7 @@ export default function ProfilePage() {
                   </Link>
                   <Link href="/tesi" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
                     <BookOpen className="w-5 h-5 shrink-0" />
-                    <span>Proposte Tesi</span>
+                    <span>Tesi di laurea</span>
                   </Link>
                   <Link href="/annunci" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
                     <Briefcase className="w-5 h-5 shrink-0" />
@@ -512,7 +512,7 @@ export default function ProfilePage() {
             )}
           </Card>
           <Link href="/tesi">
-            <Button variant="primary">Proposte Tesi</Button>
+            <Button variant="primary">Tesi di laurea</Button>
           </Link>
         </div>
       </div>

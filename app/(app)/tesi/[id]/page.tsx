@@ -188,7 +188,7 @@ export default function ThesisDetailPage() {
 
   const handleDelete = async () => {
     if (!user || !thesisId || !isOwner || actionLoading) return
-    if (!confirm('Vuoi eliminare questa proposta? Potrai crearne una nuova dopo.')) return
+    if (!confirm('Vuoi eliminare questa tesi di laurea? Potrai crearne una nuova dopo.')) return
     setActionLoading(true)
     try {
       const { data, error } = await supabase
@@ -199,7 +199,7 @@ export default function ThesisDetailPage() {
         .select('id')
       if (error) throw error
       if (!data?.length) {
-        alert('Impossibile eliminare la proposta. Verifica di essere il proprietario o riprova.')
+        alert('Impossibile eliminare la tesi di laurea. Verifica di essere il proprietario o riprova.')
         return
       }
       router.push('/tesi')
@@ -242,10 +242,10 @@ export default function ThesisDetailPage() {
         <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-primary-100 flex items-center justify-center">
               <BookOpenIcon className="w-12 h-12 text-primary-600" />
             </div>
-        <h3 className="text-xl font-semibold mb-2">Proposta non trovata</h3>
-        <p className="text-gray-600 mb-6">La proposta di tesi richiesta non esiste o è stata rimossa.</p>
+        <h3 className="text-xl font-semibold mb-2">Tesi di laurea non trovata</h3>
+        <p className="text-gray-600 mb-6">La tesi di laurea richiesta non esiste o è stata rimossa.</p>
         <Link href="/tesi">
-          <Button variant="primary">Torna alle Proposte</Button>
+          <Button variant="primary">Torna alle Tesi di laurea</Button>
         </Link>
       </Card>
     )
@@ -466,13 +466,13 @@ export default function ThesisDetailPage() {
                     className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-500 hover:text-red-600 transition-colors disabled:opacity-50"
                   >
                     <TrashIcon className="w-4 h-4" />
-                    {actionLoading ? 'Eliminazione...' : 'Elimina proposta'}
+                    {actionLoading ? 'Eliminazione...' : 'Elimina tesi di laurea'}
                   </button>
                 )}
                 <div className="flex gap-2 ml-auto">
                   <Link href="/tesi">
                     <span className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-full transition-colors">
-                      Torna alle Proposte
+                      Torna alle Tesi di laurea
                     </span>
                   </Link>
                 </div>

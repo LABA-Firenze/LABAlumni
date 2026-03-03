@@ -416,7 +416,7 @@ export default function PublicProfilePage() {
             className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 text-sm font-medium mb-6"
           >
             <ArrowLeft className="w-4 h-4" />
-            Torna alle proposte tesi
+            Torna alle tesi di laurea
           </Link>
 
           <Card variant="elevated" className="mb-6">
@@ -451,11 +451,11 @@ export default function PublicProfilePage() {
               </div>
             )}
             {!docente && (
-              <p className="text-gray-500 text-sm">Profilo docente. Contattabile dalla piattaforma per proposte di tesi.</p>
+              <p className="text-gray-500 text-sm">Profilo docente. Contattabile dalla piattaforma per tesi di laurea.</p>
             )}
           </Card>
           <Link href="/tesi">
-            <Button variant="primary">Vedi proposte tesi</Button>
+            <Button variant="primary">Vedi tesi di laurea</Button>
           </Link>
         </div>
       </div>
