@@ -148,10 +148,11 @@ export function FloatingChat() {
     if (!user || !selectedConversation) return
     setSending(true)
     try {
+      const replySubject = selectedMessages[0]?.subject || 'Messaggio'
       await supabase.from('messages').insert({
         sender_id: user.id,
         recipient_id: selectedConversation,
-        subject: conversationMessage.subject,
+        subject: replySubject,
         content: conversationMessage.content,
       })
       setConversationMessage({ subject: '', content: '' })
@@ -368,15 +369,6 @@ export function FloatingChat() {
                 onSubmit={handleSendConversation}
                 className="p-3 border-t border-gray-100 shrink-0 space-y-2"
               >
-                <input
-                  placeholder="Oggetto"
-                  value={conversationMessage.subject}
-                  onChange={(e) =>
-                    setConversationMessage((prev) => ({ ...prev, subject: e.target.value }))
-                  }
-                  className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
-                  required
-                />
                 <textarea
                   placeholder="Scrivi un messaggio..."
                   value={conversationMessage.content}
