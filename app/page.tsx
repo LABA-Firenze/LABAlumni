@@ -6,7 +6,6 @@ import { useAuth } from '@/components/AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { Navbar } from '@/components/Navbar'
 import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
 import { Briefcase, Users, MessageSquare, Newspaper, GraduationCap, ArrowRight, FileCheck, Send, Search, BookOpen } from 'lucide-react'
 import Link from 'next/link'
 
@@ -52,57 +51,44 @@ export default function Home() {
     <div className="min-h-screen bg-gray-100/90">
       <Navbar />
       
-      {/* Hero Section - Nuovo stile grafico */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary-500 via-primary-600 to-primary-800 py-28 lg:py-36">
-        {/* Pattern di sfondo raffinato */}
-        <div 
-          className="absolute inset-0 opacity-[0.07]"
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 py-24 lg:py-32">
+        <div
+          className="absolute inset-0 opacity-[0.04]"
           style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='none'/%3E%3Cpath d='M20 0v40M0 20h40' stroke='%23ffffff' stroke-width='0.5' fill='none'/%3E%3C/svg%3E")`
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z' fill='%23ffffff'/%3E%3C/g%3E%3C/svg%3E")`,
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-primary-900/30 to-transparent" />
-        
-        {/* Elementi decorativi minimali */}
-        <div className="absolute top-16 right-16 w-72 h-72 bg-white/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-16 left-16 w-96 h-96 bg-primary-400/10 rounded-full blur-3xl" />
-        
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary-400/20 rounded-full blur-[100px] -translate-y-1/2" />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
         <div className="relative z-10 max-w-9xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-4xl mx-auto">
-            <div className="flex items-center justify-center gap-3 mb-8 animate-fade-in">
-              <GraduationCap className="w-10 h-10 text-white/90" />
-              <div className="text-left">
-                <p className="text-white/90 text-sm font-medium tracking-wide">LABA Firenze</p>
-                <p className="text-white/70 text-xs">Libera Accademia di Belle Arti</p>
-              </div>
+          <div className="text-center max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-8 animate-fade-in">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-white/90 text-sm font-medium">LABA Firenze</span>
+              <span className="text-white/50">·</span>
+              <span className="text-white/70 text-sm">Libera Accademia di Belle Arti</span>
             </div>
-            
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4 animate-slide-up leading-tight">
+            <h1 className="text-4xl sm:text-5xl lg:text-[3.25rem] font-bold text-white mb-5 leading-[1.15] tracking-tight">
               La rete professionale di LABA Firenze
             </h1>
-            
-            <p className="text-xl text-white/95 mb-6 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+            <p className="text-xl text-white/90 mb-6 font-medium">
               La piattaforma ufficiale che connette studenti, diplomati e aziende.
             </p>
-            
-            <p className="text-lg text-white/85 mb-10 animate-slide-up max-w-2xl mx-auto leading-relaxed" style={{ animationDelay: '0.15s' }}>
-              Accedi a opportunità di lavoro e tirocini curriculari ed extracurriculari.
-              Costruisci il tuo profilo professionale, entra in contatto con le aziende e sviluppa il tuo percorso nel mondo creativo.
+            <p className="text-base text-white/80 mb-10 leading-relaxed">
+              Accedi a opportunità di lavoro e tirocini curriculari ed extracurriculari. Costruisci il tuo profilo professionale, entra in contatto con le aziende e sviluppa il tuo percorso nel mondo creativo.
             </p>
-
-            <p className="text-white/80 italic text-base mb-10 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+            <p className="text-white/70 text-sm italic mb-10">
               Dalla formazione al lavoro, in un unico spazio.
             </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up" style={{ animationDelay: '0.3s' }}>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link href="/accedi">
-                <Button variant="secondary" size="lg" className="w-full sm:w-auto bg-white text-primary-600 hover:bg-white/95 hover:shadow-lg transition-all flex items-center justify-center gap-2">
-                  <span>Accedi</span>
-                  <ArrowRight className="w-5 h-5" />
+                <Button variant="secondary" size="lg" className="w-full sm:w-auto bg-white text-primary-600 hover:bg-white/95 shadow-xl hover:shadow-2xl transition-all font-semibold rounded-xl px-8">
+                  Accedi →
                 </Button>
               </Link>
               <Link href="/registrati">
-                <Button variant="outline" size="lg" className="w-full sm:w-auto border-2 border-white text-white hover:bg-white/10 backdrop-blur-sm">
+                <Button variant="outline" size="lg" className="w-full sm:w-auto border-2 border-white/60 text-white hover:bg-white/15 hover:border-white rounded-xl px-8 font-medium">
                   Registrati (Docenti e Aziende)
                 </Button>
               </Link>
@@ -214,107 +200,136 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="bg-gray-100/80 py-20">
-        <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+      {/* Cosa puoi fare */}
+      <section className="py-20 lg:py-24 bg-gradient-to-b from-slate-50 to-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 mb-4">
             Cosa puoi fare
           </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card variant="elevated" className="hover:shadow-lg transition-shadow">
-              <Briefcase className="w-12 h-12 text-primary-600 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Trova Opportunità</h3>
-              <p className="text-gray-600">
+          <p className="text-center text-gray-600 mb-14 max-w-xl mx-auto">
+            Tutto ciò di cui hai bisogno per il tuo percorso professionale
+          </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="group relative rounded-2xl border border-gray-200/80 bg-white p-6 shadow-sm hover:shadow-xl hover:border-primary-200/60 transition-all duration-300">
+              <div className="w-12 h-12 rounded-xl bg-primary-500/10 text-primary-600 flex items-center justify-center mb-4 group-hover:bg-primary-500/20 transition-colors">
+                <Briefcase className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Trova Opportunità</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
                 Tirocini mirati per il tuo corso
               </p>
-            </Card>
-            
-            <Card variant="elevated" className="hover:shadow-lg transition-shadow">
-              <Users className="w-12 h-12 text-primary-600 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Connetterti</h3>
-              <p className="text-gray-600">
+            </div>
+            <div className="group relative rounded-2xl border border-gray-200/80 bg-white p-6 shadow-sm hover:shadow-xl hover:border-primary-200/60 transition-all duration-300">
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center mb-4 group-hover:bg-emerald-500/20 transition-colors">
+                <Users className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Connetterti</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
                 Conosci aziende del settore creativo e altri studenti
               </p>
-            </Card>
-            
-            <Card variant="elevated" className="hover:shadow-lg transition-shadow">
-              <MessageSquare className="w-12 h-12 text-primary-600 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Messaggistica</h3>
-              <p className="text-gray-600">
+            </div>
+            <div className="group relative rounded-2xl border border-gray-200/80 bg-white p-6 shadow-sm hover:shadow-xl hover:border-primary-200/60 transition-all duration-300">
+              <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center mb-4 group-hover:bg-amber-500/20 transition-colors">
+                <MessageSquare className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Messaggistica</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
                 Comunica direttamente con chi ti interessa
               </p>
-            </Card>
-            
-            <Card variant="elevated" className="hover:shadow-lg transition-shadow">
-              <Newspaper className="w-12 h-12 text-primary-600 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Bacheca</h3>
-              <p className="text-gray-600">
+            </div>
+            <div className="group relative rounded-2xl border border-gray-200/80 bg-white p-6 shadow-sm hover:shadow-xl hover:border-primary-200/60 transition-all duration-300">
+              <div className="w-12 h-12 rounded-xl bg-violet-500/10 text-violet-600 flex items-center justify-center mb-4 group-hover:bg-violet-500/20 transition-colors">
+                <Newspaper className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Bacheca</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
                 Resta aggiornato con news e articoli del settore
               </p>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* How it works - Simplified */}
-      <section className="py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-12">Semplice e diretto</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
-                1
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Registrati</h3>
-              <p className="text-gray-600">
-                Crea il tuo profilo in pochi passi
-              </p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
-                2
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Esplora</h3>
-              <p className="text-gray-600">
-                Trova tirocini e connettiti con le aziende
-              </p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
-                3
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Inizia</h3>
-              <p className="text-gray-600">
-                Candidati e costruisci la tua carriera
-              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 text-white py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4">
+      {/* Semplice e diretto */}
+      <section className="py-20 lg:py-24 bg-white">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 mb-4">
+            Semplice e diretto
+          </h2>
+          <p className="text-center text-gray-600 mb-16 max-w-md mx-auto">
+            Tre passi per entrare nella rete professionale LABA
+          </p>
+          <div className="relative">
+            <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary-200 to-transparent -translate-y-1/2" />
+            <div className="grid md:grid-cols-3 gap-10 md:gap-8 relative">
+              <div className="relative flex flex-col items-center text-center">
+                <div className="w-14 h-14 rounded-2xl bg-primary-600 text-white flex items-center justify-center text-xl font-bold shadow-lg shadow-primary-500/30 z-10">
+                  1
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mt-5 mb-2">Registrati</h3>
+                <p className="text-gray-600 text-sm leading-relaxed max-w-[200px]">
+                  Crea il tuo profilo in pochi passi
+                </p>
+              </div>
+              <div className="relative flex flex-col items-center text-center">
+                <div className="w-14 h-14 rounded-2xl bg-primary-600 text-white flex items-center justify-center text-xl font-bold shadow-lg shadow-primary-500/30 z-10">
+                  2
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mt-5 mb-2">Esplora</h3>
+                <p className="text-gray-600 text-sm leading-relaxed max-w-[200px]">
+                  Trova tirocini e connettiti con le aziende
+                </p>
+              </div>
+              <div className="relative flex flex-col items-center text-center">
+                <div className="w-14 h-14 rounded-2xl bg-primary-600 text-white flex items-center justify-center text-xl font-bold shadow-lg shadow-primary-500/30 z-10">
+                  3
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mt-5 mb-2">Inizia</h3>
+                <p className="text-gray-600 text-sm leading-relaxed max-w-[200px]">
+                  Candidati e costruisci la tua carriera
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="relative overflow-hidden py-20 lg:py-24">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary-500/30 via-transparent to-transparent" />
+        <div className="relative z-10 max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
             Pronto a iniziare?
           </h2>
-          <p className="text-xl mb-8 opacity-90">
+          <p className="text-white/90 text-lg mb-8">
             Unisciti alla community oggi
           </p>
           <Link href="/registrati">
-            <Button variant="secondary" size="lg">Registrati Gratis</Button>
+            <button className="inline-flex items-center justify-center px-8 py-4 bg-white text-primary-600 font-semibold rounded-xl shadow-xl hover:shadow-2xl hover:bg-white/95 transition-all duration-200">
+              Registrati Gratis
+            </button>
           </Link>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <p className="text-lg font-semibold mb-2">LABAlumni</p>
-            <p className="text-gray-400">Piattaforma di job placement per LABA Firenze</p>
+      <footer className="bg-slate-900 text-white py-14">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div>
+              <p className="text-lg font-semibold tracking-tight">LABAlumni</p>
+              <p className="text-slate-400 text-sm mt-1">Piattaforma di job placement per LABA Firenze</p>
+            </div>
+            <div className="flex gap-8 text-sm text-slate-400">
+              <Link href="/accedi" className="hover:text-white transition-colors">Accedi</Link>
+              <Link href="/registrati" className="hover:text-white transition-colors">Registrati</Link>
+            </div>
+          </div>
+          <div className="mt-10 pt-8 border-t border-slate-700/50">
+            <p className="text-slate-500 text-xs text-center">
+              © {new Date().getFullYear()} LABAlumni · LABA Firenze
+            </p>
           </div>
         </div>
       </footer>
