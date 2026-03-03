@@ -362,13 +362,13 @@ export default function NetworkPage() {
               <p className="text-gray-600">Prova a modificare la ricerca</p>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {filteredCompanies.map((company) => (
                 <Link key={company.id} href={`/azienda/${company.id}`} className="block group">
-                  <Card variant="elevated" className="overflow-hidden hover:shadow-lg transition-shadow h-full">
-                    <div className="p-6">
-                      <div className="flex items-center gap-4 mb-3">
-                        <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center shrink-0 overflow-hidden">
+                  <Card variant="elevated" className="overflow-hidden hover:shadow-xl hover:border-gray-200 transition-all duration-200 h-full">
+                    <div className="p-5">
+                      <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
                           {company.logo_url ? (
                             <img src={company.logo_url} alt="" className="w-full h-full object-cover" />
                           ) : (
@@ -376,13 +376,15 @@ export default function NetworkPage() {
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <h3 className="font-semibold text-lg truncate group-hover:text-primary-600 transition-colors">
+                          <h3 className="font-semibold text-base text-gray-900 truncate group-hover:text-primary-600 transition-colors">
                             {company.company_name}
                           </h3>
                           {company.industry && (
-                            <p className="text-sm text-gray-600 truncate">{company.industry}</p>
+                            <p className="text-sm text-gray-600 truncate mt-0.5" title={company.industry}>
+                              {company.industry}
+                            </p>
                           )}
-                          <span className="text-xs text-primary-600 mt-1 inline-block">Vedi profilo e annunci →</span>
+                          <span className="text-xs text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity mt-1.5 inline-block">Vedi profilo e annunci →</span>
                         </div>
                       </div>
                     </div>
@@ -404,37 +406,38 @@ export default function NetworkPage() {
               <p className="text-gray-600">Prova a modificare la ricerca</p>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredDocenti.map((doc) => (
-                <Link key={doc.id} href={`/profilo/${doc.id}`} className="block group">
-                  <Card variant="elevated" className="overflow-hidden hover:shadow-lg transition-shadow h-full">
-                    <div className="p-6">
-                      <div className="flex items-center gap-4 mb-3">
-                        <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${getProfileGradient('docente').circle} flex items-center justify-center shrink-0 overflow-hidden text-white`}>
-                          {doc.avatar_url ? (
-                            <img src={doc.avatar_url} alt="" className="w-full h-full object-cover" />
-                          ) : (
-                            <AcademicCapIcon className="w-7 h-7" />
-                          )}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <h3 className="font-semibold text-lg group-hover:text-primary-600 transition-colors truncate">
-                            {doc.full_name || 'Docente'}
-                          </h3>
-                          {doc.courses?.length ? (
-                            <p className="text-sm text-gray-600 truncate">
-                              {doc.courses.map((c) => COURSE_CONFIG[c as CourseType]?.name || c).join(', ')}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {filteredDocenti.map((doc) => {
+                const coursesLabel = doc.courses?.length
+                  ? doc.courses.map((c) => COURSE_CONFIG[c as CourseType]?.name || c).join(', ')
+                  : 'Docente'
+                return (
+                  <Link key={doc.id} href={`/profilo/${doc.id}`} className="block group">
+                    <Card variant="elevated" className="overflow-hidden hover:shadow-xl hover:border-amber-100 transition-all duration-200 h-full">
+                      <div className="p-5">
+                        <div className="flex gap-4">
+                          <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${getProfileGradient('docente').circle} flex items-center justify-center shrink-0 overflow-hidden text-white shadow-sm`}>
+                            {doc.avatar_url ? (
+                              <img src={doc.avatar_url} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <AcademicCapIcon className="w-7 h-7" />
+                            )}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <h3 className="font-semibold text-base text-gray-900 truncate group-hover:text-primary-600 transition-colors">
+                              {doc.full_name || 'Docente'}
+                            </h3>
+                            <p className="text-sm text-gray-600 truncate mt-0.5" title={coursesLabel}>
+                              {coursesLabel}
                             </p>
-                          ) : (
-                            <p className="text-sm text-gray-500">Docente</p>
-                          )}
-                          <span className="text-xs text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity mt-1 inline-block">Vedi profilo →</span>
+                            <span className="text-xs text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity mt-1.5 inline-block">Vedi profilo →</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Card>
-                </Link>
-              ))}
+                    </Card>
+                  </Link>
+                )
+              })}
             </div>
           )
         )}
@@ -450,38 +453,45 @@ export default function NetworkPage() {
               <p className="text-gray-600">Prova a modificare i filtri di ricerca</p>
             </Card>
           ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {students.map((student) => {
               const status = getConnectionStatus(student.id)
+              const label = getStudentDisplayLabel(student)
+              const subtitle = label
+                ? (!student.display_label && student.year != null
+                  ? `${label} · ${student.year}° anno`
+                  : label)
+                : (student.year != null ? `${student.year}° anno` : '')
               return (
-                <Card key={student.id} variant="elevated" className="overflow-hidden hover:shadow-lg transition-shadow">
-                  <div className="p-6">
-                    <Link href={`/profilo/${student.id}`} className="block group">
-                      <div className="flex items-center gap-4 mb-4">
-                        <div className={`w-16 h-16 bg-gradient-to-br ${getProfileGradient('student', student.course).circle} rounded-full flex items-center justify-center text-white text-xl font-bold overflow-hidden`}>
-                          {getInitials(student.profile?.full_name || student.profile?.email) || 'S'}
+                <Card key={student.id} variant="elevated" className="overflow-hidden hover:shadow-xl hover:border-primary-100 transition-all duration-200 group">
+                  <div className="p-5 flex flex-col h-full">
+                    <Link href={`/profilo/${student.id}`} className="flex-1 block min-w-0">
+                      <div className="flex gap-4">
+                        <div className={`w-14 h-14 shrink-0 bg-gradient-to-br ${getProfileGradient('student', student.course).circle} rounded-2xl flex items-center justify-center text-white text-lg font-bold overflow-hidden shadow-sm`}>
+                          {student.profile?.avatar_url ? (
+                            <img src={student.profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            getInitials(student.profile?.full_name || student.profile?.email) || 'S'
+                          )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-lg group-hover:text-primary-600 transition-colors">
+                          <h3 className="font-semibold text-base text-gray-900 truncate group-hover:text-primary-600 transition-colors">
                             {student.profile?.full_name || 'Studente'}
                           </h3>
-                        <p className="text-sm text-gray-600">
-                          {getStudentDisplayLabel(student)}
-                        </p>
-                          <span className="text-xs text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity mt-1 inline-block">
-                            Vedi profilo e portfolio →
+                          <p
+                            className="text-sm text-gray-600 truncate mt-0.5"
+                            title={subtitle}
+                          >
+                            {subtitle}
+                          </p>
+                          <span className="text-xs text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity mt-1.5 inline-block">
+                            Vedi profilo →
                           </span>
                         </div>
                       </div>
-
-                      {!student.display_label && student.year && (
-                        <p className="text-sm text-gray-500 mb-4">
-                          {student.year}° anno
-                        </p>
-                      )}
                     </Link>
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
                       {status === 'none' && (
                         <Button
                           variant="primary"

@@ -27,6 +27,7 @@ export interface Student {
   id: string
   course: CourseType | null
   bio: string | null
+  onboarding_completed?: boolean
   portfolio_url: string | null
   twitter_url: string | null
   linkedin_url: string | null

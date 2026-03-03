@@ -18,7 +18,7 @@ export default function RegistratiPage() {
           <Card className="shadow-xl text-center p-8">
             <h1 className="text-xl font-bold text-gray-900 mb-3">Registrazione studenti</h1>
             <p className="text-gray-600 mb-6">
-              Gli studenti non possono registrarsi. Accedi con le credenziali utilizzate per l&apos;applicazione LABA dalla pagina <strong>Accedi</strong>.
+              Gli studenti non hanno bisogno di registrarsi. Accedi con le stesse credenziali che utilizzi per l&apos;applicazione LABA.
             </p>
             <Link href="/accedi">
               <Button className="w-full">Vai ad Accedi</Button>

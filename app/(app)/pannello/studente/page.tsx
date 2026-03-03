@@ -14,6 +14,7 @@ import type { Post } from '@/types/social'
 import { PostCard } from '@/components/PostCard'
 import { SkeletonCard } from '@/components/ui/Skeleton'
 import { useMinimumLoading } from '@/hooks/useMinimumLoading'
+import { OnboardingWizard } from '@/components/OnboardingWizard'
 
 export default function StudentDashboard() {
   const { user, loading: authLoading } = useAuth()
@@ -96,6 +97,16 @@ export default function StudentDashboard() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleOnboardingComplete = async () => {
+    if (!user) return
+    await supabase
+      .from('students')
+      .update({ onboarding_completed: true })
+      .eq('id', user.id)
+    const { data } = await supabase.from('students').select('onboarding_completed').eq('id', user.id).single()
+    if (data) setStudent((s) => (s ? { ...s, onboarding_completed: true } : s))
   }
 
   const loadMyRequest = async () => {
@@ -271,8 +282,13 @@ export default function StudentDashboard() {
     )
   }
 
+  const showOnboarding = student && !student.onboarding_completed
+
   return (
     <div className="space-y-4">
+            {showOnboarding && (
+              <OnboardingWizard onComplete={handleOnboardingComplete} />
+            )}
             {/* Hero / Pubblicazione - CTA diretta */}
             {student && student.year !== null && student.year >= 2 ? (
             <Card variant="elevated" className="p-5 border border-gray-100">
