@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { createPortal } from 'react-dom'
 import { useAuth } from './AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { MessageCircle, X, Send, User, Building2, Search } from 'lucide-react'
@@ -200,12 +199,11 @@ export function FloatingChat() {
 
   if (!user) return null
 
-  const chatUI = (
+  return (
     <>
       <button
         onClick={() => setOpen(!open)}
-        className="fixed bottom-6 right-6 z-[100] w-14 h-14 bg-primary-600 hover:bg-primary-700 text-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105 relative"
-        style={{ left: 'auto' }}
+        className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-primary-600 hover:bg-primary-700 text-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105 relative"
         aria-label="Messaggi"
       >
         <MessageCircle className="w-7 h-7" />
@@ -217,7 +215,7 @@ export function FloatingChat() {
       </button>
 
       {open && (
-        <div className="fixed bottom-24 right-6 z-[101] w-[380px] max-w-[calc(100vw-3rem)] bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden flex flex-col max-h-[600px]" style={{ left: 'auto' }}>
+        <div className="fixed bottom-24 right-6 z-50 w-[380px] max-w-[calc(100vw-3rem)] bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden flex flex-col max-h-[600px]">
           <div className="bg-primary-600 text-white px-4 py-3 flex items-center justify-between shrink-0">
             <h3 className="font-semibold">Messaggi</h3>
             <button
@@ -404,9 +402,4 @@ export function FloatingChat() {
       )}
     </>
   )
-
-  if (typeof document !== 'undefined') {
-    return createPortal(chatUI, document.body)
-  }
-  return chatUI
 }
