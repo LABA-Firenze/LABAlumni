@@ -80,7 +80,7 @@ export default function ImpostazioniPage() {
   if (loading) return <div className="animate-pulse h-64 bg-gray-100 rounded-xl" />
 
   return (
-    <div className="space-y-8 max-w-2xl">
+    <div className="space-y-8 max-w-4xl">
       {/* Header */}
       <Card variant="elevated" className="p-8 bg-gradient-to-br from-primary-50/60 to-white border-primary-100/60">
         <div className="flex items-center gap-4">
@@ -94,6 +94,8 @@ export default function ImpostazioniPage() {
         </div>
       </Card>
 
+      {/* Notifiche + Privacy su due colonne */}
+      <div className="grid md:grid-cols-2 gap-6">
       {/* Notifiche */}
       <Card variant="elevated" className="p-6">
         <div className="flex items-center gap-3 mb-6">
@@ -143,7 +145,7 @@ export default function ImpostazioniPage() {
       </Card>
 
       {/* Privacy */}
-      <Card variant="elevated" className="p-6">
+      <Card variant="elevated" className="p-6 h-fit">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
             <ShieldCheckIcon className="w-5 h-5 text-emerald-600" />
@@ -179,6 +181,7 @@ export default function ImpostazioniPage() {
           </label>
         </div>
       </Card>
+      </div>
 
       {/* Altro */}
       <Card variant="elevated" className="p-6">
