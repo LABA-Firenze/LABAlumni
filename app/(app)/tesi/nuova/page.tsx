@@ -33,6 +33,8 @@ export default function NewThesisProposalPage() {
   const [methodology, setMethodology] = useState('')
   const [relatoreId, setRelatoreId] = useState('')
   const [corelatoreId, setCorelatoreId] = useState('')
+  const [relatorePreference, setRelatorePreference] = useState<'si' | 'no' | null>(null)
+  const [corelatorePreference, setCorelatorePreference] = useState<'si' | 'no' | null>(null)
   const [docenti, setDocenti] = useState<DocenteWithProfile[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -205,37 +207,87 @@ export default function NewThesisProposalPage() {
         )
       case 2:
         return (
-          <div className="space-y-4">
+          <div className="space-y-8">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <UserCircleIcon className="w-4 h-4 inline mr-1.5 text-primary-600" />
-                Relatore
-              </label>
-              <Select value={relatoreId} onChange={(e) => { setRelatoreId(e.target.value); if (e.target.value === corelatoreId) setCorelatoreId(''); }}>
-                <option value="">Nessun relatore (i docenti potranno candidarsi)</option>
-                {relatori.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.profile?.full_name || d.profile?.email} {d.courses?.length ? `· ${d.courses.map((c: string) => COURSE_CONFIG[c as keyof typeof COURSE_CONFIG]?.name).filter(Boolean).join(', ')}` : ''}
-                  </option>
-                ))}
-              </Select>
-              <p className="text-sm text-gray-500 mt-1">Opzionale. Se selezioni un relatore, riceverà un invito da accettare.</p>
+              <p className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
+                <UserCircleIcon className="w-4 h-4 text-primary-600" />
+                Hai già in mente il tuo relatore?
+              </p>
+              <div className="flex gap-3 mb-4">
+                <button
+                  type="button"
+                  onClick={() => { setRelatorePreference('si'); setRelatoreId(''); }}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${relatorePreference === 'si' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                >
+                  Sì
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setRelatorePreference('no'); setRelatoreId(''); }}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${relatorePreference === 'no' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                >
+                  No
+                </button>
+              </div>
+              {relatorePreference === 'si' && (
+                <>
+                  <Select value={relatoreId} onChange={(e) => { setRelatoreId(e.target.value); if (e.target.value === corelatoreId) setCorelatoreId(''); }}>
+                    <option value="">Seleziona un relatore</option>
+                    {relatori.map((d) => (
+                      <option key={d.id} value={d.id}>
+                        {d.profile?.full_name || d.profile?.email} {d.courses?.length ? `· ${d.courses.map((c: string) => COURSE_CONFIG[c as keyof typeof COURSE_CONFIG]?.name).filter(Boolean).join(', ')}` : ''}
+                      </option>
+                    ))}
+                  </Select>
+                  <p className="text-sm text-gray-500 mt-1">Riceverà un invito da accettare.</p>
+                </>
+              )}
+              {relatorePreference === 'no' && (
+                <p className="text-sm text-gray-600 bg-primary-50 rounded-lg p-3 border border-primary-100">
+                  La proposta è aperta a tutti i docenti: potranno candidarsi come relatore.
+                </p>
+              )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <UsersIcon className="w-4 h-4 inline mr-1.5 text-primary-600" />
-                Corelatore
-              </label>
-              <Select value={corelatoreId} onChange={(e) => setCorelatoreId(e.target.value)}>
-                <option value="">Nessun corelatore</option>
-                {correlatori.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.profile?.full_name || d.profile?.email} {d.courses?.length ? `· ${d.courses.map((c: string) => COURSE_CONFIG[c as keyof typeof COURSE_CONFIG]?.name).filter(Boolean).join(', ')}` : ''}
-                  </option>
-                ))}
-              </Select>
-              <p className="text-sm text-gray-500 mt-1">Opzionale. Max 1 relatore + 1 corelatore.</p>
+              <p className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
+                <UsersIcon className="w-4 h-4 text-primary-600" />
+                Hai già in mente il tuo corelatore?
+              </p>
+              <div className="flex gap-3 mb-4">
+                <button
+                  type="button"
+                  onClick={() => { setCorelatorePreference('si'); setCorelatoreId(''); }}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${corelatorePreference === 'si' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                >
+                  Sì
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setCorelatorePreference('no'); setCorelatoreId(''); }}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${corelatorePreference === 'no' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                >
+                  No
+                </button>
+              </div>
+              {corelatorePreference === 'si' && (
+                <>
+                  <Select value={corelatoreId} onChange={(e) => setCorelatoreId(e.target.value)}>
+                    <option value="">Seleziona un corelatore</option>
+                    {correlatori.map((d) => (
+                      <option key={d.id} value={d.id}>
+                        {d.profile?.full_name || d.profile?.email} {d.courses?.length ? `· ${d.courses.map((c: string) => COURSE_CONFIG[c as keyof typeof COURSE_CONFIG]?.name).filter(Boolean).join(', ')}` : ''}
+                      </option>
+                    ))}
+                  </Select>
+                  <p className="text-sm text-gray-500 mt-1">Max 1 relatore + 1 corelatore.</p>
+                </>
+              )}
+              {corelatorePreference === 'no' && (
+                <p className="text-sm text-gray-600 bg-primary-50 rounded-lg p-3 border border-primary-100">
+                  La proposta è aperta a tutti i docenti: potranno candidarsi come corelatore.
+                </p>
+              )}
             </div>
           </div>
         )

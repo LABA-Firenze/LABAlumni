@@ -161,7 +161,7 @@ export default function ThesisPage() {
               <Link href="/tesi/nuova">
                 <Button variant="primary">
                   <PlusCircleIcon className="w-5 h-5 mr-2" />
-                  Nuova tesi di laurea
+                  Nuova proposta di tesi
                 </Button>
               </Link>
             )}
@@ -198,7 +198,7 @@ export default function ThesisPage() {
                     filterScope === 'mine' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  Le tue tesi di laurea
+                  Le mie proposte
                 </button>
                 <button
                   onClick={() => setFilterScope('all')}
@@ -206,7 +206,7 @@ export default function ThesisPage() {
                     filterScope === 'all' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  In bacheca
+                  Bacheca
                 </button>
               </div>
             </div>

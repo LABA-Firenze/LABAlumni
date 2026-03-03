@@ -114,7 +114,12 @@ export function FloatingChat() {
   const canMessageAnyone = userRole === 'company' || isStaffEmail(user?.email)
   const conversationList = Array.from(conversations.values())
     .filter((conv) => {
-      if (!canMessageAnyone && userRole === 'student' && conv.user.role !== 'company') return false
+      // Studenti: vedono conversazioni con aziende E con staff (Simone, Alessia, Matteo)
+      if (!canMessageAnyone && userRole === 'student') {
+        const otherIsCompany = conv.user?.role === 'company'
+        const otherIsStaff = isStaffEmail(conv.user?.email)
+        if (!otherIsCompany && !otherIsStaff) return false
+      }
       if (!searchTerm) return true
       return (
         conv.user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
