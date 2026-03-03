@@ -5,7 +5,7 @@ import { useAuth } from './AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { Card } from './ui/Card'
 import { Button } from './ui/Button'
-import { Heart, MessageCircle, Share2, Send, Trash2, Calendar, Clock, Building2, User, Target, Briefcase, Handshake, BookOpen } from 'lucide-react'
+import { Heart, MessageCircle, Share2, Send, Trash2, Calendar, Clock, Building2, User, Target, Briefcase, Users, BookOpen } from 'lucide-react'
 import type { Post, PostComment } from '@/types/social'
 import { getInitials } from '@/lib/avatar'
 import { COURSE_CONFIG, getProfileGradient, type CourseType } from '@/types/database'
@@ -200,7 +200,7 @@ export function PostCard({ post, onUpdate }: PostCardProps) {
                 )}
                 {post.request_type === 'collaborazione' && (
                   <>
-                    <Handshake className="w-3.5 h-3.5" />
+                    <Users className="w-3.5 h-3.5" />
                     Collaborazione
                   </>
                 )}
