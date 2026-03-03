@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase'
 import { MessageCircle, X, Send, User, Building2, Search } from 'lucide-react'
 import { Button } from './ui/Button'
 import type { Message, Profile } from '@/types/database'
+import { useMessagesRealtime } from '@/hooks/useMessagesRealtime'
 
 const OPEN_CHAT_EVENT = 'floating-chat-open'
 
@@ -105,6 +106,8 @@ export function FloatingChat() {
       setLoading(false)
     }
   }
+
+  useMessagesRealtime(open ? user?.id : undefined, loadData)
 
   const conversationList = Array.from(conversations.values())
     .filter((conv) => {

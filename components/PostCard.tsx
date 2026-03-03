@@ -192,7 +192,7 @@ export function PostCard({ post, onUpdate }: PostCardProps) {
               </span>
               <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
                 {post.request_type === 'tirocinio' && '🎯 Tirocinio'}
-                {post.request_type === 'stage' && '💼 Stage'}
+                {post.request_type === 'stage' && '💼 Tirocinio'}
                 {post.request_type === 'collaborazione' && '🤝 Collaborazione'}
                 {post.request_type === 'lavoro' && '💼 Lavoro'}
                 {post.request_type === 'tesi' && '📚 Tesi'}

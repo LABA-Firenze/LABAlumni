@@ -23,6 +23,7 @@ export default function ThesisPage() {
   const router = useRouter()
   const [thesisProposals, setThesisProposals] = useState<ThesisProposalWithStudent[]>([])
   const [loading, setLoading] = useState(true)
+  const [filterScope, setFilterScope] = useState<'mine' | 'all'>('all')
   const [filterStatus, setFilterStatus] = useState<string>('open')
   const [role, setRole] = useState<string | null>(null)
   const [studentYear, setStudentYear] = useState<number | null>(null)
@@ -45,7 +46,7 @@ export default function ThesisPage() {
       })
       loadThesisProposals()
     }
-  }, [user, authLoading, router, filterStatus])
+  }, [user, authLoading, router, filterStatus, filterScope, role])
 
   useEffect(() => {
     if (!user || role !== 'student') {
@@ -65,6 +66,7 @@ export default function ThesisPage() {
   }, [user?.id, role])
 
   const loadThesisProposals = async () => {
+    if (!user) return
     try {
       let query = supabase
         .from('thesis_proposals')
@@ -76,6 +78,14 @@ export default function ThesisPage() {
           )
         `)
         .order('created_at', { ascending: false })
+
+      if (filterScope === 'mine') {
+        if (role === 'student') {
+          query = query.eq('student_id', user.id)
+        } else if (role === 'docente') {
+          query = query.or(`relatore_id.eq.${user.id},corelatore_id.eq.${user.id}`)
+        }
+      }
 
       if (filterStatus !== 'all') {
         query = query.eq('status', filterStatus)
@@ -158,22 +168,46 @@ export default function ThesisPage() {
           </div>
         </Card>
 
-        {/* Filters */}
-        <Card variant="elevated" className="p-4 mb-6">
-          <div className="flex gap-2 flex-wrap">
-            {(['all', 'open', 'in_progress', 'completed'] as const).map((status) => (
+        {/* Scope + Status Filters */}
+        <Card variant="elevated" className="p-4 mb-6 space-y-4">
+          <div>
+            <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Cosa vuoi vedere</p>
+            <div className="flex gap-2 flex-wrap">
               <button
-                key={status}
-                onClick={() => setFilterStatus(status)}
+                onClick={() => setFilterScope('mine')}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  filterStatus === status
-                    ? 'bg-primary-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  filterScope === 'mine' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                {status === 'all' ? 'Tutte' : statusLabels[status]}
+                Le tue proposte
               </button>
-            ))}
+              <button
+                onClick={() => setFilterScope('all')}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  filterScope === 'all' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                In bacheca
+              </button>
+            </div>
+          </div>
+          <div>
+            <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Stato</p>
+            <div className="flex gap-2 flex-wrap">
+              {(['all', 'open', 'in_progress', 'completed'] as const).map((status) => (
+                <button
+                  key={status}
+                  onClick={() => setFilterStatus(status)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    filterStatus === status
+                      ? 'bg-primary-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {status === 'all' ? 'Tutte' : statusLabels[status]}
+                </button>
+              ))}
+            </div>
           </div>
         </Card>
 
@@ -184,18 +218,22 @@ export default function ThesisPage() {
               <BookOpenIcon className="w-12 h-12 text-primary-600" />
             </div>
             <h3 className="text-xl font-semibold mb-2">
-              {filterStatus === 'all' 
-                ? 'Nessuna proposta di tesi trovata'
-                : `Nessuna proposta ${filterStatus === 'open' ? 'aperta' : filterStatus === 'in_progress' ? 'in elaborazione' : 'completata'}`
+              {filterScope === 'mine'
+                ? 'Non hai ancora proposte'
+                : filterStatus === 'all'
+                  ? 'Nessuna proposta di tesi trovata'
+                  : `Nessuna proposta ${filterStatus === 'open' ? 'aperta' : filterStatus === 'in_progress' ? 'in elaborazione' : 'completata'}`
               }
             </h3>
             <p className="text-gray-600 mb-6">
-              {role === 'student'
-                ? (filterStatus === 'open' ? 'Sii il primo a pubblicare una proposta di tesi!' : 'Prova a cambiare filtro o pubblica una nuova proposta')
-                : 'Nessuna proposta al momento. Potrai candidarti come relatore quando gli studenti ne pubblicheranno.'
+              {filterScope === 'mine'
+                ? (role === 'student' ? 'Pubblica la tua prima proposta di tesi.' : 'Nessuna proposta in cui sei relatore o corelatore.')
+                : role === 'student'
+                  ? (filterStatus === 'open' ? 'Sii il primo a pubblicare una proposta di tesi!' : 'Prova a cambiare filtro o pubblica una nuova proposta')
+                  : 'Nessuna proposta al momento. Potrai candidarti come relatore quando gli studenti ne pubblicheranno.'
               }
             </p>
-            {filterStatus === 'open' && role === 'student' && !hasActiveProposal && studentYear !== null && studentYear >= 3 && (
+            {(filterStatus === 'open' || filterScope === 'mine') && role === 'student' && !hasActiveProposal && studentYear !== null && studentYear >= 3 && (
               <Link href="/tesi/nuova">
                 <Button variant="primary">Pubblica la Prima Proposta</Button>
               </Link>

@@ -86,7 +86,7 @@ export default function Home() {
             </p>
             
             <p className="text-lg text-white/85 mb-10 animate-slide-up max-w-2xl mx-auto leading-relaxed" style={{ animationDelay: '0.15s' }}>
-              Accedi a opportunità di lavoro, stage e tirocini curriculari ed extracurriculari.
+              Accedi a opportunità di lavoro e tirocini curriculari ed extracurriculari.
               Costruisci il tuo profilo professionale, entra in contatto con le aziende e sviluppa il tuo percorso nel mondo creativo.
             </p>
 
@@ -131,7 +131,7 @@ export default function Home() {
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3">
                     <Briefcase className="w-5 h-5 text-primary-600 shrink-0 mt-0.5" />
-                    <span className="text-gray-700">Trova stage e tirocini</span>
+                    <span className="text-gray-700">Trova tirocini</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <FileCheck className="w-5 h-5 text-primary-600 shrink-0 mt-0.5" />
@@ -225,7 +225,7 @@ export default function Home() {
               <Briefcase className="w-12 h-12 text-primary-600 mb-4" />
               <h3 className="text-xl font-semibold mb-2">Trova Opportunità</h3>
               <p className="text-gray-600">
-                Tirocini e stage mirati per il tuo corso
+                Tirocini mirati per il tuo corso
               </p>
             </Card>
             
@@ -277,7 +277,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-semibold mb-2">Esplora</h3>
               <p className="text-gray-600">
-                Trova tirocini e stage e connettiti con le aziende
+                Trova tirocini e connettiti con le aziende
               </p>
             </div>
             

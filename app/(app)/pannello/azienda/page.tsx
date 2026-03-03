@@ -14,6 +14,7 @@ import type { Post } from '@/types/social'
 import { PostCard } from '@/components/PostCard'
 import { SkeletonCard } from '@/components/ui/Skeleton'
 import { useMinimumLoading } from '@/hooks/useMinimumLoading'
+import { getJobTypeLabel } from '@/lib/job-type-labels'
 
 export default function CompanyDashboard() {
   const { user, loading: authLoading } = useAuth()
@@ -311,7 +312,7 @@ export default function CompanyDashboard() {
                 <Link key={job.id} href={`/annunci/${job.id}`}>
                   <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                     <h4 className="font-medium text-sm mb-1 line-clamp-1">{job.title}</h4>
-                    <p className="text-xs text-gray-500">{job.type}</p>
+                    <p className="text-xs text-gray-500">{getJobTypeLabel(job.type)}</p>
                   </div>
                 </Link>
               ))}

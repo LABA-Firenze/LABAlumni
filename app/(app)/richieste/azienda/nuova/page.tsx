@@ -14,7 +14,6 @@ import { COURSE_CONFIG, type CourseType } from '@/types/database'
 
 const requestTypes = [
   { value: 'tirocinio', label: 'Tirocinio' },
-  { value: 'stage', label: 'Stage' },
   { value: 'collaborazione', label: 'Collaborazione' },
   { value: 'lavoro', label: 'Lavoro' },
   { value: 'tesi', label: 'Tesi' },
@@ -150,7 +149,7 @@ export default function NewCompanyCollaborationRequestPage() {
             Pubblica Offerta di Collaborazione
           </h1>
           <p className="text-gray-600 mt-2">
-            Rivolgiti agli studenti del corso che ti interessa con tirocini, stage o collaborazioni.
+            Rivolgiti agli studenti del corso che ti interessa con tirocini o collaborazioni.
           </p>
         </div>
 
@@ -205,7 +204,7 @@ export default function NewCompanyCollaborationRequestPage() {
 
             <div>
               <Input
-                label="Ore lavorative (tirocinio / stage)"
+                label="Ore lavorative (tirocinio)"
                 type="number"
                 min={1}
                 placeholder="es. 300"

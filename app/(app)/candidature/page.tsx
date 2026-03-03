@@ -85,7 +85,7 @@ export default function ApplicationsPage() {
             </div>
             <p className="text-gray-600 text-lg mb-4">Non hai ancora inviato candidature</p>
             <Link href="/annunci">
-              <Button variant="primary">Cerca Tirocini e Stage</Button>
+              <Button variant="primary">Cerca Tirocini</Button>
             </Link>
           </Card>
         ) : (

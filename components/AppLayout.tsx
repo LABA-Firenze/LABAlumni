@@ -224,7 +224,7 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
                   )}
                   <Link href={role === 'company' ? '/annunci/gestisci' : '/annunci'} className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
                     <BriefcaseIcon className="w-5 h-5 shrink-0" />
-                    <span>Tirocini e Stage</span>
+                    <span>Tirocini</span>
                   </Link>
                   {role === 'student' && (
                     <Link href="/candidature" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">

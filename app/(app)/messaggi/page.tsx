@@ -13,6 +13,7 @@ import { Send, Mail, User, Building2, Search } from 'lucide-react'
 import type { Message, Profile } from '@/types/database'
 import { Skeleton, SkeletonCard } from '@/components/ui/Skeleton'
 import { useMinimumLoading } from '@/hooks/useMinimumLoading'
+import { useMessagesRealtime } from '@/hooks/useMessagesRealtime'
 
 export default function MessagesPage() {
   const { user, loading: authLoading } = useAuth()
@@ -132,6 +133,8 @@ export default function MessagesPage() {
       console.error('Error loading recipients:', error)
     }
   }
+
+  useMessagesRealtime(user?.id, loadMessages)
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()

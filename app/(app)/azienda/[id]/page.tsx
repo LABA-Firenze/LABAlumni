@@ -12,6 +12,7 @@ import { SkeletonJobCard } from '@/components/ui/Skeleton'
 import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 import type { Company } from '@/types/database'
 import { COURSE_CONFIG } from '@/types/database'
+import { getJobTypeLabel } from '@/lib/job-type-labels'
 
 export default function AziendaPage() {
   const params = useParams()
@@ -157,7 +158,7 @@ export default function AziendaPage() {
                     <h3 className="text-lg font-semibold text-gray-900">{job.title}</h3>
                     <div className="flex items-center gap-4 text-gray-600 text-sm mt-2">
                       <span className="px-3 py-1 bg-primary-50 text-primary text-sm rounded-full font-medium">
-                        {job.type}
+                        {getJobTypeLabel(job.type)}
                       </span>
                       {job.location && (
                         <span className="flex items-center gap-1">

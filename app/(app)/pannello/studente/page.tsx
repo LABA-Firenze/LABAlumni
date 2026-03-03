@@ -295,7 +295,7 @@ export default function StudentDashboard() {
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-gray-900">
-                    Pubblica una richiesta di stage o collaborazione
+                    Pubblica una richiesta di tirocinio o collaborazione
                   </h3>
                   <p className="text-sm text-gray-600 mt-0.5">
                     Scopri le opportunità attive e fatti trovare dalle aziende
@@ -314,7 +314,7 @@ export default function StudentDashboard() {
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-gray-900">
-                    Le richieste di stage sono disponibili dal 2° anno
+                    Le richieste di tirocinio sono disponibili dal 2° anno
                   </h3>
                   <p className="text-sm text-gray-600 mt-0.5">
                     Al momento puoi esplorare le opportunità e completare il tuo profilo
@@ -347,20 +347,20 @@ export default function StudentDashboard() {
                     <UsersIcon className="w-8 h-8 text-primary-600" />
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">Qui iniziano le tue opportunità.</h3>
-                  <p className="text-gray-600 mb-8 max-w-md mx-auto">
-                    Segui aziende e studenti per scoprire stage, collaborazioni e progetti.
+                  <p className="text-gray-600 mb-8 max-w-2xl mx-auto whitespace-nowrap">
+                    Segui aziende e studenti per scoprire tirocini, collaborazioni e progetti.
                   </p>
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <Link href="/annunci">
-                      <Button variant="primary" size="lg">Scopri opportunità</Button>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center sm:items-stretch">
+                    <Link href="/annunci" className="flex-1 sm:min-w-[200px]">
+                      <Button variant="primary" size="lg" className="w-full h-12">Scopri opportunità</Button>
                     </Link>
-                    <Link href="/profilo">
-                      <Button variant="outline" size="lg">Completa il tuo profilo</Button>
+                    <Link href="/profilo" className="flex-1 sm:min-w-[200px]">
+                      <Button variant="outline" size="lg" className="w-full h-12">Completa il tuo profilo</Button>
                     </Link>
                   </div>
                 </Card>
 
-                {/* Stage suggeriti / in evidenza */}
+                {/* Tirocini suggeriti / in evidenza */}
                 {suggestedJobs.length > 0 && (
                   <div>
                     <h4 className="text-lg font-semibold text-gray-900 mb-4">Opportunità in evidenza</h4>

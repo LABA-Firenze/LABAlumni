@@ -15,6 +15,7 @@ import {
   NewspaperIcon,
   BriefcaseIcon,
   BookOpenIcon,
+  UsersIcon,
 } from '@heroicons/react/24/solid'
 import { openFloatingChat } from './FloatingChat'
 import { HeaderSearch } from './HeaderSearch'
@@ -104,7 +105,7 @@ export function Navbar() {
                 }`}
               >
                 <BriefcaseIcon className="w-5 h-5 shrink-0" />
-                Tirocini e Stage
+                Tirocini
               </Link>
               {userRole !== 'company' && (
               <Link
@@ -116,7 +117,7 @@ export function Navbar() {
                 }`}
               >
                 <BookOpenIcon className="w-5 h-5 shrink-0" />
-                Proposte Tesi
+                Tesi di laurea
               </Link>
               )}
               <div className="flex items-center gap-0.5 pl-1">
@@ -140,6 +141,14 @@ export function Navbar() {
                         >
                           <UserCircleIcon className="w-5 h-5 shrink-0 text-gray-500" />
                           <span>Profilo</span>
+                        </Link>
+                        <Link
+                          href="/rete"
+                          onClick={() => setMenuOpen(false)}
+                          className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50"
+                        >
+                          <UsersIcon className="w-5 h-5 shrink-0 text-gray-500" />
+                          <span>Network</span>
                         </Link>
                         <button
                           onClick={() => {

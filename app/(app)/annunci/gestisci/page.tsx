@@ -13,10 +13,11 @@ import { PlusIcon, PencilSquareIcon, TrashIcon, EyeIcon, EyeSlashIcon, Briefcase
 import Link from 'next/link'
 import type { JobPost, CourseType } from '@/types/database'
 import { COURSE_CONFIG } from '@/types/database'
+import { getJobTypeLabel } from '@/lib/job-type-labels'
 import { SkeletonJobCard } from '@/components/ui/Skeleton'
 import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 
-const JOB_TYPES = ['tirocinio', 'stage', 'collaborazione', 'lavoro']
+const JOB_TYPES = ['tirocinio', 'collaborazione', 'lavoro']
 
 export default function ManageJobsPage() {
   const { user, loading: authLoading } = useAuth()
@@ -90,7 +91,7 @@ export default function ManageJobsPage() {
     setEditingJob(job)
     setTitle(job.title)
     setDescription(job.description)
-    setType(job.type)
+    setType(job.type === 'stage' ? 'tirocinio' : job.type)
     setCourses(job.courses)
     setLocation(job.location || '')
     setRemote(job.remote)
@@ -184,9 +185,9 @@ export default function ManageJobsPage() {
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
               <BriefcaseIcon className="w-8 h-8 text-primary-600" />
-              Tirocini e Stage
+              Tirocini
             </h1>
-            <p className="text-gray-600 mt-2">Crea e gestisci le tue offerte di tirocinio e stage</p>
+            <p className="text-gray-600 mt-2">Crea e gestisci le tue offerte di tirocinio</p>
           </div>
           {!showForm && (
             <Button variant="primary" onClick={() => setShowForm(true)}>
@@ -327,7 +328,7 @@ export default function ManageJobsPage() {
                         {job.active ? 'Attivo' : 'Inattivo'}
                       </span>
                     </div>
-                    <p className="text-gray-600 mb-2">{job.type} • {job.location || 'Remoto'}</p>
+                    <p className="text-gray-600 mb-2">{getJobTypeLabel(job.type)} • {job.location || 'Remoto'}</p>
                     <p className="text-gray-700 line-clamp-2">{job.description}</p>
                     <div className="flex flex-wrap gap-2 mt-3">
                       {job.courses.map((course) => (

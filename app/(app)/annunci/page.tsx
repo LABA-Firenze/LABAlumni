@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { BriefcaseIcon, MapPinIcon, ClockIcon } from '@heroicons/react/24/solid'
+import { getJobTypeLabel } from '@/lib/job-type-labels'
 import Link from 'next/link'
 import { SkeletonJobCard } from '@/components/ui/Skeleton'
 import { useMinimumLoading } from '@/hooks/useMinimumLoading'
@@ -94,7 +95,7 @@ export default function JobsPage() {
         <Card variant="elevated" className="p-6 bg-gradient-to-br from-primary-50/60 to-white border-primary-100/60">
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
             <BriefcaseIcon className="w-8 h-8 text-primary-600" />
-            Tirocini e Stage
+            Tirocini
           </h1>
           <p className="text-gray-600 mt-2">Trova le opportunità giuste per te</p>
         </Card>
@@ -103,7 +104,7 @@ export default function JobsPage() {
         <Card variant="elevated" className="mb-6">
           <div className="grid md:grid-cols-2 gap-4">
             <Input
-              placeholder="Cerca tirocini e stage..."
+              placeholder="Cerca tirocini..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -132,7 +133,7 @@ export default function JobsPage() {
             <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-primary-100 flex items-center justify-center">
               <BriefcaseIcon className="w-12 h-12 text-primary-600" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">Nessun tirocinio o stage trovato</h3>
+            <h3 className="text-xl font-semibold mb-2">Nessun tirocinio trovato</h3>
             <p className="text-gray-600">Prova a modificare i filtri o controlla più tardi</p>
           </Card>
         ) : (
@@ -144,7 +145,7 @@ export default function JobsPage() {
                     <div className="flex items-center gap-3 mb-2">
                       <h2 className="text-xl font-semibold">{job.title}</h2>
                       <span className="px-3 py-1 bg-primary-50 text-primary text-sm rounded-full font-medium">
-                        {job.type}
+                        {getJobTypeLabel(job.type)}
                       </span>
                     </div>
                     

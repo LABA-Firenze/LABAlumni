@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button'
 import { Textarea } from '@/components/ui/Textarea'
 import { BriefcaseIcon, MapPinIcon, ClockIcon, BuildingOffice2Icon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
+import { getJobTypeLabel } from '@/lib/job-type-labels'
 import type { JobPost } from '@/types/database'
 import { COURSE_CONFIG } from '@/types/database'
 import { SkeletonJobCard } from '@/components/ui/Skeleton'
@@ -105,7 +106,7 @@ export default function JobDetailPage() {
       <Card variant="elevated" className="text-center py-12">
         <p className="text-gray-600 text-lg">Offerta non trovata</p>
         <Link href="/annunci">
-          <Button variant="primary" className="mt-4">Torna a Tirocini e Stage</Button>
+          <Button variant="primary" className="mt-4">Torna a Tirocini</Button>
         </Link>
       </Card>
     )
@@ -114,14 +115,14 @@ export default function JobDetailPage() {
   return (
       <div className="space-y-6">
         <Link href="/annunci">
-          <Button variant="ghost" size="sm" className="mb-6">← Torna a Tirocini e Stage</Button>
+          <Button variant="ghost" size="sm" className="mb-6">← Torna a Tirocini</Button>
         </Link>
 
         <Card variant="elevated" className="mb-6">
           <div className="mb-6">
             <div className="flex items-center gap-3 mb-4">
               <span className="px-3 py-1 bg-primary-50 text-primary text-sm rounded-full font-medium">
-                {job.type}
+                {getJobTypeLabel(job.type)}
               </span>
               <span className="text-gray-500 text-sm">
                 Pubblicato il {new Date(job.created_at).toLocaleDateString('it-IT')}

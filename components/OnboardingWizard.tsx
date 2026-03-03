@@ -134,7 +134,7 @@ function Step1() {
       </h2>
       <p className="text-gray-600 text-lg leading-relaxed">
         LABAlumni è la piattaforma che connette studenti, docenti e aziende della Libera Accademia di Belle Arti.
-        Qui puoi metterti in mostra, cercare stage, proporre tesi e costruire la tua rete professionale.
+        Qui puoi metterti in mostra, cercare tirocini, proporre tesi e costruire la tua rete professionale.
       </p>
     </div>
   )
@@ -142,7 +142,7 @@ function Step1() {
 
 function Step2() {
   const features = [
-    { icon: Building2, title: 'Aziende', desc: 'Scopri stage e collaborazioni' },
+    { icon: Building2, title: 'Aziende', desc: 'Scopri tirocini e collaborazioni' },
     { icon: BookOpen, title: 'Tesi', desc: 'Proponi e candidati per tesi di laurea' },
     { icon: GraduationCap, title: 'Docenti', desc: 'Trova relatori e correlatori' },
     { icon: Briefcase, title: 'Richieste', desc: 'Pubblica la tua disponibilità' },
