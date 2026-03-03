@@ -37,7 +37,8 @@ export default function AppLayoutClient({
   const isWidePage = pathname?.startsWith('/profilo') || pathname?.startsWith('/portfolio') ||
     pathname?.startsWith('/annunci') || pathname?.startsWith('/azienda') || pathname?.startsWith('/rete') ||
     pathname?.startsWith('/candidature') || pathname?.startsWith('/messaggi') || pathname?.startsWith('/tesi') ||
-    pathname === '/bacheca'
+    pathname === '/bacheca' || pathname === '/guida' || pathname === '/risorse' || pathname === '/eventi' ||
+    pathname === '/storie' || pathname === '/impostazioni'
 
   if (isDashboard) {
     return <AppLayout>{children}</AppLayout>

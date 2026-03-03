@@ -19,6 +19,7 @@ import {
 } from '@heroicons/react/24/solid'
 import { openFloatingChat } from './FloatingChat'
 import { HeaderSearch } from './HeaderSearch'
+import { NotificationsBell } from './NotificationsBell'
 
 export function Navbar() {
   const { user, loading, signOut } = useAuth()
@@ -74,6 +75,7 @@ export function Navbar() {
 
           {!loading && user && (
             <div className="flex items-center gap-1 shrink-0 ml-auto">
+              <NotificationsBell />
               <Link
                 href={dashboardHref}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -143,6 +145,13 @@ export function Navbar() {
                           <span>Profilo</span>
                         </Link>
                         <Link
+                          href="/impostazioni"
+                          onClick={() => setMenuOpen(false)}
+                          className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50"
+                        >
+                          <span>Impostazioni</span>
+                        </Link>
+                        <Link
                           href="/rete"
                           onClick={() => setMenuOpen(false)}
                           className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50"
@@ -156,6 +165,7 @@ export function Navbar() {
                             openFloatingChat()
                           }}
                           className="flex items-center gap-3 w-full px-4 py-3 text-left text-gray-700 hover:bg-gray-50"
+                          data-tour="messaggi"
                         >
                           <ChatBubbleLeftRightIcon className="w-5 h-5 shrink-0 text-gray-500" />
                           <span>Messaggi</span>

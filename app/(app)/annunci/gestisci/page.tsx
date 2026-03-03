@@ -34,6 +34,7 @@ export default function ManageJobsPage() {
   const [type, setType] = useState('tirocinio')
   const [courses, setCourses] = useState<CourseType[]>([])
   const [location, setLocation] = useState('')
+  const [deadline, setDeadline] = useState('')
   const [remote, setRemote] = useState(false)
   const [active, setActive] = useState(true)
   const showSkeleton = useMinimumLoading(loading)
@@ -87,13 +88,14 @@ export default function ManageJobsPage() {
     loadJobs()
   }
 
-  const handleEdit = (job: JobPost) => {
+  const handleEdit = (job: JobPost & { deadline?: string | null }) => {
     setEditingJob(job)
     setTitle(job.title)
     setDescription(job.description)
     setType(job.type === 'stage' ? 'tirocinio' : job.type)
     setCourses(job.courses)
     setLocation(job.location || '')
+    setDeadline(job.deadline ? job.deadline.slice(0, 10) : '')
     setRemote(job.remote)
     setActive(job.active)
     setShowForm(true)
@@ -111,6 +113,7 @@ export default function ManageJobsPage() {
     setType('tirocinio')
     setCourses([])
     setLocation('')
+    setDeadline('')
     setRemote(false)
     setActive(true)
   }
@@ -139,6 +142,7 @@ export default function ManageJobsPage() {
         type,
         courses,
         location: location || null,
+        deadline: deadline || null,
         remote,
         active,
       }
@@ -266,18 +270,24 @@ export default function ManageJobsPage() {
                   onChange={(e) => setLocation(e.target.value)}
                   placeholder="Es: Firenze, Italia"
                 />
+                <Input
+                  label="Scadenza (opzionale)"
+                  type="date"
+                  value={deadline}
+                  onChange={(e) => setDeadline(e.target.value)}
+                />
+              </div>
 
-                <div className="flex items-center gap-4 pt-8">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={remote}
-                      onChange={(e) => setRemote(e.target.checked)}
-                      className="w-4 h-4"
-                    />
-                    <span className="text-sm font-medium">Lavoro remoto</span>
-                  </label>
-                </div>
+              <div className="flex items-center gap-4 pt-2">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={remote}
+                    onChange={(e) => setRemote(e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                  <span className="text-sm font-medium">Lavoro remoto</span>
+                </label>
               </div>
 
               <div className="flex items-center gap-4">

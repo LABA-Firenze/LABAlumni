@@ -16,6 +16,7 @@ import {
   SparklesIcon,
   ArrowTrendingUpIcon,
 } from '@heroicons/react/24/solid'
+import { FileText } from 'lucide-react'
 import Link from 'next/link'
 import { getInitials } from '@/lib/avatar'
 import { COURSE_CONFIG, getProfileGradient } from '@/types/database'
@@ -24,6 +25,10 @@ import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 import { SkeletonProfileSidebar, SkeletonScopriSidebar } from './ui/Skeleton'
 import type { Student, Company, Docente } from '@/types/database'
 import { ProfilePill } from './ProfilePill'
+import dynamic from 'next/dynamic'
+import { ProfileChecklist } from './ProfileChecklist'
+
+const GuidedTour = dynamic(() => import('./GuidedTour').then(m => ({ default: m.GuidedTour })), { ssr: false })
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -33,6 +38,7 @@ interface AppLayoutProps {
 export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
   const { user } = useAuth()
   const [profileName, setProfileName] = useState<string | null>(null)
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [role, setRole] = useState<'student' | 'company' | 'docente' | null>(null)
   const [student, setStudent] = useState<Student | null>(null)
   const [company, setCompany] = useState<Company | null>(null)
@@ -48,7 +54,7 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
     const loadSidebarData = async () => {
       const { data: profileData } = await supabase
         .from('profiles')
-        .select('role, full_name')
+        .select('role, full_name, avatar_url')
         .eq('id', user.id)
         .single()
 
@@ -56,6 +62,7 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
       const pn = profileData?.full_name || null
       setRole(r)
       setProfileName(pn)
+      setAvatarUrl(profileData?.avatar_url || null)
 
       if (r === 'student') {
         const [studentRes, connRes, portRes, appRes] = await Promise.all([
@@ -99,6 +106,7 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
 
   return (
     <div className="min-h-screen">
+      <GuidedTour />
       <Navbar />
       <div className="bg-gray-100/90 rounded-b-2xl min-h-[calc(100vh-3.5rem)]">
         <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -133,7 +141,7 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
                   <p className="text-sm text-gray-600 mt-1">Relatore · Corelatore</p>
                 )}
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2" data-tour="dashboard">
                 <Link href="/profilo" className="block">
                   <Button variant="outline" className="w-full justify-start" size="sm">
                     <UserCircleIcon className="w-4 h-4 shrink-0" />
@@ -142,7 +150,7 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
                 </Link>
                 {role === 'student' && (
                   <>
-                    <Link href="/portfolio" className="block">
+                    <Link href="/portfolio" className="block" data-tour="portfolio">
                       <Button variant="outline" className="w-full justify-start" size="sm">
                         <FolderOpenIcon className="w-4 h-4 shrink-0" />
                         Portfolio
@@ -198,7 +206,17 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
           <aside className="lg:col-span-3 space-y-6">
             {sidebarLoading ? (
               <SkeletonScopriSidebar />
-            ) : rightSidebar ?? (
+            ) : (
+            <>
+            {role === 'student' && student && (
+              <ProfileChecklist
+                profile={{ full_name: profileName, avatar_url: avatarUrl }}
+                student={student}
+                portfolioCount={portfolioCount}
+                connectionsCount={connectionsCount}
+              />
+            )}
+            {rightSidebar ?? (
               <Card variant="elevated">
                 <h3 className="font-semibold mb-4 flex items-center gap-3">
                   <SparklesIcon className="w-5 h-5 shrink-0 text-primary-600" />
@@ -206,7 +224,7 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
                 </h3>
                 <div className="space-y-2">
                   {role === 'student' && (
-                    <Link href="/rete" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
+                    <Link href="/rete" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2" data-tour="rete">
                       <UsersIcon className="w-5 h-5 shrink-0" />
                       <span>Rete</span>
                       {connectionsCount > 0 && (
@@ -222,7 +240,7 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
                     <span>Tesi di laurea</span>
                   </Link>
                   )}
-                  <Link href={role === 'company' ? '/annunci/gestisci' : '/annunci'} className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
+                  <Link href={role === 'company' ? '/annunci/gestisci' : '/annunci'} className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2" data-tour="annunci">
                     <BriefcaseIcon className="w-5 h-5 shrink-0" />
                     <span>Tirocini</span>
                   </Link>
@@ -232,8 +250,26 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
                       <span>Le Tue Candidature</span>
                     </Link>
                   )}
+                  <Link href="/guida" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
+                    <span className="text-primary-600 font-bold">?</span>
+                    <span>Guida e FAQ</span>
+                  </Link>
+                  <Link href="/risorse" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
+                    <FileText className="w-5 h-5 shrink-0" />
+                    <span>Risorse</span>
+                  </Link>
+                  <Link href="/eventi" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
+                    <span>📅</span>
+                    <span>Eventi</span>
+                  </Link>
+                  <Link href="/storie" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
+                    <span>✨</span>
+                    <span>Storie</span>
+                  </Link>
                 </div>
               </Card>
+            )}
+            </>
             )}
           </aside>
           )}

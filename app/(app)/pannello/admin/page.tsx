@@ -16,6 +16,7 @@ import {
   TrashIcon,
 } from '@heroicons/react/24/solid'
 import { useMinimumLoading } from '@/hooks/useMinimumLoading'
+import Link from 'next/link'
 
 type ManagedUser = {
   id: string
@@ -214,7 +215,8 @@ export default function AdminPanel() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
         <div className="p-2 rounded-xl bg-slate-100">
           <ShieldCheckIcon className="w-8 h-8 text-slate-600" />
         </div>
@@ -222,6 +224,10 @@ export default function AdminPanel() {
           <h1 className="text-2xl font-bold text-gray-900">Pannello Admin</h1>
           <p className="text-gray-600">Gestione docenti e aziende</p>
         </div>
+        </div>
+        <Link href="/pannello/admin/statistiche" className="text-primary-600 hover:underline text-sm font-medium">
+          Statistiche →
+        </Link>
       </div>
 
       {message && (

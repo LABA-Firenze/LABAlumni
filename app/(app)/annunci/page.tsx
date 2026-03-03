@@ -1,13 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useAuth } from '@/components/AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
-import { BriefcaseIcon, MapPinIcon, ClockIcon } from '@heroicons/react/24/solid'
+import { BriefcaseIcon, MapPinIcon, ClockIcon, StarIcon } from '@heroicons/react/24/solid'
+import { StarIcon as StarOutlineIcon } from '@heroicons/react/24/outline'
 import { getJobTypeLabel } from '@/lib/job-type-labels'
 import Link from 'next/link'
 import { SkeletonJobCard } from '@/components/ui/Skeleton'
@@ -16,6 +17,14 @@ import type { JobPost, CourseType } from '@/types/database'
 import { COURSE_CONFIG } from '@/types/database'
 
 const PAGE_SIZE = 20
+
+const JOB_TYPES = [
+  { value: 'all', label: 'Tutti i tipi' },
+  { value: 'tirocinio', label: 'Tirocinio' },
+  { value: 'stage', label: 'Stage' },
+  { value: 'collaborazione', label: 'Collaborazione' },
+  { value: 'lavoro', label: 'Lavoro' },
+]
 
 const COURSES: { value: CourseType | 'all'; label: string }[] = [
   { value: 'all', label: 'Tutti i corsi' },
@@ -33,8 +42,37 @@ export default function JobsPage() {
   const [hasMore, setHasMore] = useState(true)
   const [search, setSearch] = useState('')
   const [selectedCourse, setSelectedCourse] = useState<CourseType | 'all'>('all')
+  const [selectedType, setSelectedType] = useState<string>('all')
+  const [remoteOnly, setRemoteOnly] = useState(false)
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set())
   const [studentCourse, setStudentCourse] = useState<CourseType | null>(null)
+  const [isStudent, setIsStudent] = useState(false)
   const showSkeleton = useMinimumLoading(loading)
+
+  const loadSavedIds = useCallback(async () => {
+    if (!user) return
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+    if (profile?.role !== 'student') return
+    setIsStudent(true)
+    const { data } = await supabase.from('saved_jobs').select('job_post_id').eq('student_id', user.id)
+    setSavedIds(new Set((data || []).map((r: { job_post_id: string }) => r.job_post_id)))
+  }, [user])
+
+  useEffect(() => {
+    if (user) loadSavedIds()
+  }, [user, loadSavedIds])
+
+  const toggleSaved = async (jobId: string) => {
+    if (!user || !isStudent) return
+    const isSaved = savedIds.has(jobId)
+    if (isSaved) {
+      await supabase.from('saved_jobs').delete().eq('student_id', user.id).eq('job_post_id', jobId)
+      setSavedIds((prev) => { const n = new Set(prev); n.delete(jobId); return n })
+    } else {
+      await supabase.from('saved_jobs').insert({ student_id: user.id, job_post_id: jobId })
+      setSavedIds((prev) => new Set([...prev, jobId]))
+    }
+  }
 
   useEffect(() => {
     if (user) loadStudentCourse()
@@ -69,6 +107,12 @@ export default function JobsPage() {
       if (selectedCourse !== 'all') {
         query = query.contains('courses', [selectedCourse])
       }
+      if (selectedType !== 'all') {
+        query = query.eq('type', selectedType)
+      }
+      if (remoteOnly) {
+        query = query.eq('remote', true)
+      }
 
       const { data } = await query
       const fetched = data || []
@@ -94,7 +138,7 @@ export default function JobsPage() {
     setPage(0)
     setHasMore(true)
     loadJobs(false)
-  }, [selectedCourse])
+  }, [selectedCourse, selectedType, remoteOnly])
 
   const filteredJobs = jobs.filter(job =>
     job.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -113,9 +157,9 @@ export default function JobsPage() {
 
         {/* Filters */}
         <Card variant="elevated" className="mb-6">
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Input
-              placeholder="Cerca tirocini..."
+              placeholder="Cerca titolo o descrizione..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -129,7 +173,35 @@ export default function JobsPage() {
                 </option>
               ))}
             </Select>
+            <Select
+              value={selectedType}
+              onChange={(e) => setSelectedType(e.target.value)}
+            >
+              {JOB_TYPES.map((t) => (
+                <option key={t.value} value={t.value}>
+                  {t.label}
+                </option>
+              ))}
+            </Select>
+            {isStudent && (
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={remoteOnly}
+                  onChange={(e) => setRemoteOnly(e.target.checked)}
+                  className="rounded border-gray-300"
+                />
+                <span className="text-sm">Solo remoto</span>
+              </label>
+            )}
           </div>
+          {isStudent && (
+            <div className="mt-3">
+              <Link href="/annunci/preferiti" className="text-sm text-primary-600 hover:underline">
+                Vedi i tuoi annunci salvati ({savedIds.size})
+              </Link>
+            </div>
+          )}
         </Card>
 
         {/* Jobs list */}
@@ -153,6 +225,19 @@ export default function JobsPage() {
               <Card key={job.id} variant="elevated" className="hover:shadow-lg transition-shadow">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
+                    {isStudent && (
+                      <button
+                        onClick={() => toggleSaved(job.id)}
+                        className="float-right p-1 rounded-full hover:bg-gray-100"
+                        aria-label={savedIds.has(job.id) ? 'Rimuovi dai preferiti' : 'Salva'}
+                      >
+                        {savedIds.has(job.id) ? (
+                          <StarIcon className="w-6 h-6 text-amber-500 fill-amber-500" />
+                        ) : (
+                          <StarOutlineIcon className="w-6 h-6 text-gray-400" />
+                        )}
+                      </button>
+                    )}
                     <div className="flex items-center gap-3 mb-2">
                       <h2 className="text-xl font-semibold">{job.title}</h2>
                       <span className="px-3 py-1 bg-primary-50 text-primary text-sm rounded-full font-medium">
