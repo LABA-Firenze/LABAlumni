@@ -407,59 +407,123 @@ export default function PublicProfilePage() {
     )
   }
 
-  // DOCENTE PROFILE (public view) - mostra anche se docente row manca (solo profile)
+  // DOCENTE PROFILE (public view) - layout con sidebar come studenti, accent giallo-arancio
   if (profile.role === 'docente') {
     const fullName = profile.full_name || profile.email || 'Docente'
+    const docenteGradient = getProfileGradient('docente')
 
     return (
       <div className="min-h-screen bg-gray-100/80">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Link
             href="/tesi"
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 text-sm font-medium mb-6"
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-amber-600 text-sm font-medium mb-6 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Torna alle tesi di laurea
           </Link>
 
-          <Card variant="elevated" className="mb-6">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-white text-2xl font-bold overflow-hidden">
-                {profile.avatar_url ? (
-                  <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" loading="lazy" />
-                ) : (
-                  <span>{getInitials(fullName)}</span>
+          <div className="grid lg:grid-cols-12 gap-6">
+            {/* Sidebar - accent giallo-arancio */}
+            <aside className="lg:col-span-3 space-y-6">
+              <Card variant="elevated" className="sticky top-24 border-l-4 border-amber-400">
+                <div className="text-center mb-4">
+                  <div className={`w-20 h-20 bg-gradient-to-br ${docenteGradient.circle} rounded-full mx-auto mb-3 flex items-center justify-center text-white text-2xl font-bold overflow-hidden`}>
+                    {profile.avatar_url ? (
+                      <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" loading="lazy" />
+                    ) : (
+                      <span>{getInitials(fullName)}</span>
+                    )}
+                  </div>
+                  <h3 className="font-semibold text-lg">{fullName}</h3>
+                  <div className="mt-1.5 flex justify-center">
+                    <ProfilePill role="docente" />
+                  </div>
+                  {docente && (
+                    <p className="text-sm text-gray-600 mt-1">
+                      {docente.can_relatore && 'Relatore'}
+                      {docente.can_relatore && docente.can_corelatore && ' · '}
+                      {docente.can_corelatore && 'Corelatore'}
+                    </p>
+                  )}
+                </div>
+                <Link href="/tesi">
+                  <Button variant="primary" className="w-full bg-amber-600 hover:bg-amber-700 border-amber-600" size="sm">
+                    <GraduationCap className="w-4 h-4 mr-2" />
+                    Vedi tesi di laurea
+                  </Button>
+                </Link>
+                {isOwnProfile && (
+                  <Link href="/profilo" className="block mt-2">
+                    <Button variant="outline" className="w-full" size="sm">
+                      Modifica profilo
+                    </Button>
+                  </Link>
                 )}
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">{fullName}</h1>
-                <ProfilePill role="docente" />
-                {docente && (
-                  <p className="text-sm text-gray-600 mt-1">
-                    {docente.can_relatore && 'Relatore'}
-                    {docente.can_relatore && docente.can_corelatore && ' · '}
-                    {docente.can_corelatore && 'Corelatore'}
-                  </p>
-                )}
-              </div>
-            </div>
-            {docente?.bio && <p className="text-gray-700">{docente.bio}</p>}
-            {docente?.courses && docente.courses.length > 0 && (
-              <div className="mt-4 flex flex-wrap gap-2">
-                {docente.courses.map((c: string) => (
-                  <span key={c} className="px-2 py-1 bg-amber-100 text-amber-800 rounded-lg text-sm">
-                    {COURSE_CONFIG[c as keyof typeof COURSE_CONFIG]?.name || c}
+              </Card>
+
+              {/* Scopri - accent amber */}
+              <Card variant="elevated" className="border-l-4 border-amber-200">
+                <h3 className="font-semibold mb-4 flex items-center gap-3">
+                  <span className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
+                    <GraduationCap className="w-4 h-4 text-amber-600" />
                   </span>
-                ))}
-              </div>
-            )}
-            {!docente && (
-              <p className="text-gray-500 text-sm">Profilo docente. Contattabile dalla piattaforma per tesi di laurea.</p>
-            )}
-          </Card>
-          <Link href="/tesi">
-            <Button variant="primary">Vedi tesi di laurea</Button>
-          </Link>
+                  Scopri
+                </h3>
+                <div className="space-y-2">
+                  <Link href="/tesi" className="flex items-center gap-3 text-gray-700 hover:text-amber-600 transition-colors py-2">
+                    <GraduationCap className="w-5 h-5 shrink-0 text-amber-500" />
+                    <span>Tesi di laurea</span>
+                  </Link>
+                  <Link href="/rete" className="flex items-center gap-3 text-gray-700 hover:text-amber-600 transition-colors py-2">
+                    <Users className="w-5 h-5 shrink-0 text-amber-500" />
+                    <span>Rete</span>
+                  </Link>
+                </div>
+              </Card>
+            </aside>
+
+            {/* Main content */}
+            <main className="lg:col-span-6 space-y-4">
+              <Card variant="elevated" padding={false} className="overflow-hidden">
+                <div className={`h-32 sm:h-40 bg-gradient-to-r ${docenteGradient.cover}`} />
+                <div className="px-6 pb-6 -mt-12 relative">
+                  <div className={`w-24 h-24 rounded-full border-4 border-white bg-gradient-to-br ${docenteGradient.circle} flex items-center justify-center text-white text-3xl font-bold shadow-lg overflow-hidden`}>
+                    {profile.avatar_url ? (
+                      <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" loading="lazy" />
+                    ) : (
+                      <span>{getInitials(fullName)}</span>
+                    )}
+                  </div>
+                  <h1 className="text-2xl font-bold text-gray-900 mt-4">{fullName}</h1>
+                  <p className="text-gray-600 flex items-center gap-2 mt-1">
+                    <GraduationCap className="w-4 h-4 shrink-0 text-amber-500" />
+                    {docente?.can_relatore && docente?.can_corelatore ? 'Relatore · Corelatore' : docente?.can_relatore ? 'Relatore' : docente?.can_corelatore ? 'Corelatore' : 'Docente'}
+                  </p>
+                  {docente?.bio && <p className="text-gray-700 mt-3 leading-relaxed">{docente.bio}</p>}
+                  {!docente?.bio && !docente && (
+                    <p className="text-gray-500 text-sm mt-3">Profilo docente. Contattabile dalla piattaforma per tesi di laurea.</p>
+                  )}
+                </div>
+              </Card>
+
+              {docente?.courses && docente.courses.length > 0 && (
+                <Card variant="elevated">
+                  <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <GraduationCap className="w-5 h-5 shrink-0 text-amber-600" />
+                    Corsi
+                  </h2>
+                  <div className="flex flex-wrap gap-2">
+                    {docente.courses.map((c: string) => (
+                      <span key={c} className="px-3 py-1.5 bg-amber-50 text-amber-800 border border-amber-200 rounded-lg text-sm font-medium">
+                        {COURSE_CONFIG[c as keyof typeof COURSE_CONFIG]?.name || c}
+                      </span>
+                    ))}
+                  </div>
+                </Card>
+              )}
+            </main>
+          </div>
         </div>
       </div>
     )

@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { BellIcon } from '@heroicons/react/24/outline'
-import { BellIcon as BellSolidIcon } from '@heroicons/react/24/solid'
+import { BellIcon } from '@heroicons/react/24/solid'
 import { useAuth } from './AuthProvider'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
@@ -59,11 +58,7 @@ export function NotificationsBell() {
         className="p-2 rounded-full text-gray-600 hover:bg-gray-100 relative"
         aria-label="Notifiche"
       >
-        {unreadCount > 0 ? (
-          <BellSolidIcon className="w-6 h-6 text-primary-600" />
-        ) : (
-          <BellIcon className="w-6 h-6" />
-        )}
+        <BellIcon className={`w-6 h-6 ${unreadCount > 0 ? 'text-primary-600' : 'text-gray-600'}`} />
         {unreadCount > 0 && (
           <span className="absolute top-0.5 right-0.5 w-4 h-4 bg-primary-600 text-white text-xs rounded-full flex items-center justify-center">
             {unreadCount > 9 ? '9+' : unreadCount}
