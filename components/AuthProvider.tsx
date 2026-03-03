@@ -1,10 +1,12 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { FloatingChat } from './FloatingChat'
 import type { User } from '@supabase/supabase-js'
+
+const FloatingChat = dynamic(() => import('./FloatingChat').then(m => ({ default: m.FloatingChat })), { ssr: false })
 
 interface AuthContextType {
   user: User | null

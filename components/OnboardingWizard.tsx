@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   Sparkles,
   Building2,
@@ -25,6 +25,43 @@ interface OnboardingWizardProps {
 
 export function OnboardingWizard({ onComplete, onSkip }: OnboardingWizardProps) {
   const [step, setStep] = useState(0)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const focusables = el.querySelectorAll<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+    const first = focusables[0]
+    if (first) first.focus()
+  }, [])
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onSkip?.()
+        onComplete()
+      }
+      if (e.key !== 'Tab') return
+      const el = containerRef.current
+      if (!el) return
+      const focusables = Array.from(el.querySelectorAll<HTMLElement>('button, [href], input, [tabindex]:not([tabindex="-1"])')).filter((x) => !x.hasAttribute('disabled'))
+      const idx = focusables.indexOf(document.activeElement as HTMLElement)
+      if (idx === -1) return
+      if (e.shiftKey) {
+        if (idx === 0) {
+          e.preventDefault()
+          focusables[focusables.length - 1]?.focus()
+        }
+      } else {
+        if (idx === focusables.length - 1) {
+          e.preventDefault()
+          focusables[0]?.focus()
+        }
+      }
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [onComplete, onSkip])
 
   const handleNext = () => {
     if (step < TOTAL_STEPS - 1) {
@@ -46,8 +83,10 @@ export function OnboardingWizard({ onComplete, onSkip }: OnboardingWizardProps) 
       aria-labelledby="onboarding-title"
     >
       <div
+        ref={containerRef}
         className="relative w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto rounded-3xl bg-white shadow-2xl border border-gray-100 animate-slide-up"
         onClick={e => e.stopPropagation()}
+        role="dialog"
       >
         {/* Skip */}
         <button
@@ -220,7 +259,7 @@ function Step4() {
         <li className="flex gap-3">
           <span className="flex-shrink-0 w-7 h-7 rounded-full bg-primary-100 text-primary-700 font-semibold text-sm flex items-center justify-center">1</span>
           <div>
-            <strong className="text-gray-900">Vai al Portfolio</strong> dal menu e clicca su &quot;Nuova opera&quot;
+            <strong className="text-gray-900">Vai al Portfolio</strong> dal menu e clicca su &quot;Aggiungi Lavoro&quot;
           </div>
         </li>
         <li className="flex gap-3">

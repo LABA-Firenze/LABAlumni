@@ -22,12 +22,12 @@ export default function Home() {
         .select('role')
         .eq('id', user.id)
         .single()
-        .then(({ data }: any) => {
-          if (data?.role === 'company') {
-            router.replace('/pannello/azienda')
-          } else {
-            router.replace('/pannello/studente')
-          }
+        .then(({ data }: { data?: { role?: string } }) => {
+          const role = data?.role
+          if (role === 'admin') router.replace('/pannello/admin')
+          else if (role === 'company') router.replace('/pannello/azienda')
+          else if (role === 'docente') router.replace('/tesi')
+          else router.replace('/pannello/studente')
         })
     }
   }, [user, loading, router])
@@ -95,15 +95,15 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up" style={{ animationDelay: '0.3s' }}>
-              <Link href="/registrati">
+              <Link href="/accedi">
                 <Button variant="secondary" size="lg" className="w-full sm:w-auto bg-white text-primary-600 hover:bg-white/95 hover:shadow-lg transition-all flex items-center justify-center gap-2">
-                  <span>Crea il tuo profilo</span>
+                  <span>Accedi</span>
                   <ArrowRight className="w-5 h-5" />
                 </Button>
               </Link>
-              <Link href="/accedi">
+              <Link href="/registrati">
                 <Button variant="outline" size="lg" className="w-full sm:w-auto border-2 border-white text-white hover:bg-white/10 backdrop-blur-sm">
-                  Accedi
+                  Registrati (Docenti e Aziende)
                 </Button>
               </Link>
             </div>

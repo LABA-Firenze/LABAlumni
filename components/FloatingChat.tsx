@@ -59,7 +59,7 @@ export function FloatingChat() {
         `)
         .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
         .order('created_at', { ascending: false })
-        .limit(500)
+        .limit(200)
 
       setMessages(data || [])
 

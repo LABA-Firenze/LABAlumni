@@ -15,7 +15,10 @@ import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 
 export default function CommunityPage() {
   const { user } = useAuth()
+  const PAGE_SIZE = 20
   const [posts, setPosts] = useState<(CommunityPost & { company: any })[]>([])
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -41,24 +44,34 @@ export default function CommunityPage() {
     setIsCompany(data?.role === 'company')
   }
 
-  const loadPosts = async () => {
+  const loadPosts = async (append = false) => {
+    if (!append) setLoading(true)
     try {
+      const from = append ? page * PAGE_SIZE : 0
       const { data } = await supabase
         .from('community_posts')
-        .select(`
-          *,
-          company:companies(id, company_name, logo_url)
-        `)
+        .select(`*, company:companies(id, company_name, logo_url)`)
         .eq('published', true)
         .order('created_at', { ascending: false })
+        .range(from, from + PAGE_SIZE - 1)
 
-      setPosts(data || [])
+      const fetched = data || []
+      if (append) {
+        setPosts(prev => [...prev, ...fetched])
+      } else {
+        setPosts(fetched)
+      }
+      setHasMore(fetched.length === PAGE_SIZE)
+      if (append) setPage(p => p + 1)
+      else setPage(1)
     } catch (error) {
       console.error('Error loading posts:', error)
     } finally {
       setLoading(false)
     }
   }
+
+  const loadMore = () => loadPosts(true)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -78,7 +91,7 @@ export default function CommunityPage() {
       setTitle('')
       setContent('')
       setShowForm(false)
-      loadPosts()
+      loadPosts(false)
     } catch (error: any) {
       alert(error.message || 'Errore durante la pubblicazione')
     } finally {
@@ -185,6 +198,13 @@ export default function CommunityPage() {
                 </div>
               </Card>
             ))}
+            {hasMore && (
+              <div className="flex justify-center pt-4">
+                <Button variant="outline" onClick={loadMore} disabled={loading}>
+                  Carica altri
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </div>

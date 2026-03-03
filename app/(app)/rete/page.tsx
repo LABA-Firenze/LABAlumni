@@ -250,7 +250,7 @@ export default function NetworkPage() {
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
               <UsersIcon className="w-8 h-8 text-primary-600" />
-              Network
+              Rete
             </h1>
             <p className="text-gray-600 mt-2">Connettiti con studenti e scopri le aziende</p>
             <div className="flex gap-2 mt-4">
@@ -370,7 +370,7 @@ export default function NetworkPage() {
                       <div className="flex items-center gap-4">
                         <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
                           {company.logo_url ? (
-                            <img src={company.logo_url} alt="" className="w-full h-full object-cover" />
+                            <img src={company.logo_url} alt="" className="w-full h-full object-cover" loading="lazy" />
                           ) : (
                             <BuildingOffice2Icon className="w-7 h-7 text-white" />
                           )}
@@ -418,7 +418,7 @@ export default function NetworkPage() {
                         <div className="flex gap-4">
                           <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${getProfileGradient('docente').circle} flex items-center justify-center shrink-0 overflow-hidden text-white shadow-sm`}>
                             {doc.avatar_url ? (
-                              <img src={doc.avatar_url} alt="" className="w-full h-full object-cover" />
+                              <img src={doc.avatar_url} alt="" className="w-full h-full object-cover" loading="lazy" />
                             ) : (
                               <AcademicCapIcon className="w-7 h-7" />
                             )}
@@ -469,7 +469,7 @@ export default function NetworkPage() {
                       <div className="flex gap-4">
                         <div className={`w-14 h-14 shrink-0 bg-gradient-to-br ${getProfileGradient('student', student.course).circle} rounded-2xl flex items-center justify-center text-white text-lg font-bold overflow-hidden shadow-sm`}>
                           {student.profile?.avatar_url ? (
-                            <img src={student.profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                            <img src={student.profile.avatar_url} alt="" className="w-full h-full object-cover" loading="lazy" />
                           ) : (
                             getInitials(student.profile?.full_name || student.profile?.email) || 'S'
                           )}

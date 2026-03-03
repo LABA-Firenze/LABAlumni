@@ -15,6 +15,8 @@ import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 import type { JobPost, CourseType } from '@/types/database'
 import { COURSE_CONFIG } from '@/types/database'
 
+const PAGE_SIZE = 20
+
 const COURSES: { value: CourseType | 'all'; label: string }[] = [
   { value: 'all', label: 'Tutti i corsi' },
   ...Object.entries(COURSE_CONFIG).map(([value, config]) => ({
@@ -27,16 +29,15 @@ export default function JobsPage() {
   const { user } = useAuth()
   const [jobs, setJobs] = useState<(JobPost & { company: any })[]>([])
   const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(0)
+  const [hasMore, setHasMore] = useState(true)
   const [search, setSearch] = useState('')
   const [selectedCourse, setSelectedCourse] = useState<CourseType | 'all'>('all')
   const [studentCourse, setStudentCourse] = useState<CourseType | null>(null)
   const showSkeleton = useMinimumLoading(loading)
 
   useEffect(() => {
-    if (user) {
-      loadStudentCourse()
-    }
-    loadJobs()
+    if (user) loadStudentCourse()
   }, [user])
 
   const loadStudentCourse = async () => {
@@ -54,26 +55,32 @@ export default function JobsPage() {
     }
   }
 
-  const loadJobs = async () => {
-    setLoading(true)
+  const loadJobs = async (append = false) => {
+    if (!append) setLoading(true)
     try {
+      const from = append ? page * PAGE_SIZE : 0
       let query = supabase
         .from('job_posts')
-        .select(`
-          *,
-          company:companies(id, company_name, logo_url)
-        `)
+        .select(`*, company:companies(id, company_name, logo_url)`)
         .eq('active', true)
         .order('created_at', { ascending: false })
+        .range(from, from + PAGE_SIZE - 1)
 
-      // Filter by course if student and course selected
       if (selectedCourse !== 'all') {
         query = query.contains('courses', [selectedCourse])
       }
 
       const { data } = await query
+      const fetched = data || []
 
-      setJobs(data || [])
+      if (append) {
+        setJobs(prev => [...prev, ...fetched])
+      } else {
+        setJobs(fetched)
+      }
+      setHasMore(fetched.length === PAGE_SIZE)
+      if (append) setPage(p => p + 1)
+      else setPage(1)
     } catch (error) {
       console.error('Error loading jobs:', error)
     } finally {
@@ -81,8 +88,12 @@ export default function JobsPage() {
     }
   }
 
+  const loadMore = () => loadJobs(true)
+
   useEffect(() => {
-    loadJobs()
+    setPage(0)
+    setHasMore(true)
+    loadJobs(false)
   }, [selectedCourse])
 
   const filteredJobs = jobs.filter(job =>
@@ -189,6 +200,13 @@ export default function JobsPage() {
                 </div>
               </Card>
             ))}
+            {hasMore && (
+              <div className="flex justify-center pt-4">
+                <Button variant="outline" onClick={loadMore} disabled={loading}>
+                  Carica altri
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </div>

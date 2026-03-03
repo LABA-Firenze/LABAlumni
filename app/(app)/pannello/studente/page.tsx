@@ -1,5 +1,6 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/components/AuthProvider'
@@ -14,7 +15,8 @@ import type { Post } from '@/types/social'
 import { PostCard } from '@/components/PostCard'
 import { SkeletonCard } from '@/components/ui/Skeleton'
 import { useMinimumLoading } from '@/hooks/useMinimumLoading'
-import { OnboardingWizard } from '@/components/OnboardingWizard'
+
+const OnboardingWizard = dynamic(() => import('@/components/OnboardingWizard').then(m => ({ default: m.OnboardingWizard })), { ssr: false })
 
 export default function StudentDashboard() {
   const { user, loading: authLoading } = useAuth()

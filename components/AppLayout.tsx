@@ -208,7 +208,7 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
                   {role === 'student' && (
                     <Link href="/rete" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
                       <UsersIcon className="w-5 h-5 shrink-0" />
-                      <span>Network</span>
+                      <span>Rete</span>
                       {connectionsCount > 0 && (
                         <span className="ml-auto px-2 py-0.5 bg-primary-100 text-primary-700 rounded-full text-xs font-medium">
                           {connectionsCount}

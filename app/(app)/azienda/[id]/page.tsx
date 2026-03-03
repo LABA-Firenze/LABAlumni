@@ -103,7 +103,7 @@ export default function AziendaPage() {
         <div className="flex flex-col sm:flex-row gap-6">
           <div className="w-20 h-20 rounded-xl bg-primary-100 flex items-center justify-center shrink-0 overflow-hidden">
             {company.logo_url ? (
-              <img src={company.logo_url} alt="" className="w-full h-full object-cover" />
+              <img src={company.logo_url} alt="" className="w-full h-full object-cover" loading="lazy" />
             ) : (
               <BuildingOffice2Icon className="w-10 h-10 text-primary-600" />
             )}

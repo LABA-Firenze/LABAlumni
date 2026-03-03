@@ -85,9 +85,13 @@ export default function LoginPage() {
               <p className="text-gray-600">Benvenuto su LABAlumni</p>
             </div>
 
-            <div className="flex rounded-lg border border-gray-200 p-1 mb-6 bg-gray-50">
+            <div role="tablist" aria-label="Tipo di account" className="flex rounded-lg border border-gray-200 p-1 mb-6 bg-gray-50">
               <button
                 type="button"
+                role="tab"
+                aria-selected={isStudentLogos}
+                aria-controls="login-panel"
+                id="tab-studente"
                 onClick={() => { setIsStudentLogos(true); setError(''); }}
                 className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-sm font-medium transition-colors ${isStudentLogos ? 'bg-white text-primary-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
               >
@@ -96,6 +100,10 @@ export default function LoginPage() {
               </button>
               <button
                 type="button"
+                role="tab"
+                aria-selected={!isStudentLogos}
+                aria-controls="login-panel"
+                id="tab-docente"
                 onClick={() => { setIsStudentLogos(false); setError(''); }}
                 className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-sm font-medium transition-colors ${!isStudentLogos ? 'bg-white text-primary-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
               >
@@ -104,12 +112,12 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm animate-slide-up">
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm animate-slide-up" role="alert">
                 {error}
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form id="login-panel" role="tabpanel" aria-labelledby={isStudentLogos ? 'tab-studente' : 'tab-docente'} onSubmit={handleSubmit} className="space-y-5">
               <Input
                 label="Email"
                 type="email"
@@ -132,7 +140,7 @@ export default function LoginPage() {
                 </p>
               ) : (
                 <p className="text-xs text-gray-500 text-center -mt-1">
-                  Crea il tuo account docente che utilizzerai sulla piattaforma.
+                  Accedi con le credenziali del tuo account docente o azienda.
                 </p>
               )}
               <Button type="submit" className="w-full group flex items-center justify-center" disabled={loading}>

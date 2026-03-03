@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { checkRateLimit } from '@/lib/rate-limit'
 import { logosGetStudent, logosGetEnrollment, logosPreferredEmail, logosFullName, logosCourseFromPianoStudi, logosYearFromEnrollment, logosAcademicYearFromPianoStudi } from '@/lib/logos'
 import { getStaffLabel } from '@/lib/staff-labels'
 
 export async function POST(request: Request) {
+  if (!checkRateLimit(request, { maxRequests: 15, windowMs: 60_000 })) {
+    return NextResponse.json({ error: 'Troppi tentativi. Riprova tra un minuto.' }, { status: 429 })
+  }
   try {
     const body = await request.json()
     const email = (body.email ?? '').toString().trim()

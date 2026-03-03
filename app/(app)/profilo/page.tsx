@@ -406,7 +406,7 @@ export default function ProfilePage() {
                       <Link key={item.id} href={`/portfolio/${item.id}`}>
                         <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden hover:opacity-90 transition-opacity">
                           {item.images?.[0] ? (
-                            <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover" />
+                            <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-gray-400">
                               <Briefcase className="w-8 h-8" />
@@ -454,7 +454,7 @@ export default function ProfilePage() {
                 <div className="space-y-2">
                   <Link href="/rete" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
                     <Users className="w-5 h-5 shrink-0" />
-                    <span>Network</span>
+                    <span>Rete</span>
                     {connectionsCount > 0 && (
                       <span className="ml-auto px-2 py-0.5 bg-primary-100 text-primary-700 rounded-full text-xs font-medium">
                         {connectionsCount}

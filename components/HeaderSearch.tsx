@@ -172,7 +172,7 @@ export function HeaderSearch() {
                       <>
                         <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center shrink-0 overflow-hidden">
                           {r.logo_url ? (
-                            <img src={r.logo_url} alt="" className="w-full h-full object-cover" />
+                            <img src={r.logo_url} alt="" className="w-full h-full object-cover" loading="lazy" />
                           ) : (
                             <Building2 className="w-5 h-5 text-white" />
                           )}
@@ -186,7 +186,7 @@ export function HeaderSearch() {
                       <>
                         <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${getProfileGradient('student', r.courseKey).circle} flex items-center justify-center shrink-0 overflow-hidden text-white`}>
                           {r.avatar_url ? (
-                            <img src={r.avatar_url} alt="" className="w-full h-full object-cover" />
+                            <img src={r.avatar_url} alt="" className="w-full h-full object-cover" loading="lazy" />
                           ) : (
                             <span className="font-semibold">
                               {getInitials(r.full_name)}
@@ -206,7 +206,7 @@ export function HeaderSearch() {
                       <>
                         <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${getProfileGradient('docente').circle} flex items-center justify-center shrink-0 overflow-hidden text-white`}>
                           {r.avatar_url ? (
-                            <img src={r.avatar_url} alt="" className="w-full h-full object-cover" />
+                            <img src={r.avatar_url} alt="" className="w-full h-full object-cover" loading="lazy" />
                           ) : (
                             <GraduationCap className="w-5 h-5" />
                           )}

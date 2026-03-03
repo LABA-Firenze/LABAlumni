@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 export const dynamic = 'force-dynamic'
 import { requireAdmin } from '../verify-admin'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 /** POST: reset password per docente/azienda (non studenti) */
 export async function POST(request: NextRequest) {
+  if (!checkRateLimit(request, { maxRequests: 20, windowMs: 60_000 })) {
+    return NextResponse.json({ error: 'Troppi tentativi' }, { status: 429 })
+  }
   const { admin, error } = await requireAdmin()
   if (error || !admin) {
     return NextResponse.json({ error: error || 'Non autorizzato' }, { status: 401 })

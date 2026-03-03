@@ -58,7 +58,7 @@ export default function MessagesPage() {
         `)
         .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
         .order('created_at', { ascending: false })
-        .limit(1000)
+        .limit(200)
 
       setMessages(data || [])
 

@@ -246,7 +246,7 @@ export default function PublicProfilePage() {
                 <div className="text-center mb-4">
                   <div className={`w-20 h-20 bg-gradient-to-br ${getProfileGradient(profile.role, student?.course).circle} rounded-full mx-auto mb-3 flex items-center justify-center text-white text-2xl font-bold overflow-hidden`}>
                     {profile.avatar_url ? (
-                      <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                      <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" loading="lazy" />
                     ) : (
                       <span>{getInitials(fullName)}</span>
                     )}
@@ -312,7 +312,7 @@ export default function PublicProfilePage() {
                 <div className="px-6 pb-6 -mt-12 relative">
                   <div className={`w-24 h-24 rounded-full border-4 border-white bg-gradient-to-br ${getProfileGradient(profile.role, student?.course).circle} flex items-center justify-center text-white text-3xl font-bold shadow-lg overflow-hidden`}>
                     {profile.avatar_url ? (
-                      <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                      <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" loading="lazy" />
                     ) : (
                       <span>{getInitials(fullName)}</span>
                     )}
@@ -369,7 +369,7 @@ export default function PublicProfilePage() {
                       <Link key={item.id} href={`/portfolio/${item.id}`}>
                         <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden hover:opacity-90 transition-opacity">
                           {item.images?.[0] ? (
-                            <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover" />
+                            <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-gray-400">
                               <FileImage className="w-8 h-8" />
@@ -423,7 +423,7 @@ export default function PublicProfilePage() {
             <div className="flex items-center gap-4 mb-6">
               <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-white text-2xl font-bold overflow-hidden">
                 {profile.avatar_url ? (
-                  <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                  <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" loading="lazy" />
                 ) : (
                   <span>{getInitials(fullName)}</span>
                 )}

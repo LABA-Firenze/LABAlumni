@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server'
 
-/** Debug: verifica se le env LOGOS sono disponibili a runtime. Non espone i valori. */
+/** Debug: verifica se le env LOGOS sono disponibili a runtime. Non espone i valori. Disabilitato in produzione. */
 export async function GET() {
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Not available' }, { status: 404 })
+  }
   const keys = ['LOGOS_API_URL', 'LOGOS_AUTH_URL', 'LOGOS_CLIENT_ID', 'LOGOS_CLIENT_SECRET', 'SUPABASE_SERVICE_ROLE_KEY']
   const env = keys.reduce<Record<string, boolean>>((acc, k) => {
     acc[k] = !!process.env[k]

@@ -148,7 +148,7 @@ export function Navbar() {
                           className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50"
                         >
                           <UsersIcon className="w-5 h-5 shrink-0 text-gray-500" />
-                          <span>Network</span>
+                          <span>Rete</span>
                         </Link>
                         <button
                           onClick={() => {
