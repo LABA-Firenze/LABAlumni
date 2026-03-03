@@ -6,17 +6,21 @@ import { useAuth } from '@/components/AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { AvatarUpload } from '@/components/AvatarUpload'
 import {
   Cog6ToothIcon,
   BellIcon,
   ShieldCheckIcon,
   ArrowPathIcon,
+  UserCircleIcon,
 } from '@heroicons/react/24/solid'
 import { resetTour } from '@/components/GuidedTour'
 
 export default function ImpostazioniPage() {
   const { user } = useAuth()
   const router = useRouter()
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+  const [fullName, setFullName] = useState('')
   const [prefs, setPrefs] = useState({
     notify_messages: true,
     notify_applications: true,
@@ -38,6 +42,13 @@ export default function ImpostazioniPage() {
 
   const loadPrefs = async () => {
     if (!user) return
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('avatar_url, full_name')
+      .eq('id', user.id)
+      .single()
+    setAvatarUrl(profile?.avatar_url ?? null)
+    setFullName(profile?.full_name ?? '')
     const { data } = await supabase
       .from('user_preferences')
       .select('*')
@@ -77,6 +88,13 @@ export default function ImpostazioniPage() {
     alert('Tour resettato. Ricarica la pagina per vederlo di nuovo.')
   }
 
+  const handleAvatarUpdate = async (url: string | null) => {
+    if (!user) return
+    const { error } = await supabase.from('profiles').update({ avatar_url: url }).eq('id', user.id)
+    if (!error) setAvatarUrl(url)
+    else alert(error.message || 'Errore aggiornamento foto')
+  }
+
   if (loading) return <div className="animate-pulse h-64 bg-gray-100 rounded-xl" />
 
   return (
@@ -90,6 +108,31 @@ export default function ImpostazioniPage() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Impostazioni</h1>
             <p className="text-gray-600 mt-0.5">Preferenze notifiche e privacy</p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Foto profilo */}
+      <Card variant="elevated" className="p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center">
+            <UserCircleIcon className="w-5 h-5 text-primary-600" />
+          </div>
+          <h2 className="text-lg font-semibold text-gray-900">Foto profilo</h2>
+        </div>
+        <div className="flex items-center gap-6">
+          {user && (
+            <AvatarUpload
+              userId={user.id}
+              avatarUrl={avatarUrl}
+              fullName={fullName || user.email?.split('@')[0] || 'Utente'}
+              onUpdate={handleAvatarUpdate}
+              size="lg"
+            />
+          )}
+          <div>
+            <p className="text-sm text-gray-600">Clicca sull&apos;immagine per cambiare la tua foto profilo.</p>
+            <p className="text-xs text-gray-500 mt-1">JPG, PNG, WebP o GIF. Max 5MB.</p>
           </div>
         </div>
       </Card>

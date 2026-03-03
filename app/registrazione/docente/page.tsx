@@ -29,6 +29,8 @@ export default function DocenteRegisterPage() {
   const [selectedCourses, setSelectedCourses] = useState<CourseType[]>([])
   const [canRelatore, setCanRelatore] = useState(true)
   const [canCorelatore, setCanCorelatore] = useState(true)
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
@@ -117,6 +119,16 @@ export default function DocenteRegisterPage() {
 
       if (docError) throw docError
 
+      if (avatarFile) {
+        const ext = avatarFile.name.split('.').pop() || 'jpg'
+        const path = `${authData.user.id}/avatar_${Date.now()}.${ext}`
+        const { error: uploadErr } = await supabase.storage.from('image_profilo').upload(path, avatarFile, { cacheControl: '3600', upsert: true })
+        if (!uploadErr) {
+          const { data } = supabase.storage.from('image_profilo').getPublicUrl(path)
+          await supabase.from('profiles').update({ avatar_url: data.publicUrl }).eq('id', authData.user.id)
+        }
+      }
+
       router.push('/tesi')
       router.refresh()
     } catch (err: any) {
@@ -186,6 +198,38 @@ export default function DocenteRegisterPage() {
               rows={4}
               placeholder="Breve presentazione..."
             />
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-2">Foto profilo (opzionale)</p>
+              <div className="flex items-center gap-4">
+                <label className="flex flex-col items-center justify-center w-20 h-20 rounded-full border-2 border-dashed border-gray-300 hover:border-primary-400 cursor-pointer overflow-hidden bg-gray-50 shrink-0">
+                  {avatarPreview ? (
+                    <img src={avatarPreview} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-3xl text-gray-400">+</span>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0]
+                      if (f && f.size <= 5 * 1024 * 1024) {
+                        setAvatarFile(f)
+                        setAvatarPreview(URL.createObjectURL(f))
+                      } else if (f) alert('File max 5MB')
+                    }}
+                  />
+                </label>
+                <div>
+                  <p className="text-sm text-gray-600">Clicca per caricare una foto</p>
+                  {avatarFile && (
+                    <button type="button" onClick={() => { setAvatarFile(null); setAvatarPreview(null) }} className="text-sm text-primary-600 hover:underline mt-1">
+                      Rimuovi
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         )
       case 5:

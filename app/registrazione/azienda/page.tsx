@@ -28,6 +28,8 @@ export default function CompanyRegisterPage() {
   const [description, setDescription] = useState('')
   const [industry, setIndustry] = useState('')
   const [websiteUrl, setWebsiteUrl] = useState('')
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
@@ -124,11 +126,22 @@ export default function CompanyRegisterPage() {
         return
       }
 
-      // Update profile
+      // Update profile (including avatar if uploaded)
+      let avatarUrl: string | null = null
+      if (avatarFile) {
+        const ext = avatarFile.name.split('.').pop() || 'jpg'
+        const path = `${authData.user.id}/avatar_${Date.now()}.${ext}`
+        const { error: uploadErr } = await supabase.storage.from('image_profilo').upload(path, avatarFile, { cacheControl: '3600', upsert: true })
+        if (!uploadErr) {
+          const { data } = supabase.storage.from('image_profilo').getPublicUrl(path)
+          avatarUrl = data.publicUrl
+        }
+      }
       await supabase
         .from('profiles')
         .update({
           full_name: referentName,
+          avatar_url: avatarUrl,
           updated_at: new Date().toISOString(),
         })
         .eq('id', authData.user.id)
@@ -304,6 +317,39 @@ export default function CompanyRegisterPage() {
               onChange={(e) => setWebsiteUrl(e.target.value)}
               placeholder="https://www.azienda.it"
             />
+
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-2">Logo / Foto profilo (opzionale)</p>
+              <div className="flex items-center gap-4">
+                <label className="flex flex-col items-center justify-center w-20 h-20 rounded-full border-2 border-dashed border-gray-300 hover:border-primary-400 cursor-pointer overflow-hidden bg-gray-50 shrink-0">
+                  {avatarPreview ? (
+                    <img src={avatarPreview} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-3xl text-gray-400">+</span>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0]
+                      if (f && f.size <= 5 * 1024 * 1024) {
+                        setAvatarFile(f)
+                        setAvatarPreview(URL.createObjectURL(f))
+                      } else if (f) alert('File max 5MB')
+                    }}
+                  />
+                </label>
+                <div>
+                  <p className="text-sm text-gray-600">Clicca per caricare un logo o foto</p>
+                  {avatarFile && (
+                    <button type="button" onClick={() => { setAvatarFile(null); setAvatarPreview(null) }} className="text-sm text-primary-600 hover:underline mt-1">
+                      Rimuovi
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
 
             <p className="text-sm text-gray-500">
               I campi di questo step sono opzionali. Potrai completarli successivamente dal tuo profilo.

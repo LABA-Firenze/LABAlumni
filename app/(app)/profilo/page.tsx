@@ -23,6 +23,7 @@ import {
   Edit3,
   ExternalLink,
 } from 'lucide-react'
+import { AvatarUpload } from '@/components/AvatarUpload'
 import Link from 'next/link'
 import type { Student, Company, Docente, Profile, CourseType } from '@/types/database'
 import type { PortfolioItem } from '@/types/social'
@@ -178,6 +179,17 @@ export default function ProfilePage() {
     }
   }
 
+  const handleAvatarUpdate = async (url: string | null) => {
+    if (!user) return
+    const { error } = await supabase.from('profiles').update({ avatar_url: url }).eq('id', user.id)
+    if (!error) {
+      setProfile((p) => (p ? { ...p, avatar_url: url } : null))
+      loadProfile()
+    } else {
+      alert(error.message || 'Errore aggiornamento foto')
+    }
+  }
+
   const handleSave = async () => {
     if (!user || !profile) return
     setSaving(true)
@@ -257,9 +269,17 @@ export default function ProfilePage() {
             <aside className="lg:col-span-3 space-y-6">
               <Card variant="elevated" className="sticky top-24">
                 <div className="text-center mb-4">
-                  <div className={`w-20 h-20 bg-gradient-to-br ${getProfileGradient('student', student?.course).circle} rounded-full mx-auto mb-3 flex items-center justify-center text-white text-2xl font-bold`}>
-                    {getInitials(fullName || (student ? 'S' : undefined))}
-                  </div>
+                  {user && (
+                    <AvatarUpload
+                      userId={user.id}
+                      avatarUrl={profile?.avatar_url ?? null}
+                      fullName={fullName || (student ? 'S' : '')}
+                      onUpdate={handleAvatarUpdate}
+                      size="md"
+                      gradientClass={getProfileGradient('student', student?.course).circle}
+                      className="mx-auto mb-3"
+                    />
+                  )}
                   <h3 className="font-semibold text-lg">{fullName || user?.email?.split('@')[0]}</h3>
                   <div className="mt-1.5 flex justify-center">
                     <ProfilePill role={profile?.role} displayLabel={getProfileDisplayLabel(student, profile?.email || user?.email)} />
@@ -319,9 +339,18 @@ export default function ProfilePage() {
               <Card variant="elevated" padding={false} className="overflow-hidden">
                 <div className={`h-32 sm:h-40 bg-gradient-to-r ${getProfileGradient('student', student?.course).cover}`} />
                 <div className="px-6 pb-6 -mt-12 relative">
-                  <div className={`w-24 h-24 rounded-full border-4 border-white bg-gradient-to-br ${getProfileGradient('student', student?.course).circle} flex items-center justify-center text-white text-3xl font-bold shadow-lg`}>
-                    {getInitials(fullName || 'S')}
-                  </div>
+                  {user && (
+                    <div className="w-24 h-24 shrink-0">
+                      <AvatarUpload
+                        userId={user.id}
+                        avatarUrl={profile?.avatar_url ?? null}
+                        fullName={fullName || 'S'}
+                        onUpdate={handleAvatarUpdate}
+                        size="lg"
+                        gradientClass={getProfileGradient('student', student?.course).circle}
+                      />
+                    </div>
+                  )}
                   <h1 className="text-2xl font-bold text-gray-900 mt-4">{fullName || 'Studente'}</h1>
                   <p className="text-gray-600 flex items-center gap-2 mt-1">
                     <GraduationCap className="w-4 h-4 shrink-0" />
@@ -485,9 +514,16 @@ export default function ProfilePage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Card variant="elevated" className="mb-6">
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                {getInitials(fullName || 'D')}
-              </div>
+              {user && (
+                <AvatarUpload
+                  userId={user.id}
+                  avatarUrl={profile?.avatar_url ?? null}
+                  fullName={fullName || 'D'}
+                  onUpdate={handleAvatarUpdate}
+                  size="md"
+                  gradientClass="from-amber-400 to-amber-600"
+                />
+              )}
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">{fullName || user?.email}</h1>
                 <ProfilePill role="docente" />
@@ -528,6 +564,23 @@ export default function ProfilePage() {
           <ProfilePill role="company" />
         </div>
         <p className="text-gray-600 -mt-6 mb-8">Gestisci i dati della tua azienda</p>
+
+        <Card variant="elevated" className="mb-6">
+          <h2 className="flex items-center gap-2 text-lg font-semibold mb-4">Foto profilo</h2>
+          <div className="flex items-center gap-4 mb-6">
+            {user && (
+              <AvatarUpload
+                userId={user.id}
+                avatarUrl={profile?.avatar_url ?? null}
+                fullName={companyName || fullName || 'Azienda'}
+                onUpdate={handleAvatarUpdate}
+                size="lg"
+                gradientClass="from-gray-800 to-gray-900"
+              />
+            )}
+            <p className="text-sm text-gray-600">Clicca sull&apos;immagine per cambiare.</p>
+          </div>
+        </Card>
 
         <Card variant="elevated" className="mb-6">
           <h2 className="flex items-center gap-2 text-lg font-semibold mb-4">
