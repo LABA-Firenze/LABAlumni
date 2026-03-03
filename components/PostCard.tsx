@@ -5,7 +5,7 @@ import { useAuth } from './AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { Card } from './ui/Card'
 import { Button } from './ui/Button'
-import { Heart, MessageCircle, Share2, Send, Trash2 } from 'lucide-react'
+import { Heart, MessageCircle, Share2, Send, Trash2, Calendar, Clock, Building2, User, Target, Briefcase, Handshake, BookOpen } from 'lucide-react'
 import type { Post, PostComment } from '@/types/social'
 import { getInitials } from '@/lib/avatar'
 import { COURSE_CONFIG, getProfileGradient, type CourseType } from '@/types/database'
@@ -185,17 +185,37 @@ export function PostCard({ post, onUpdate }: PostCardProps) {
           return (
           <div className="mb-3 space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${
                 isCompany ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-700'
               }`}>
-                {isCompany ? '🏢 Offerta azienda' : '👤 Richiesta studente'}
+                {isCompany ? <Building2 className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
+                {isCompany ? 'Offerta azienda' : 'Richiesta studente'}
               </span>
-              <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
-                {post.request_type === 'tirocinio' && '🎯 Tirocinio'}
-                {post.request_type === 'stage' && '💼 Tirocinio'}
-                {post.request_type === 'collaborazione' && '🤝 Collaborazione'}
-                {post.request_type === 'lavoro' && '💼 Lavoro'}
-                {post.request_type === 'tesi' && '📚 Tesi'}
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+                {(post.request_type === 'tirocinio' || post.request_type === 'stage') && (
+                  <>
+                    <Target className="w-3.5 h-3.5" />
+                    Tirocinio
+                  </>
+                )}
+                {post.request_type === 'collaborazione' && (
+                  <>
+                    <Handshake className="w-3.5 h-3.5" />
+                    Collaborazione
+                  </>
+                )}
+                {post.request_type === 'lavoro' && (
+                  <>
+                    <Briefcase className="w-3.5 h-3.5" />
+                    Lavoro
+                  </>
+                )}
+                {post.request_type === 'tesi' && (
+                  <>
+                    <BookOpen className="w-3.5 h-3.5" />
+                    Tesi
+                  </>
+                )}
               </span>
             </div>
             {isCompany && post.request_courses && post.request_courses.length > 0 && (
@@ -220,15 +240,35 @@ export function PostCard({ post, onUpdate }: PostCardProps) {
               </div>
             )}
             {!isCompany && (post.available_days || post.available_hours_total) && (
-              <div className="flex gap-3 flex-wrap text-xs text-gray-600">
-                {post.available_days && <span>📅 {post.available_days}</span>}
-                {post.available_hours_total && <span>⏱ {post.available_hours_total} ore</span>}
+              <div className="flex gap-3 flex-wrap text-xs text-gray-600 items-center">
+                {post.available_days && (
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-3.5 h-3.5 shrink-0" />
+                    {post.available_days}
+                  </span>
+                )}
+                {post.available_hours_total && (
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5 shrink-0" />
+                    {post.available_hours_total} ore
+                  </span>
+                )}
               </div>
             )}
             {isCompany && (post.work_hours || post.interested_days) && (
-              <div className="flex gap-3 flex-wrap text-xs text-gray-600">
-                {post.work_hours && <span>⏱ {post.work_hours} ore tirocinio</span>}
-                {post.interested_days && <span>📅 {post.interested_days}</span>}
+              <div className="flex gap-3 flex-wrap text-xs text-gray-600 items-center">
+                {post.work_hours && (
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5 shrink-0" />
+                    {post.work_hours} ore tirocinio
+                  </span>
+                )}
+                {post.interested_days && (
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-3.5 h-3.5 shrink-0" />
+                    {post.interested_days}
+                  </span>
+                )}
               </div>
             )}
           </div>

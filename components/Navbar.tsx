@@ -16,6 +16,7 @@ import {
   BriefcaseIcon,
   BookOpenIcon,
   UsersIcon,
+  Cog6ToothIcon,
 } from '@heroicons/react/24/solid'
 import { openFloatingChat } from './FloatingChat'
 import { HeaderSearch } from './HeaderSearch'
@@ -75,7 +76,6 @@ export function Navbar() {
 
           {!loading && user && (
             <div className="flex items-center gap-1 shrink-0 ml-auto">
-              <NotificationsBell />
               <Link
                 href={dashboardHref}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -149,6 +149,7 @@ export function Navbar() {
                           onClick={() => setMenuOpen(false)}
                           className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50"
                         >
+                          <Cog6ToothIcon className="w-5 h-5 shrink-0 text-gray-500" />
                           <span>Impostazioni</span>
                         </Link>
                         <Link
@@ -184,7 +185,9 @@ export function Navbar() {
                       </div>
                     )}
                   </div>
-                ) : (
+                ) : null}
+                {user && <NotificationsBell />}
+                {!user && (
                   <div className="flex items-center gap-2">
                     <Link href="/accedi">
                       <Button variant="ghost" size="sm">Accedi</Button>

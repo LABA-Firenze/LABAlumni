@@ -16,7 +16,7 @@ import {
   SparklesIcon,
   ArrowTrendingUpIcon,
 } from '@heroicons/react/24/solid'
-import { FileText } from 'lucide-react'
+import { FileText, Calendar, Sparkles, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import { getInitials } from '@/lib/avatar'
 import { COURSE_CONFIG, getProfileGradient } from '@/types/database'
@@ -251,7 +251,7 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
                     </Link>
                   )}
                   <Link href="/guida" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
-                    <span className="text-primary-600 font-bold">?</span>
+                    <HelpCircle className="w-5 h-5 shrink-0 text-gray-500" />
                     <span>Guida e FAQ</span>
                   </Link>
                   <Link href="/risorse" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
@@ -259,12 +259,12 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
                     <span>Risorse</span>
                   </Link>
                   <Link href="/eventi" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
-                    <span>📅</span>
+                    <Calendar className="w-5 h-5 shrink-0" />
                     <span>Eventi</span>
                   </Link>
                   <Link href="/storie" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
-                    <span>✨</span>
-                    <span>Storie</span>
+                    <Sparkles className="w-5 h-5 shrink-0" />
+                    <span>Storie di successo</span>
                   </Link>
                 </div>
               </Card>
