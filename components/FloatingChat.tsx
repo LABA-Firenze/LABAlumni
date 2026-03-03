@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase'
 import { MessageCircle, X, Send, User, Building2, Search } from 'lucide-react'
 import { Button } from './ui/Button'
 import type { Message, Profile } from '@/types/database'
+import { isStaffEmail } from '@/lib/staff-labels'
 import { useMessagesRealtime } from '@/hooks/useMessagesRealtime'
 
 const OPEN_CHAT_EVENT = 'floating-chat-open'
@@ -84,14 +85,15 @@ export function FloatingChat() {
         .select('role')
         .eq('id', user.id)
         .single()
-      setUserRole((profile?.role || 'student') as 'student' | 'company')
+      const role = (profile?.role || 'student') as 'student' | 'company'
+      setUserRole(role)
 
-      if (profile?.role === 'company') {
-        const { data: recs } = await supabase
-          .from('profiles')
-          .select('*')
-          .neq('id', user.id)
-          .eq('role', 'student')
+      // Aziende e staff (Simone, Alessia, Matteo) possono avviare nuove conversazioni
+      const canMessageAnyone = role === 'company' || isStaffEmail(user.email)
+      if (canMessageAnyone) {
+        const { data: recs } = role === 'company'
+          ? await supabase.from('profiles').select('*').neq('id', user.id).eq('role', 'student')
+          : await supabase.from('profiles').select('*').neq('id', user.id)
         setRecipients(recs || [])
       }
 
@@ -109,9 +111,10 @@ export function FloatingChat() {
 
   useMessagesRealtime(open ? user?.id : undefined, loadData)
 
+  const canMessageAnyone = userRole === 'company' || isStaffEmail(user?.email)
   const conversationList = Array.from(conversations.values())
     .filter((conv) => {
-      if (userRole === 'student' && conv.user.role !== 'company') return false
+      if (!canMessageAnyone && userRole === 'student' && conv.user.role !== 'company') return false
       if (!searchTerm) return true
       return (
         conv.user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -226,7 +229,7 @@ export function FloatingChat() {
                   <div className="p-8 text-center text-gray-500 text-sm">Caricamento...</div>
                 ) : conversationList.length === 0 ? (
                   <div className="p-8 text-center text-gray-500 text-sm">
-                    {userRole === 'student'
+                    {!canMessageAnyone && userRole === 'student'
                       ? 'Le aziende possono contattarti qui'
                       : 'Nessuna conversazione'}
                   </div>
@@ -265,7 +268,7 @@ export function FloatingChat() {
                   </div>
                 )}
               </div>
-              {userRole === 'company' && (
+              {canMessageAnyone && (
                 <div className="p-3 border-t border-gray-100 shrink-0">
                   <form onSubmit={handleSendNew} className="space-y-2">
                     <select

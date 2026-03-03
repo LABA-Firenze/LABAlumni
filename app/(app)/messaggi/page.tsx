@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/Textarea'
 import { Select } from '@/components/ui/Select'
 import { Send, Mail, User, Building2, Search } from 'lucide-react'
 import type { Message, Profile } from '@/types/database'
+import { isStaffEmail } from '@/lib/staff-labels'
 import { Skeleton, SkeletonCard } from '@/components/ui/Skeleton'
 import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 import { useMessagesRealtime } from '@/hooks/useMessagesRealtime'
@@ -116,13 +117,12 @@ export default function MessagesPage() {
       const role = (profile?.role || 'student') as 'student' | 'company'
       setUserRole(role)
 
-      // Solo le aziende possono avviare nuove conversazioni; caricare solo studenti come destinatari
-      if (role === 'company') {
-        const { data } = await supabase
-          .from('profiles')
-          .select('*')
-          .neq('id', user.id)
-          .eq('role', 'student')
+      // Aziende e staff (Simone, Alessia, Matteo) possono avviare nuove conversazioni con chiunque
+      const canMessageAnyone = role === 'company' || isStaffEmail(user.email)
+      if (canMessageAnyone) {
+        const { data } = role === 'company'
+          ? await supabase.from('profiles').select('*').neq('id', user.id).eq('role', 'student')
+          : await supabase.from('profiles').select('*').neq('id', user.id)
         setRecipients(data || [])
 
         if (preselectedUserId) {
@@ -192,10 +192,11 @@ export default function MessagesPage() {
       ).sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
     : []
 
+  const canMessageAnyone = userRole === 'company' || isStaffEmail(user?.email)
   const conversationList = Array.from(conversations.values())
     .filter((conv) => {
-      // Studenti: solo conversazioni con aziende
-      if (userRole === 'student' && conv.user.role !== 'company') return false
+      // Studenti: solo conversazioni con aziende; staff può vedere tutte
+      if (!canMessageAnyone && userRole === 'student' && conv.user.role !== 'company') return false
       if (searchTerm === '') return true
       return (
         conv.user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -243,7 +244,7 @@ export default function MessagesPage() {
             <Mail className="w-8 h-8 text-primary-600" />
             Messaggi
           </h1>
-          {userRole === 'student' && (
+          {userRole === 'student' && !isStaffEmail(user?.email) && (
             <p className="text-gray-600 mt-1">
               Puoi rispondere qui quando un&apos;azienda ti contatta. Solo le aziende possono avviare nuove conversazioni.
             </p>
@@ -382,15 +383,15 @@ export default function MessagesPage() {
               <Card variant="elevated" className="text-center py-16">
                 <Mail className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-600">
-                  {userRole === 'student'
+                  {!canMessageAnyone && userRole === 'student'
                     ? 'Le aziende interessate ai tuoi contenuti e portfolio possono contattarti qui. Quando riceverai un messaggio, potrai rispondere in questa sezione.'
-                    : 'Seleziona una conversazione o invia un nuovo messaggio a uno studente'}
+                    : 'Seleziona una conversazione o invia un nuovo messaggio.'}
                 </p>
               </Card>
             )}
 
-            {/* Nuovo messaggio: solo per aziende */}
-            {!selectedConversation && userRole === 'company' && (
+            {/* Nuovo messaggio: aziende e staff (Simone, Alessia, Matteo) */}
+            {!selectedConversation && canMessageAnyone && (
               <Card variant="elevated" className="mt-6">
                 <h2 className="text-xl font-semibold mb-4">Nuovo Messaggio</h2>
                 <form onSubmit={handleSendMessage} className="space-y-4">
@@ -403,7 +404,7 @@ export default function MessagesPage() {
                     <option value="">Seleziona un destinatario</option>
                     {recipients.map((recipient) => (
                       <option key={recipient.id} value={recipient.id}>
-                        {recipient.full_name || recipient.email} ({recipient.role === 'student' ? 'Studente' : 'Azienda'})
+                        {recipient.full_name || recipient.email} ({recipient.role === 'student' ? 'Studente' : recipient.role === 'company' ? 'Azienda' : recipient.role === 'docente' ? 'Docente' : recipient.role || 'Utente'})
                       </option>
                     ))}
                   </Select>
