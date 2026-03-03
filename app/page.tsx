@@ -22,8 +22,8 @@ export default function Home() {
         .select('role')
         .eq('id', user.id)
         .single()
-        .then(({ data }: { data?: { role?: string } }) => {
-          const role = data?.role
+        .then((res) => {
+          const role = res.data?.role
           if (role === 'admin') router.replace('/pannello/admin')
           else if (role === 'company') router.replace('/pannello/azienda')
           else if (role === 'docente') router.replace('/tesi')
