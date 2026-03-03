@@ -176,45 +176,30 @@ export default function StudentDashboard() {
       let postsData: PostWithRelations | null = null
       let error: unknown = null
 
-      const fullSelect = `
-          *,
-          user:profiles!posts_user_id_fkey(id, full_name, avatar_url, role),
-          portfolio_item:portfolio_items!posts_portfolio_item_id_fkey(id, title, images)
-        `
+      // Query base senza portfolio_item (evita 400 da join complesso)
+      const baseSelect = `*, user:profiles!posts_user_id_fkey(id, full_name, avatar_url, role)`
       const result = await supabase
         .from('posts')
-        .select(fullSelect)
+        .select(baseSelect)
         .order('created_at', { ascending: false })
         .limit(20)
 
       if (result.error) {
         error = result.error
-        // Fallback senza embed portfolio_item (evita 400 se la relazione non è riconosciuta)
-        const fallback = await supabase
-            .from('posts')
-            .select(`
-              *,
-              user:profiles!posts_user_id_fkey(id, full_name, avatar_url, role)
-            `)
-            .order('created_at', { ascending: false })
-            .limit(20)
-          if (!fallback.error) {
-            postsData = fallback.data as unknown as PostWithRelations
-            const portfolioIds = [...new Set((postsData || []).map(p => p.portfolio_item_id).filter(Boolean) as string[])]
-            if (portfolioIds.length > 0) {
-              const { data: portfolioItems } = await supabase
-                .from('portfolio_items')
-                .select('id, title, images')
-                .in('id', portfolioIds)
-              const portfolioMap = Object.fromEntries((portfolioItems || []).map((pi: { id: string; title: string; images: string[] }) => [pi.id, pi]))
-              postsData = (postsData || []).map(p => ({
-                ...p,
-                portfolio_item: p.portfolio_item_id ? (portfolioMap[p.portfolio_item_id] as Post['portfolio_item']) : undefined,
-              })) as PostWithRelations
-            }
-          }
       } else {
         postsData = result.data as unknown as PostWithRelations
+        const portfolioIds = [...new Set((postsData || []).map(p => p.portfolio_item_id).filter(Boolean) as string[])]
+        if (portfolioIds.length > 0) {
+          const { data: portfolioItems } = await supabase
+            .from('portfolio_items')
+            .select('id, title, images')
+            .in('id', portfolioIds)
+          const portfolioMap = Object.fromEntries((portfolioItems || []).map((pi: { id: string; title: string; images: string[] }) => [pi.id, pi]))
+          postsData = (postsData || []).map(p => ({
+            ...p,
+            portfolio_item: p.portfolio_item_id ? (portfolioMap[p.portfolio_item_id] as Post['portfolio_item']) : undefined,
+          })) as PostWithRelations
+        }
       }
 
       if (error && !postsData) throw error
@@ -247,12 +232,10 @@ export default function StudentDashboard() {
           })
         }
 
-        const { data: likedPosts } = await supabase
-          .from('post_likes')
-          .select('post_id')
-          .eq('user_id', user.id)
-          .in('post_id', postsData.map(p => p.id))
-        const likedPostIds = new Set(likedPosts?.map(l => l.post_id) || [])
+        const postIds = postsData.map(p => p.id)
+        const likedPostIds = postIds.length > 0
+          ? new Set((await supabase.from('post_likes').select('post_id').eq('user_id', user.id).in('post_id', postIds)).data?.map(l => l.post_id) || [])
+          : new Set<string>()
 
         setPosts(postsData.map(post => ({
           ...post,

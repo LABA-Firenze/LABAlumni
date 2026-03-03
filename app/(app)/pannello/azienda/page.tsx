@@ -60,18 +60,22 @@ export default function CompanyDashboard() {
 
       setJobPosts(jobsData || [])
 
-      const { data: applicationsData } = await supabase
-        .from('applications')
-        .select(`
-          *,
-          job_post:job_posts(*),
-          student:students(id, course)
-        `)
-        .in('job_post_id', jobsData?.map((j: any) => j.id) || [])
-        .order('created_at', { ascending: false })
-        .limit(5)
-
-      setApplications(applicationsData || [])
+      const jobIds = jobsData?.map((j: any) => j.id) || []
+      if (jobIds.length > 0) {
+        const { data: applicationsData } = await supabase
+          .from('applications')
+          .select(`
+            *,
+            job_post:job_posts(*),
+            student:students(id, course)
+          `)
+          .in('job_post_id', jobIds)
+          .order('created_at', { ascending: false })
+          .limit(5)
+        setApplications(applicationsData || [])
+      } else {
+        setApplications([])
+      }
     } catch (error) {
       console.error('Error loading company data:', error)
     } finally {
@@ -96,13 +100,10 @@ export default function CompanyDashboard() {
       if (error) throw error
 
       if (postsData) {
-        const { data: likedPosts } = await supabase
-          .from('post_likes')
-          .select('post_id')
-          .eq('user_id', user.id)
-          .in('post_id', postsData.map(p => p.id))
-
-        const likedPostIds = new Set(likedPosts?.map(l => l.post_id) || [])
+        const postIds = postsData.map(p => p.id)
+        const likedPostIds = postIds.length > 0
+          ? new Set((await supabase.from('post_likes').select('post_id').eq('user_id', user.id).in('post_id', postIds)).data?.map(l => l.post_id) || [])
+          : new Set<string>()
 
         setPosts(postsData.map(post => ({
           ...post,

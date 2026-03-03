@@ -115,19 +115,21 @@ export default function PublicProfilePage() {
           .eq('status', 'accepted')
         setConnectionsCount(count || 0)
 
-        // Load posts from this student (collaboration_request, portfolio, etc.)
+        // Load posts (query base senza portfolio_item per evitare 400)
         const { data: postsData } = await supabase
           .from('posts')
-          .select(`
-            *,
-            user:profiles!posts_user_id_fkey(id, full_name, avatar_url, role),
-            portfolio_item:portfolio_items(id, title, images)
-          `)
+          .select(`*, user:profiles!posts_user_id_fkey(id, full_name, avatar_url, role)`)
           .eq('user_id', profileId)
           .order('created_at', { ascending: false })
           .limit(20)
 
         if (postsData?.length) {
+          const portfolioIds = [...new Set(postsData.map((p: any) => p.portfolio_item_id).filter(Boolean) as string[])]
+          let portfolioMap: Record<string, { id: string; title: string; images: string[] }> = {}
+          if (portfolioIds.length > 0) {
+            const { data: pi } = await supabase.from('portfolio_items').select('id, title, images').in('id', portfolioIds)
+            portfolioMap = Object.fromEntries((pi || []).map((x: any) => [x.id, x]))
+          }
           const { data: studentCourses } = await supabase
             .from('students')
             .select('id, course, display_label')
@@ -140,6 +142,7 @@ export default function PublicProfilePage() {
           setPosts(
             postsData.map((p: any) => ({
               ...p,
+              portfolio_item: p.portfolio_item_id ? portfolioMap[p.portfolio_item_id] : undefined,
               student_course: courseMap[p.user_id],
               is_liked: likedSet.has(p.id),
             }))
