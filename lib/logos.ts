@@ -1,7 +1,7 @@
 /**
  * Client per le API LOGOS (LogosUni Laba API).
  * Variabili d'ambiente:
- * - LOGOS_API_URL: base URL API (es. https://logosuni.laba.biz/logosuni.servicesv2)
+ * - LOGOS_API_URL: base URL API (prod: https://logosuni.laba.biz/api-prod → chiamate /api/Students, /api/Enrollments)
  * - LOGOS_AUTH_URL: (opzionale) URL token OAuth2 (es. https://logosuni.laba.biz/identityserver/connect/token)
  * - LOGOS_CLIENT_ID / LOGOS_CLIENT_SECRET: (opzionali) se richiesti da IdentityServer
  */
@@ -16,7 +16,7 @@ function env(key: string): string | undefined {
 
 /** Fallback per Railway: alcune env possono non essere disponibili a runtime */
 const LOGOS_DEFAULTS = {
-  API_URL: 'https://logosuni.laba.biz/logosuni.servicesv2',
+  API_URL: 'https://logosuni.laba.biz/api-prod',
   AUTH_URL: 'https://logosuni.laba.biz/identityserver/connect/token',
   CLIENT_ID: '98C96373243D',
 } as const
