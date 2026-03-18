@@ -46,18 +46,23 @@ async function logosGetOAuth2Token(email: string, password: string): Promise<str
     password,
     scope: 'LogosUni.Laba.Api',
   })
-  // In prod preferisci env; se manca usa il default per non rompere deploy esistenti (impostare LOGOS_CLIENT_ID è comunque consigliato).
   const clientId = env('LOGOS_CLIENT_ID') ?? LOGOS_DEFAULTS.CLIENT_ID_DEV
   if (process.env.NODE_ENV === 'production' && env('LOGOS_CLIENT_ID') === undefined) {
-    console.warn('LOGOS_CLIENT_ID non impostato in produzione: usato default. Per chiarezza imposta LOGOS_CLIENT_ID in env.')
+    console.warn('LOGOS_CLIENT_ID non impostato in produzione: usato default.')
   }
   const clientSecret = env('LOGOS_CLIENT_SECRET')
-  if (clientId) body.set('client_id', clientId)
-  if (clientSecret) body.set('client_secret', clientSecret)
+
+  const headers: Record<string, string> = { 'Content-Type': 'application/x-www-form-urlencoded' }
+  if (clientId && clientSecret) {
+    headers.Authorization = `Basic ${Buffer.from(`${clientId}:${clientSecret}`, 'utf-8').toString('base64')}`
+  } else {
+    if (clientId) body.set('client_id', clientId)
+    if (clientSecret) body.set('client_secret', clientSecret)
+  }
 
   const res = await fetch(authUrl, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    headers,
     body: body.toString(),
   })
 
