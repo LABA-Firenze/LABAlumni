@@ -62,7 +62,14 @@ async function logosGetOAuth2Token(email: string, password: string): Promise<str
   })
 
   if (!res.ok) {
-    console.warn('[Logos] Identity Server token:', res.status, res.statusText)
+    let errBody: string | undefined
+    try {
+      const j = await res.json() as { error?: string; error_description?: string }
+      errBody = [j.error, j.error_description].filter(Boolean).join(' — ') || res.statusText
+    } catch {
+      errBody = res.statusText
+    }
+    console.warn('[Logos] Identity Server token:', res.status, errBody)
     return null
   }
   const data: LogosOAuth2TokenResponse = await res.json()
