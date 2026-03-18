@@ -1,9 +1,10 @@
 /**
  * Client per le API LOGOS (LogosUni Laba API).
+ * Swagger: https://logosuni.laba.biz/api-prod/swagger/v1/swagger.json — server base = /api-prod.
  * Variabili d'ambiente:
- * - LOGOS_API_URL: base URL API (prod: https://logosuni.laba.biz/api-prod → chiamate /api/Students, /api/Enrollments)
- * - LOGOS_AUTH_URL: (opzionale) URL token OAuth2 (es. https://logosuni.laba.biz/identityserver/connect/token)
- * - LOGOS_CLIENT_ID / LOGOS_CLIENT_SECRET: (opzionali) se richiesti da IdentityServer
+ * - LOGOS_API_URL: base URL API (deve essere https://logosuni.laba.biz/api-prod, non logosuni.servicesv2)
+ * - LOGOS_AUTH_URL: (opzionale) URL token OAuth2 = https://logosuni.laba.biz/identityserver/connect/token
+ * - LOGOS_CLIENT_ID / LOGOS_CLIENT_SECRET: per Identity Server (password grant)
  */
 
 import type { CourseType } from '@/types/database'
