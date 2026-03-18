@@ -2,7 +2,7 @@
  * Client per le API LOGOS (LogosUni Laba API).
  * Swagger: https://logosuni.laba.biz/api-prod/swagger/v1/swagger.json — server base = /api-prod.
  * Variabili d'ambiente:
- * - LOGOS_API_URL: base URL API (deve essere https://logosuni.laba.biz/api-prod, non logosuni.servicesv2)
+ * - Base API fissata a https://logosuni.laba.biz/api-prod (non usare LOGOS_API_URL)
  * - LOGOS_AUTH_URL: (opzionale) URL token OAuth2 = https://logosuni.laba.biz/identityserver/connect/token
  * - LOGOS_CLIENT_ID / LOGOS_CLIENT_SECRET: per Identity Server (password grant)
  */
@@ -22,9 +22,9 @@ const LOGOS_DEFAULTS = {
   CLIENT_ID_DEV: '98C96373243D',
 } as const
 
+/** Base URL fissa per API Logos (Swagger server = /api-prod). Request: https://logosuni.laba.biz/api-prod/api/Students */
 function getLogosApiUrl(): string {
-  const url = env('LOGOS_API_URL') || LOGOS_DEFAULTS.API_URL
-  return url.replace(/\/$/, '')
+  return LOGOS_DEFAULTS.API_URL
 }
 
 function getLogosAuthUrl(): string | null {
