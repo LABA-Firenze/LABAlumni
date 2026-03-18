@@ -47,16 +47,19 @@ async function logosGetOAuth2Token(email: string, password: string): Promise<str
     scope: 'LogosUni.Laba.Api',
   })
   const clientId = (env('LOGOS_CLIENT_ID') ?? LOGOS_DEFAULTS.CLIENT_ID_DEV).trim()
-  if (process.env.NODE_ENV === 'production' && env('LOGOS_CLIENT_ID') === undefined) {
-    console.warn('LOGOS_CLIENT_ID non impostato in produzione: usato default.')
-  }
   const clientSecret = (env('LOGOS_CLIENT_SECRET') ?? '').trim()
+  if (process.env.NODE_ENV === 'production' && !clientSecret) {
+    console.warn('[Logos] LOGOS_CLIENT_SECRET vuoto a runtime — verifica Variables su Railway')
+  }
   body.set('client_id', clientId)
   if (clientSecret) body.set('client_secret', clientSecret)
 
   const res = await fetch(authUrl, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'User-Agent': 'LABAlumni/1.0 (LogosUni.Laba.Api)',
+    },
     body: body.toString(),
   })
 
