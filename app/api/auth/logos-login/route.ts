@@ -30,7 +30,6 @@ export async function POST(request: Request) {
       logosGetEnrollment(email, password),
     ])
     if (!payload) {
-      console.warn('[logos-login] 401 — vedi log [Logos] sopra per token/Students/body')
       return NextResponse.json(
         { error: 'Credenziali non valide o studente non trovato' },
         { status: 401 }

@@ -2,7 +2,7 @@
  * Client per le API LOGOS (LogosUni Laba API).
  * Swagger: https://logosuni.laba.biz/api-prod/swagger/v1/swagger.json — server base = /api-prod.
  * Variabili d'ambiente:
- * - Base API fissata a https://logosuni.laba.biz/api-prod (non usare LOGOS_API_URL)
+ * - LOGOS_API_URL: base API (default https://logosuni.laba.biz/api-prod)
  * - LOGOS_AUTH_URL: (opzionale) URL token OAuth2 = https://logosuni.laba.biz/identityserver/connect/token
  * - LOGOS_CLIENT_ID / LOGOS_CLIENT_SECRET: per Identity Server (password grant)
  */
@@ -15,16 +15,16 @@ function env(key: string): string | undefined {
   return process.env[key]
 }
 
-/** Fallback per Railway: alcune env possono non essere disponibili a runtime. CLIENT_ID: in produzione non usare default (impostare LOGOS_CLIENT_ID). */
+/** Fallback per Railway */
 const LOGOS_DEFAULTS = {
   API_URL: 'https://logosuni.laba.biz/api-prod',
   AUTH_URL: 'https://logosuni.laba.biz/identityserver/connect/token',
-  CLIENT_ID_DEV: '98C96373243D',
+  CLIENT_ID: '98C96373243D',
 } as const
 
-/** Base URL fissa per API Logos (Swagger server = /api-prod). Request: https://logosuni.laba.biz/api-prod/api/Students */
 function getLogosApiUrl(): string {
-  return LOGOS_DEFAULTS.API_URL
+  const url = env('LOGOS_API_URL') || LOGOS_DEFAULTS.API_URL
+  return url.replace(/\/$/, '')
 }
 
 function getLogosAuthUrl(): string | null {
@@ -46,39 +46,20 @@ async function logosGetOAuth2Token(email: string, password: string): Promise<str
     password,
     scope: 'LogosUni.Laba.Api',
   })
-  const clientId = (env('LOGOS_CLIENT_ID') ?? LOGOS_DEFAULTS.CLIENT_ID_DEV).trim()
-  const clientSecret = (env('LOGOS_CLIENT_SECRET') ?? '').trim()
-  if (process.env.NODE_ENV === 'production' && !clientSecret) {
-    console.warn('[Logos] LOGOS_CLIENT_SECRET vuoto a runtime — verifica Variables su Railway')
-  }
-  body.set('client_id', clientId)
+  const clientId = env('LOGOS_CLIENT_ID') || LOGOS_DEFAULTS.CLIENT_ID
+  const clientSecret = env('LOGOS_CLIENT_SECRET')
+  if (clientId) body.set('client_id', clientId)
   if (clientSecret) body.set('client_secret', clientSecret)
 
   const res = await fetch(authUrl, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'User-Agent': 'LABAlumni/1.0 (LogosUni.Laba.Api)',
-    },
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: body.toString(),
   })
 
-  if (!res.ok) {
-    let errBody: string | undefined
-    try {
-      const j = await res.json() as { error?: string; error_description?: string }
-      errBody = [j.error, j.error_description].filter(Boolean).join(' — ') || res.statusText
-    } catch {
-      errBody = res.statusText
-    }
-    console.warn('[Logos] Identity Server token:', res.status, errBody)
-    return null
-  }
+  if (!res.ok) return null
   const data: LogosOAuth2TokenResponse = await res.json()
-  if (data.error || !data.access_token) {
-    console.warn('[Logos] Identity Server response:', data.error || 'no access_token')
-    return null
-  }
+  if (data.error || !data.access_token) return null
   return data.access_token
 }
 
@@ -117,15 +98,9 @@ export async function logosGetStudent(email: string, password: string): Promise<
     },
   })
 
-  if (!res.ok) {
-    console.warn('[Logos] Students API:', res.status, res.statusText, 'baseUrl:', baseUrl)
-    return null
-  }
+  if (!res.ok) return null
   const data: LogosStudentsResponse = await res.json()
-  if (!data.success || !data.payload) {
-    console.warn('[Logos] Students API body: success=', data.success, 'payload=', !!data.payload)
-    return null
-  }
+  if (!data.success || !data.payload) return null
   return data.payload
 }
 
