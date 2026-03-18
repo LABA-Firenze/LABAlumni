@@ -45,10 +45,10 @@ async function logosGetOAuth2Token(email: string, password: string): Promise<str
     password,
     scope: 'LogosUni.Laba.Api',
   })
-  const clientId = env('LOGOS_CLIENT_ID') ?? (process.env.NODE_ENV === 'production' ? undefined : LOGOS_DEFAULTS.CLIENT_ID_DEV)
-  if (process.env.NODE_ENV === 'production' && !clientId) {
-    console.error('LOGOS_CLIENT_ID mancante in produzione')
-    return null
+  // In prod preferisci env; se manca usa il default per non rompere deploy esistenti (impostare LOGOS_CLIENT_ID è comunque consigliato).
+  const clientId = env('LOGOS_CLIENT_ID') ?? LOGOS_DEFAULTS.CLIENT_ID_DEV
+  if (process.env.NODE_ENV === 'production' && env('LOGOS_CLIENT_ID') === undefined) {
+    console.warn('LOGOS_CLIENT_ID non impostato in produzione: usato default. Per chiarezza imposta LOGOS_CLIENT_ID in env.')
   }
   const clientSecret = env('LOGOS_CLIENT_SECRET')
   if (clientId) body.set('client_id', clientId)
