@@ -3,9 +3,14 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
 import { checkRateLimit } from '@/lib/rate-limit'
+import { checkCorsOrigin } from '@/lib/cors'
 
 /** POST: l'utente elimina il proprio account. Richiede conferma esplicita. */
 export async function POST(request: NextRequest) {
+  const cors = checkCorsOrigin(request)
+  if (!cors.allowed) {
+    return NextResponse.json({ error: 'Origine non consentita' }, { status: cors.status })
+  }
   if (!checkRateLimit(request, { maxRequests: 5, windowMs: 60_000 })) {
     return NextResponse.json({ error: 'Troppi tentativi' }, { status: 429 })
   }

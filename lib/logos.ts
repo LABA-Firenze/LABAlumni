@@ -14,11 +14,11 @@ function env(key: string): string | undefined {
   return process.env[key]
 }
 
-/** Fallback per Railway: alcune env possono non essere disponibili a runtime */
+/** Fallback per Railway: alcune env possono non essere disponibili a runtime. CLIENT_ID: in produzione non usare default (impostare LOGOS_CLIENT_ID). */
 const LOGOS_DEFAULTS = {
   API_URL: 'https://logosuni.laba.biz/api-prod',
   AUTH_URL: 'https://logosuni.laba.biz/identityserver/connect/token',
-  CLIENT_ID: '98C96373243D',
+  CLIENT_ID_DEV: '98C96373243D',
 } as const
 
 function getLogosApiUrl(): string {
@@ -45,7 +45,11 @@ async function logosGetOAuth2Token(email: string, password: string): Promise<str
     password,
     scope: 'LogosUni.Laba.Api',
   })
-  const clientId = env('LOGOS_CLIENT_ID') || LOGOS_DEFAULTS.CLIENT_ID
+  const clientId = env('LOGOS_CLIENT_ID') ?? (process.env.NODE_ENV === 'production' ? undefined : LOGOS_DEFAULTS.CLIENT_ID_DEV)
+  if (process.env.NODE_ENV === 'production' && !clientId) {
+    console.error('LOGOS_CLIENT_ID mancante in produzione')
+    return null
+  }
   const clientSecret = env('LOGOS_CLIENT_SECRET')
   if (clientId) body.set('client_id', clientId)
   if (clientSecret) body.set('client_secret', clientSecret)

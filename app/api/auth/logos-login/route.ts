@@ -1,10 +1,15 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { checkRateLimit } from '@/lib/rate-limit'
+import { checkCorsOrigin } from '@/lib/cors'
 import { logosGetStudent, logosGetEnrollment, logosPreferredEmail, logosFullName, logosCourseFromPianoStudi, logosYearFromEnrollment, logosAcademicYearFromPianoStudi } from '@/lib/logos'
 import { getStaffLabel } from '@/lib/staff-labels'
 
 export async function POST(request: Request) {
+  const cors = checkCorsOrigin(request)
+  if (!cors.allowed) {
+    return NextResponse.json({ error: 'Origine non consentita' }, { status: cors.status })
+  }
   if (!checkRateLimit(request, { maxRequests: 15, windowMs: 60_000 })) {
     return NextResponse.json({ error: 'Troppi tentativi. Riprova tra un minuto.' }, { status: 429 })
   }

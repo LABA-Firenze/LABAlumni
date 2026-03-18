@@ -1,9 +1,13 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 export const dynamic = 'force-dynamic'
 import { requireAdmin } from '../verify-admin'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 /** GET: elenco docenti e aziende per pannello admin */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  if (!checkRateLimit(request, { maxRequests: 60, windowMs: 60_000 })) {
+    return NextResponse.json({ error: 'Troppi tentativi' }, { status: 429 })
+  }
   const { admin, error } = await requireAdmin()
   if (error || !admin) {
     return NextResponse.json({ error: error || 'Non autorizzato' }, { status: 401 })
