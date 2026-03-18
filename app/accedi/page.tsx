@@ -37,8 +37,10 @@ export default function LoginPage() {
       }
       const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
       if (signInError) throw signInError
-      router.push('/pannello')
-      router.refresh()
+      const from = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('redirectedFrom') : null
+      const target = from && from.startsWith('/') ? from : '/pannello'
+      window.location.href = target
+      return
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Errore durante l\'accesso')
     } finally {
