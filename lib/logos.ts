@@ -51,17 +51,12 @@ async function logosGetOAuth2Token(email: string, password: string): Promise<str
     console.warn('LOGOS_CLIENT_ID non impostato in produzione: usato default.')
   }
   const clientSecret = (env('LOGOS_CLIENT_SECRET') ?? '').trim()
-
-  const headers: Record<string, string> = { 'Content-Type': 'application/x-www-form-urlencoded' }
-  if (clientId && clientSecret) {
-    headers.Authorization = `Basic ${Buffer.from(`${clientId}:${clientSecret}`, 'utf-8').toString('base64')}`
-  }
   body.set('client_id', clientId)
   if (clientSecret) body.set('client_secret', clientSecret)
 
   const res = await fetch(authUrl, {
     method: 'POST',
-    headers,
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: body.toString(),
   })
 
