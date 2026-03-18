@@ -61,9 +61,15 @@ async function logosGetOAuth2Token(email: string, password: string): Promise<str
     body: body.toString(),
   })
 
-  if (!res.ok) return null
+  if (!res.ok) {
+    console.warn('[Logos] Identity Server token:', res.status, res.statusText)
+    return null
+  }
   const data: LogosOAuth2TokenResponse = await res.json()
-  if (data.error || !data.access_token) return null
+  if (data.error || !data.access_token) {
+    console.warn('[Logos] Identity Server response:', data.error || 'no access_token')
+    return null
+  }
   return data.access_token
 }
 
@@ -102,9 +108,15 @@ export async function logosGetStudent(email: string, password: string): Promise<
     },
   })
 
-  if (!res.ok) return null
+  if (!res.ok) {
+    console.warn('[Logos] Students API:', res.status, res.statusText, 'baseUrl:', baseUrl)
+    return null
+  }
   const data: LogosStudentsResponse = await res.json()
-  if (!data.success || !data.payload) return null
+  if (!data.success || !data.payload) {
+    console.warn('[Logos] Students API body: success=', data.success, 'payload=', !!data.payload)
+    return null
+  }
   return data.payload
 }
 
