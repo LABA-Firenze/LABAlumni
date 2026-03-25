@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/components/AuthProvider'
 import { supabase } from '@/lib/supabase'
@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
-import { Send, Mail, User, Building2, Search } from 'lucide-react'
+import { Send, Mail, User, Building2, Search, Paperclip, Trash2, X } from 'lucide-react'
 import { getInitials } from '@/lib/avatar'
 import { getProfileGradient } from '@/types/database'
 import type { Message, Profile } from '@/types/database'
@@ -35,6 +35,8 @@ export default function MessagesPage() {
   const [newMessage, setNewMessage] = useState({ recipient_id: '', content: '' })
   const [conversationMessage, setConversationMessage] = useState({ content: '' })
   const [searchTerm, setSearchTerm] = useState('')
+  const [showConversationDetails, setShowConversationDetails] = useState(false)
+  const recipientPickerRef = useRef<HTMLDivElement>(null)
   const showSkeleton = useMinimumLoading(loading)
 
   useEffect(() => {
@@ -48,6 +50,17 @@ export default function MessagesPage() {
       loadRecipients()
     }
   }, [user, authLoading, router])
+
+  useEffect(() => {
+    const onPointerDown = (event: MouseEvent) => {
+      if (!recipientPickerRef.current) return
+      if (!recipientPickerRef.current.contains(event.target as Node)) {
+        setRecipientPickerOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', onPointerDown)
+    return () => document.removeEventListener('mousedown', onPointerDown)
+  }, [])
 
   const loadMessages = async () => {
     if (!user) return
@@ -142,6 +155,10 @@ export default function MessagesPage() {
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!user) return
+    if (!newMessage.recipient_id) {
+      alert('Seleziona un destinatario dalla lista.')
+      return
+    }
 
     setSending(true)
     try {
@@ -197,6 +214,45 @@ export default function MessagesPage() {
           (m.recipient_id === selectedConversation && m.sender_id === user?.id)
       ).sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
     : []
+
+  const selectedConversationUser = selectedConversation
+    ? conversations.get(selectedConversation)?.user || null
+    : null
+
+  const conversationAttachments = useMemo(() => {
+    if (!selectedMessages.length) return []
+    const urlRegex = /(https?:\/\/[^\s]+)/gi
+    const items = selectedMessages.flatMap((msg) =>
+      Array.from(msg.content.matchAll(urlRegex)).map((match, index) => ({
+        id: `${msg.id}-${index}`,
+        url: match[0],
+      }))
+    )
+    return items
+  }, [selectedMessages])
+
+  const handleDeleteConversation = async () => {
+    if (!user || !selectedConversation) return
+    const ok = window.confirm('Eliminare questa conversazione? L\'azione non si puo annullare.')
+    if (!ok) return
+    setSending(true)
+    try {
+      const { error } = await supabase
+        .from('messages')
+        .delete()
+        .or(
+          `and(sender_id.eq.${user.id},recipient_id.eq.${selectedConversation}),and(sender_id.eq.${selectedConversation},recipient_id.eq.${user.id})`
+        )
+      if (error) throw error
+      setShowConversationDetails(false)
+      setSelectedConversation(null)
+      await loadMessages()
+    } catch (error: any) {
+      alert(error.message || 'Errore durante eliminazione conversazione')
+    } finally {
+      setSending(false)
+    }
+  }
 
   const canMessageAnyone = userRole === 'company' || isStaffEmail(user?.email)
   const conversationList = Array.from(conversations.values())
@@ -297,10 +353,18 @@ export default function MessagesPage() {
                   <p className="text-gray-500 text-center py-8 text-sm">Nessuna conversazione</p>
                 ) : (
                   conversationList.map((conv) => (
-                    <button
+                    <div
                       key={conv.id}
+                      role="button"
+                      tabIndex={0}
                       onClick={() => setSelectedConversation(conv.id)}
-                      className={`w-full text-left p-3 rounded-lg transition-colors ${
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault()
+                          setSelectedConversation(conv.id)
+                        }
+                      }}
+                      className={`w-full text-left p-3 rounded-lg transition-colors cursor-pointer ${
                         selectedConversation === conv.id
                           ? 'bg-primary text-white'
                           : 'bg-gray-50 hover:bg-gray-100'
@@ -308,14 +372,33 @@ export default function MessagesPage() {
                     >
                       <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center gap-2">
-                          {conv.user.role === 'company' ? (
-                            <Building2 className="w-4 h-4" />
-                          ) : (
-                            <User className="w-4 h-4" />
-                          )}
-                          <span className="font-medium truncate">
+                          <button
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              setSelectedConversation(conv.id)
+                              setShowConversationDetails(true)
+                            }}
+                            className="inline-flex items-center gap-2 hover:opacity-80"
+                            aria-label="Apri dettagli chat"
+                          >
+                            {conv.user.role === 'company' ? (
+                              <Building2 className="w-4 h-4" />
+                            ) : (
+                              <User className="w-4 h-4" />
+                            )}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              setSelectedConversation(conv.id)
+                              setShowConversationDetails(true)
+                            }}
+                            className="font-medium truncate hover:underline"
+                          >
                             {conv.user.full_name || conv.user.email}
-                          </span>
+                          </button>
                         </div>
                         {conv.unread > 0 && (
                           <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
@@ -334,7 +417,7 @@ export default function MessagesPage() {
                           {conv.lastMessage.subject}
                         </p>
                       )}
-                    </button>
+                    </div>
                   ))
                 )}
               </div>
@@ -346,13 +429,19 @@ export default function MessagesPage() {
             {selectedConversation ? (
               <Card variant="elevated">
                 <div className="mb-6 pb-4 border-b border-gray-200">
-                  <h2 className="text-xl font-semibold">
-                    {conversations.get(selectedConversation)?.user.full_name ||
-                      conversations.get(selectedConversation)?.user.email}
-                  </h2>
-                  <p className="text-sm text-gray-600">
-                    {conversations.get(selectedConversation)?.user.email}
-                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setShowConversationDetails(true)}
+                    className="text-left hover:text-primary-700"
+                  >
+                    <h2 className="text-xl font-semibold">
+                      {conversations.get(selectedConversation)?.user.full_name ||
+                        conversations.get(selectedConversation)?.user.email}
+                    </h2>
+                    <p className="text-sm text-gray-600">
+                      {conversations.get(selectedConversation)?.user.email}
+                    </p>
+                  </button>
                 </div>
 
                 <div className="space-y-4 mb-6 max-h-[500px] overflow-y-auto">
@@ -424,32 +513,42 @@ export default function MessagesPage() {
               <Card variant="elevated" className="mt-6">
                 <h2 className="text-xl font-semibold mb-4">Nuovo Messaggio</h2>
                 <form onSubmit={handleSendMessage} className="space-y-4">
-                  <div className="relative">
+                  <div className="relative" ref={recipientPickerRef}>
                     <Input
                       label="Destinatario"
                       placeholder="Cerca nome o email..."
-                      value={selectedRecipient ? (selectedRecipient.full_name || selectedRecipient.email || '') : recipientQuery}
+                      value={recipientQuery}
                       onChange={(e) => {
-                        setNewMessage((prev) => ({ ...prev, recipient_id: '' }))
+                        if (newMessage.recipient_id) {
+                          setNewMessage((prev) => ({ ...prev, recipient_id: '' }))
+                        }
                         setRecipientQuery(e.target.value)
                         setRecipientPickerOpen(true)
                       }}
                       onFocus={() => setRecipientPickerOpen(true)}
-                      required
+                      onBlur={() => {
+                        window.setTimeout(() => setRecipientPickerOpen(false), 120)
+                      }}
+                      required={!selectedRecipient}
                     />
                     {selectedRecipient && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setNewMessage((prev) => ({ ...prev, recipient_id: '' }))
-                          setRecipientQuery('')
-                          setRecipientPickerOpen(true)
-                        }}
-                        className="absolute right-3 top-[42px] text-gray-400 hover:text-gray-600"
-                        aria-label="Cambia destinatario"
-                      >
-                        ×
-                      </button>
+                      <div className="mt-2 flex items-center justify-between rounded-lg bg-primary-50 border border-primary-100 px-2 py-1">
+                        <div className="text-xs text-primary-800 truncate">
+                          Destinatario: <span className="font-semibold">{selectedRecipient.full_name || selectedRecipient.email}</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setNewMessage((prev) => ({ ...prev, recipient_id: '' }))
+                            setRecipientQuery('')
+                            setRecipientPickerOpen(true)
+                          }}
+                          className="ml-2 text-primary-700 hover:text-primary-900"
+                          aria-label="Rimuovi destinatario"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
                     )}
                     {recipientPickerOpen && !selectedRecipient && filteredRecipients.length > 0 && (
                       <div className="absolute z-10 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg overflow-hidden">
@@ -497,6 +596,74 @@ export default function MessagesPage() {
           </div>
         </div>
       </div>
+      {selectedConversation && showConversationDetails && selectedConversationUser && (
+        <div className="fixed inset-0 z-[80] bg-black/40 flex items-center justify-center p-4">
+          <div className="w-full max-w-lg rounded-2xl bg-white shadow-2xl border border-gray-200 overflow-hidden">
+            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Dettagli conversazione</h3>
+              <button
+                type="button"
+                onClick={() => setShowConversationDetails(false)}
+                className="p-1 rounded-full hover:bg-gray-100"
+                aria-label="Chiudi dettagli"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-5 space-y-5">
+              <div className="flex items-center gap-3 rounded-lg border border-gray-200 p-3">
+                <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center shrink-0">
+                  {selectedConversationUser.role === 'company' ? (
+                    <Building2 className="w-5 h-5 text-primary-600" />
+                  ) : (
+                    <User className="w-5 h-5 text-primary-600" />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <div className="font-medium truncate">{selectedConversationUser.full_name || selectedConversationUser.email}</div>
+                  <div className="text-xs text-gray-500 truncate">{selectedConversationUser.email}</div>
+                </div>
+              </div>
+
+              <div>
+                <div className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
+                  <Paperclip className="w-4 h-4" />
+                  Allegati
+                </div>
+                {conversationAttachments.length === 0 ? (
+                  <p className="text-sm text-gray-500">Nessun allegato trovato nella conversazione.</p>
+                ) : (
+                  <div className="max-h-40 overflow-y-auto space-y-2">
+                    {conversationAttachments.map((item) => (
+                      <a
+                        key={item.id}
+                        href={item.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="block text-sm text-primary-700 hover:text-primary-800 truncate"
+                      >
+                        {item.url}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full border-red-300 text-red-700 hover:bg-red-50"
+                disabled={sending}
+                onClick={handleDeleteConversation}
+              >
+                <Trash2 className="w-4 h-4 shrink-0" />
+                Elimina conversazione
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      
   )
 }
 

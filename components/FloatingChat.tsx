@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuth } from './AuthProvider'
 import { supabase } from '@/lib/supabase'
-import { MessageCircle, X, Send, User, Building2, Search } from 'lucide-react'
+import { MessageCircle, X, Send, User, Building2, Search, Paperclip, Trash2 } from 'lucide-react'
 import { Button } from './ui/Button'
 import type { Message, Profile } from '@/types/database'
 import { isStaffEmail } from '@/lib/staff-labels'
@@ -32,7 +32,9 @@ export function FloatingChat() {
   const [recipientPickerOpen, setRecipientPickerOpen] = useState(false)
   const [newMessage, setNewMessage] = useState({ recipient_id: '', content: '' })
   const [conversationMessage, setConversationMessage] = useState({ content: '' })
+  const [showConversationDetails, setShowConversationDetails] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const recipientPickerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handler = () => setOpen(true)
@@ -49,6 +51,17 @@ export function FloatingChat() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, selectedConversation])
+
+  useEffect(() => {
+    const onPointerDown = (event: MouseEvent) => {
+      if (!recipientPickerRef.current) return
+      if (!recipientPickerRef.current.contains(event.target as Node)) {
+        setRecipientPickerOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', onPointerDown)
+    return () => document.removeEventListener('mousedown', onPointerDown)
+  }, [])
 
   const loadData = async () => {
     if (!user) return
@@ -169,6 +182,10 @@ export function FloatingChat() {
   const handleSendNew = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!user) return
+    if (!newMessage.recipient_id) {
+      alert('Seleziona un destinatario dalla lista.')
+      return
+    }
     setSending(true)
     try {
       await supabase.from('messages').insert({
@@ -196,6 +213,7 @@ export function FloatingChat() {
   const backToList = () => {
     setSelectedConversation(null)
     setView('list')
+    setShowConversationDetails(false)
   }
 
   if (!user) return null
@@ -215,6 +233,48 @@ export function FloatingChat() {
     ? recipients.find((r) => r.id === newMessage.recipient_id) || null
     : null
 
+  const selectedConversationUser = selectedConversation
+    ? conversations.get(selectedConversation)?.user || null
+    : null
+
+  const conversationAttachments = useMemo(() => {
+    if (!selectedMessages.length) return []
+    const urlRegex = /(https?:\/\/[^\s]+)/gi
+    const items = selectedMessages.flatMap((msg) =>
+      Array.from(msg.content.matchAll(urlRegex)).map((match, index) => ({
+        id: `${msg.id}-${index}`,
+        messageId: msg.id,
+        url: match[0],
+        createdAt: msg.created_at,
+      }))
+    )
+    return items
+  }, [selectedMessages])
+
+  const handleDeleteConversation = async () => {
+    if (!user || !selectedConversation) return
+    const ok = window.confirm('Eliminare questa conversazione? L\'azione non si puo annullare.')
+    if (!ok) return
+
+    setSending(true)
+    try {
+      const { error } = await supabase
+        .from('messages')
+        .delete()
+        .or(
+          `and(sender_id.eq.${user.id},recipient_id.eq.${selectedConversation}),and(sender_id.eq.${selectedConversation},recipient_id.eq.${user.id})`
+        )
+      if (error) throw error
+      setShowConversationDetails(false)
+      backToList()
+      await loadData()
+    } catch (err: any) {
+      alert(err.message || 'Errore eliminazione chat')
+    } finally {
+      setSending(false)
+    }
+  }
+
   const content = (
     <>
       <button
@@ -228,7 +288,7 @@ export function FloatingChat() {
 
       {open && (
         <div
-          className="fixed z-50 w-[380px] max-w-[calc(100vw-3rem)] bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden flex flex-col max-h-[520px]"
+          className="fixed z-50 w-[400px] max-w-[calc(100vw-3rem)] bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden flex flex-col h-[650px] max-h-[calc(100vh-7.5rem)]"
           style={{ right: '1.5rem', bottom: '6rem', left: 'auto', top: 'auto' }}
         >
           <div className="bg-primary-600 text-white px-4 py-3 flex items-center justify-between shrink-0">
@@ -266,22 +326,49 @@ export function FloatingChat() {
                 ) : (
                   <div className="py-1">
                     {conversationList.map((conv) => (
-                      <button
+                      <div
                         key={conv.id}
+                        role="button"
+                        tabIndex={0}
                         onClick={() => selectConv(conv.id)}
-                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-left"
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault()
+                            selectConv(conv.id)
+                          }
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-left cursor-pointer"
                       >
-                        <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center shrink-0">
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            setSelectedConversation(conv.id)
+                            setView('chat')
+                            setShowConversationDetails(true)
+                          }}
+                          className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center shrink-0 hover:bg-primary-200"
+                          aria-label="Apri dettagli chat"
+                        >
                           {conv.user.role === 'company' ? (
                             <Building2 className="w-5 h-5 text-primary-600" />
                           ) : (
                             <User className="w-5 h-5 text-primary-600" />
                           )}
-                        </div>
+                        </button>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate">
+                          <button
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              setSelectedConversation(conv.id)
+                              setView('chat')
+                              setShowConversationDetails(true)
+                            }}
+                            className="font-medium truncate hover:underline"
+                          >
                             {conv.user.full_name || conv.user.email}
-                          </p>
+                          </button>
                           {conv.lastMessage && (
                             <p className="text-xs text-gray-500 truncate">
                               {conv.lastMessage.subject}
@@ -293,7 +380,7 @@ export function FloatingChat() {
                             {conv.unread}
                           </span>
                         )}
-                      </button>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -301,32 +388,42 @@ export function FloatingChat() {
               {canMessageAnyone && (
                 <div className="p-3 border-t border-gray-100 shrink-0">
                   <form onSubmit={handleSendNew} className="space-y-2">
-                    <div className="relative">
+                    <div className="relative" ref={recipientPickerRef}>
                       <input
                         placeholder="Nuovo messaggio a..."
-                        value={selectedRecipient ? (selectedRecipient.full_name || selectedRecipient.email || '') : recipientQuery}
+                        value={recipientQuery}
                         onChange={(e) => {
-                          setNewMessage((prev) => ({ ...prev, recipient_id: '' }))
+                          if (newMessage.recipient_id) {
+                            setNewMessage((prev) => ({ ...prev, recipient_id: '' }))
+                          }
                           setRecipientQuery(e.target.value)
                           setRecipientPickerOpen(true)
                         }}
                         onFocus={() => setRecipientPickerOpen(true)}
+                        onBlur={() => {
+                          window.setTimeout(() => setRecipientPickerOpen(false), 120)
+                        }}
                         className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
-                        required
+                        required={!selectedRecipient}
                       />
                       {selectedRecipient && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setNewMessage((prev) => ({ ...prev, recipient_id: '' }))
-                            setRecipientQuery('')
-                            setRecipientPickerOpen(true)
-                          }}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                          aria-label="Cambia destinatario"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
+                        <div className="mt-2 flex items-center justify-between rounded-lg bg-primary-50 border border-primary-100 px-2 py-1">
+                          <div className="text-xs text-primary-800 truncate">
+                            Destinatario: <span className="font-semibold">{selectedRecipient.full_name || selectedRecipient.email}</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setNewMessage((prev) => ({ ...prev, recipient_id: '' }))
+                              setRecipientQuery('')
+                              setRecipientPickerOpen(true)
+                            }}
+                            className="ml-2 text-primary-700 hover:text-primary-900"
+                            aria-label="Rimuovi destinatario"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
                       )}
                       {recipientPickerOpen && !selectedRecipient && filteredRecipients.length > 0 && (
                         <div className="absolute z-10 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg overflow-hidden">
@@ -377,10 +474,13 @@ export function FloatingChat() {
                 >
                   ← Indietro
                 </button>
-                <span className="font-medium truncate">
-                  {conversations.get(selectedConversation!)?.user?.full_name ||
-                    conversations.get(selectedConversation!)?.user?.email}
-                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowConversationDetails(true)}
+                  className="font-medium truncate text-left hover:text-primary-600"
+                >
+                  {selectedConversationUser?.full_name || selectedConversationUser?.email}
+                </button>
               </div>
               <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
                 {selectedMessages.map((msg) => (
@@ -429,6 +529,77 @@ export function FloatingChat() {
               </form>
             </>
           )}
+        </div>
+      )}
+      {open && showConversationDetails && selectedConversationUser && (
+        <div className="fixed inset-0 z-[60] bg-black/40 flex items-center justify-center p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl border border-gray-200 overflow-hidden">
+            <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+              <h4 className="font-semibold">Dettagli chat</h4>
+              <button
+                type="button"
+                onClick={() => setShowConversationDetails(false)}
+                className="p-1 rounded-full hover:bg-gray-100"
+                aria-label="Chiudi dettagli chat"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-4 space-y-4">
+              <button
+                type="button"
+                onClick={() => setShowConversationDetails(false)}
+                className="w-full flex items-center gap-3 text-left rounded-lg border border-gray-200 p-3 hover:bg-gray-50"
+              >
+                <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center shrink-0">
+                  {selectedConversationUser.role === 'company' ? (
+                    <Building2 className="w-5 h-5 text-primary-600" />
+                  ) : (
+                    <User className="w-5 h-5 text-primary-600" />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <div className="font-medium truncate">{selectedConversationUser.full_name || selectedConversationUser.email}</div>
+                  <div className="text-xs text-gray-500 truncate">{selectedConversationUser.email}</div>
+                </div>
+              </button>
+
+              <div>
+                <div className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
+                  <Paperclip className="w-4 h-4" />
+                  Allegati
+                </div>
+                {conversationAttachments.length === 0 ? (
+                  <p className="text-sm text-gray-500">Nessun allegato trovato nella conversazione.</p>
+                ) : (
+                  <div className="max-h-36 overflow-y-auto space-y-2">
+                    {conversationAttachments.map((item) => (
+                      <a
+                        key={item.id}
+                        href={item.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="block text-sm text-primary-700 hover:text-primary-800 truncate"
+                      >
+                        {item.url}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                disabled={sending}
+                onClick={handleDeleteConversation}
+                className="w-full border-red-300 text-red-700 hover:bg-red-50"
+              >
+                <Trash2 className="w-4 h-4 shrink-0" />
+                Elimina conversazione
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </>
