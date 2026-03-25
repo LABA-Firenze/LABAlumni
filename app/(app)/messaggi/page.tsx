@@ -8,7 +8,6 @@ import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
-import { Select } from '@/components/ui/Select'
 import { Send, Mail, User, Building2, Search } from 'lucide-react'
 import { getInitials } from '@/lib/avatar'
 import { getProfileGradient } from '@/types/database'
@@ -31,8 +30,10 @@ export default function MessagesPage() {
   const [userRole, setUserRole] = useState<'student' | 'company' | null>(null)
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
-  const [newMessage, setNewMessage] = useState({ recipient_id: '', subject: '', content: '' })
-  const [conversationMessage, setConversationMessage] = useState({ subject: '', content: '' })
+  const [recipientQuery, setRecipientQuery] = useState('')
+  const [recipientPickerOpen, setRecipientPickerOpen] = useState(false)
+  const [newMessage, setNewMessage] = useState({ recipient_id: '', content: '' })
+  const [conversationMessage, setConversationMessage] = useState({ content: '' })
   const [searchTerm, setSearchTerm] = useState('')
   const showSkeleton = useMinimumLoading(loading)
 
@@ -149,11 +150,13 @@ export default function MessagesPage() {
         .insert({
           sender_id: user.id,
           recipient_id: newMessage.recipient_id,
-          subject: newMessage.subject,
+          subject: 'Messaggio',
           content: newMessage.content,
         })
 
-      setNewMessage({ recipient_id: '', subject: '', content: '' })
+      setNewMessage({ recipient_id: '', content: '' })
+      setRecipientQuery('')
+      setRecipientPickerOpen(false)
       loadMessages()
     } catch (error: any) {
       alert(error.message || 'Errore durante l\'invio')
@@ -178,7 +181,7 @@ export default function MessagesPage() {
           content: conversationMessage.content,
         })
 
-      setConversationMessage({ subject: '', content: '' })
+      setConversationMessage({ content: '' })
       loadMessages()
     } catch (error: any) {
       alert(error.message || 'Errore durante l\'invio')
@@ -243,6 +246,21 @@ export default function MessagesPage() {
       </div>
     )
   }
+
+  const filteredRecipients = recipients
+    .filter((r) => {
+      const q = recipientQuery.trim().toLowerCase()
+      if (!q) return true
+      return (
+        (r.full_name || '').toLowerCase().includes(q) ||
+        (r.email || '').toLowerCase().includes(q)
+      )
+    })
+    .slice(0, 12)
+
+  const selectedRecipient = newMessage.recipient_id
+    ? recipients.find((r) => r.id === newMessage.recipient_id) || null
+    : null
 
   return (
       <div className="space-y-6">
@@ -406,26 +424,60 @@ export default function MessagesPage() {
               <Card variant="elevated" className="mt-6">
                 <h2 className="text-xl font-semibold mb-4">Nuovo Messaggio</h2>
                 <form onSubmit={handleSendMessage} className="space-y-4">
-                  <Select
-                    label="Destinatario"
-                    value={newMessage.recipient_id}
-                    onChange={(e) => setNewMessage({ ...newMessage, recipient_id: e.target.value })}
-                    required
-                  >
-                    <option value="">Seleziona un destinatario</option>
-                    {recipients.map((recipient) => (
-                      <option key={recipient.id} value={recipient.id}>
-                        {recipient.full_name || recipient.email} ({recipient.role === 'student' ? 'Studente' : recipient.role === 'company' ? 'Azienda' : recipient.role === 'docente' ? 'Docente' : recipient.role || 'Utente'})
-                      </option>
-                    ))}
-                  </Select>
-
-                  <Input
-                    label="Oggetto"
-                    value={newMessage.subject}
-                    onChange={(e) => setNewMessage({ ...newMessage, subject: e.target.value })}
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      label="Destinatario"
+                      placeholder="Cerca nome o email..."
+                      value={selectedRecipient ? (selectedRecipient.full_name || selectedRecipient.email || '') : recipientQuery}
+                      onChange={(e) => {
+                        setNewMessage((prev) => ({ ...prev, recipient_id: '' }))
+                        setRecipientQuery(e.target.value)
+                        setRecipientPickerOpen(true)
+                      }}
+                      onFocus={() => setRecipientPickerOpen(true)}
+                      required
+                    />
+                    {selectedRecipient && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNewMessage((prev) => ({ ...prev, recipient_id: '' }))
+                          setRecipientQuery('')
+                          setRecipientPickerOpen(true)
+                        }}
+                        className="absolute right-3 top-[42px] text-gray-400 hover:text-gray-600"
+                        aria-label="Cambia destinatario"
+                      >
+                        ×
+                      </button>
+                    )}
+                    {recipientPickerOpen && !selectedRecipient && filteredRecipients.length > 0 && (
+                      <div className="absolute z-10 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg overflow-hidden">
+                        {filteredRecipients.map((r) => (
+                          <button
+                            type="button"
+                            key={r.id}
+                            onClick={() => {
+                              setNewMessage((prev) => ({ ...prev, recipient_id: r.id }))
+                              setRecipientQuery('')
+                              setRecipientPickerOpen(false)
+                            }}
+                            className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50"
+                          >
+                            <div className="font-medium text-gray-900 truncate">
+                              {r.full_name || r.email}{' '}
+                              <span className="text-xs text-gray-500">
+                                ({r.role === 'student' ? 'Studente' : r.role === 'company' ? 'Azienda' : r.role === 'docente' ? 'Docente' : r.role || 'Utente'})
+                              </span>
+                            </div>
+                            {r.full_name && r.email && (
+                              <div className="text-xs text-gray-500 truncate">{r.email}</div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
 
                   <Textarea
                     label="Messaggio"

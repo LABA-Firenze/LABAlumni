@@ -28,8 +28,10 @@ export function FloatingChat() {
   const [loading, setLoading] = useState(false)
   const [sending, setSending] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
-  const [newMessage, setNewMessage] = useState({ recipient_id: '', subject: '', content: '' })
-  const [conversationMessage, setConversationMessage] = useState({ subject: '', content: '' })
+  const [recipientQuery, setRecipientQuery] = useState('')
+  const [recipientPickerOpen, setRecipientPickerOpen] = useState(false)
+  const [newMessage, setNewMessage] = useState({ recipient_id: '', content: '' })
+  const [conversationMessage, setConversationMessage] = useState({ content: '' })
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -155,7 +157,7 @@ export function FloatingChat() {
         subject: replySubject,
         content: conversationMessage.content,
       })
-      setConversationMessage({ subject: '', content: '' })
+      setConversationMessage({ content: '' })
       loadData()
     } catch (err: any) {
       alert(err.message || 'Errore invio')
@@ -172,10 +174,12 @@ export function FloatingChat() {
       await supabase.from('messages').insert({
         sender_id: user.id,
         recipient_id: newMessage.recipient_id,
-        subject: newMessage.subject,
+        subject: 'Messaggio',
         content: newMessage.content,
       })
-      setNewMessage({ recipient_id: '', subject: '', content: '' })
+      setNewMessage({ recipient_id: '', content: '' })
+      setRecipientQuery('')
+      setRecipientPickerOpen(false)
       loadData()
     } catch (err: any) {
       alert(err.message || 'Errore invio')
@@ -195,6 +199,21 @@ export function FloatingChat() {
   }
 
   if (!user) return null
+
+  const filteredRecipients = recipients
+    .filter((r) => {
+      const q = recipientQuery.trim().toLowerCase()
+      if (!q) return true
+      return (
+        (r.full_name || '').toLowerCase().includes(q) ||
+        (r.email || '').toLowerCase().includes(q)
+      )
+    })
+    .slice(0, 8)
+
+  const selectedRecipient = newMessage.recipient_id
+    ? recipients.find((r) => r.id === newMessage.recipient_id) || null
+    : null
 
   const content = (
     <>
@@ -282,30 +301,55 @@ export function FloatingChat() {
               {canMessageAnyone && (
                 <div className="p-3 border-t border-gray-100 shrink-0">
                   <form onSubmit={handleSendNew} className="space-y-2">
-                    <select
-                      value={newMessage.recipient_id}
-                      onChange={(e) =>
-                        setNewMessage((prev) => ({ ...prev, recipient_id: e.target.value }))
-                      }
-                      className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
-                      required
-                    >
-                      <option value="">Nuovo messaggio a...</option>
-                      {recipients.map((r) => (
-                        <option key={r.id} value={r.id}>
-                          {r.full_name || r.email}
-                        </option>
-                      ))}
-                    </select>
-                    <input
-                      placeholder="Oggetto"
-                      value={newMessage.subject}
-                      onChange={(e) =>
-                        setNewMessage((prev) => ({ ...prev, subject: e.target.value }))
-                      }
-                      className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
-                      required
-                    />
+                    <div className="relative">
+                      <input
+                        placeholder="Nuovo messaggio a..."
+                        value={selectedRecipient ? (selectedRecipient.full_name || selectedRecipient.email || '') : recipientQuery}
+                        onChange={(e) => {
+                          setNewMessage((prev) => ({ ...prev, recipient_id: '' }))
+                          setRecipientQuery(e.target.value)
+                          setRecipientPickerOpen(true)
+                        }}
+                        onFocus={() => setRecipientPickerOpen(true)}
+                        className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
+                        required
+                      />
+                      {selectedRecipient && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setNewMessage((prev) => ({ ...prev, recipient_id: '' }))
+                            setRecipientQuery('')
+                            setRecipientPickerOpen(true)
+                          }}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                          aria-label="Cambia destinatario"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+                      {recipientPickerOpen && !selectedRecipient && filteredRecipients.length > 0 && (
+                        <div className="absolute z-10 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg overflow-hidden">
+                          {filteredRecipients.map((r) => (
+                            <button
+                              type="button"
+                              key={r.id}
+                              onClick={() => {
+                                setNewMessage((prev) => ({ ...prev, recipient_id: r.id }))
+                                setRecipientQuery('')
+                                setRecipientPickerOpen(false)
+                              }}
+                              className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50"
+                            >
+                              <div className="font-medium text-gray-900 truncate">{r.full_name || r.email}</div>
+                              {r.full_name && r.email && (
+                                <div className="text-xs text-gray-500 truncate">{r.email}</div>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                     <textarea
                       placeholder="Messaggio..."
                       value={newMessage.content}
@@ -351,7 +395,6 @@ export function FloatingChat() {
                           : 'bg-gray-100 text-gray-900'
                       }`}
                     >
-                      <p className="text-xs font-medium opacity-90">{msg.subject}</p>
                       <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                       <p
                         className={`text-xs mt-1 ${
