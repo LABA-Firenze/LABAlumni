@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuth } from './AuthProvider'
 import { supabase } from '@/lib/supabase'
@@ -237,19 +237,16 @@ export function FloatingChat() {
     ? conversations.get(selectedConversation)?.user || null
     : null
 
-  const conversationAttachments = useMemo(() => {
-    if (!selectedMessages.length) return []
-    const urlRegex = /(https?:\/\/[^\s]+)/gi
-    const items = selectedMessages.flatMap((msg) =>
-      Array.from(msg.content.matchAll(urlRegex)).map((match, index) => ({
-        id: `${msg.id}-${index}`,
-        messageId: msg.id,
-        url: match[0],
-        createdAt: msg.created_at,
-      }))
-    )
-    return items
-  }, [selectedMessages])
+  const conversationAttachments = selectedMessages.length
+    ? selectedMessages.flatMap((msg) =>
+        Array.from(msg.content.matchAll(/(https?:\/\/[^\s]+)/gi)).map((match, index) => ({
+          id: `${msg.id}-${index}`,
+          messageId: msg.id,
+          url: match[0],
+          createdAt: msg.created_at,
+        }))
+      )
+    : []
 
   const handleDeleteConversation = async () => {
     if (!user || !selectedConversation) return
