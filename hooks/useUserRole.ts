@@ -13,20 +13,22 @@ export function useUserRole(userId: string | undefined) {
       return
     }
 
-    setLoading(true)
-    supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', userId)
-      .single()
-      .then(({ data, error }: any) => {
+    ;(async () => {
+      setLoading(true)
+      try {
+        const { data, error }: any = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', userId)
+          .single()
+
         if (cancelled) return
         if (error) setRole(null)
         else setRole(data?.role || null)
-      })
-      .finally(() => {
+      } finally {
         if (!cancelled) setLoading(false)
-      })
+      }
+    })()
 
     return () => {
       cancelled = true
