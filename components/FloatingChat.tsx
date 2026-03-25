@@ -255,13 +255,15 @@ export function FloatingChat() {
 
     setSending(true)
     try {
-      const { error } = await supabase
-        .from('messages')
-        .delete()
-        .or(
-          `and(sender_id.eq.${user.id},recipient_id.eq.${selectedConversation}),and(sender_id.eq.${selectedConversation},recipient_id.eq.${user.id})`
-        )
-      if (error) throw error
+      const response = await fetch('/api/messages/conversation', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ otherUserId: selectedConversation }),
+      })
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        throw new Error(payload.error || 'Errore eliminazione chat')
+      }
       setShowConversationDetails(false)
       backToList()
       await loadData()
@@ -423,7 +425,7 @@ export function FloatingChat() {
                         </div>
                       )}
                       {recipientPickerOpen && !selectedRecipient && filteredRecipients.length > 0 && (
-                        <div className="absolute z-10 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg overflow-hidden">
+                        <div className="absolute z-20 bottom-full mb-1 w-full max-h-52 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg">
                           {filteredRecipients.map((r) => (
                             <button
                               type="button"

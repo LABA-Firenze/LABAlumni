@@ -237,13 +237,15 @@ export default function MessagesPage() {
     if (!ok) return
     setSending(true)
     try {
-      const { error } = await supabase
-        .from('messages')
-        .delete()
-        .or(
-          `and(sender_id.eq.${user.id},recipient_id.eq.${selectedConversation}),and(sender_id.eq.${selectedConversation},recipient_id.eq.${user.id})`
-        )
-      if (error) throw error
+      const response = await fetch('/api/messages/conversation', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ otherUserId: selectedConversation }),
+      })
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        throw new Error(payload.error || 'Errore eliminazione conversazione')
+      }
       setShowConversationDetails(false)
       setSelectedConversation(null)
       await loadMessages()
