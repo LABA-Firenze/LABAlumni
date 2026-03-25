@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/components/AuthProvider'
-import { supabase } from '@/lib/supabase'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -31,7 +30,6 @@ type ManagedUser = {
 export default function AdminPanel() {
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
-  const [role, setRole] = useState<string | null>(null)
   const [docenti, setDocenti] = useState<ManagedUser[]>([])
   const [companies, setCompanies] = useState<ManagedUser[]>([])
   const [loading, setLoading] = useState(true)
@@ -48,19 +46,11 @@ export default function AdminPanel() {
       router.push('/accedi')
       return
     }
-    if (user) {
-      supabase.from('profiles').select('role').eq('id', user.id).single().then(({ data }: any) => {
-        setRole(data?.role || null)
-        if (data?.role !== 'admin') {
-          router.replace('/pannello')
-        }
-      })
-    }
   }, [user, authLoading, router])
 
   useEffect(() => {
-    if (user && role === 'admin') loadUsers()
-  }, [user, role])
+    if (user) loadUsers()
+  }, [user])
 
   const loadUsers = async () => {
     setLoading(true)
@@ -139,14 +129,6 @@ export default function AdminPanel() {
     } finally {
       setActionLoading(null)
     }
-  }
-
-  if (role !== 'admin') {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
-      </div>
-    )
   }
 
   if (showSkeleton) {

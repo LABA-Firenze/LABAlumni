@@ -10,6 +10,11 @@ export async function POST(request: Request) {
   if (!cors.allowed) {
     return NextResponse.json({ error: 'Origine non consentita' }, { status: cors.status })
   }
+  // In produzione richiediamo una allowlist esplicita per evitare chiamate cross-site indesiderate.
+  // (In dev può restare non impostato.)
+  if (process.env.NODE_ENV === 'production' && !process.env.CORS_ORIGINS) {
+    return NextResponse.json({ error: 'Configurazione server mancante' }, { status: 500 })
+  }
   if (!checkRateLimit(request, { maxRequests: 15, windowMs: 60_000 })) {
     return NextResponse.json({ error: 'Troppi tentativi. Riprova tra un minuto.' }, { status: 429 })
   }
@@ -31,7 +36,7 @@ export async function POST(request: Request) {
     ])
     if (!payload) {
       return NextResponse.json(
-        { error: 'Credenziali non valide o studente non trovato' },
+        { error: 'Credenziali non valide' },
         { status: 401 }
       )
     }
@@ -45,7 +50,6 @@ export async function POST(request: Request) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
     if (!supabaseUrl || !serviceKey) {
-      console.error('Missing SUPABASE_SERVICE_ROLE_KEY or NEXT_PUBLIC_SUPABASE_URL')
       return NextResponse.json(
         { error: 'Configurazione server mancante' },
         { status: 500 }
@@ -61,9 +65,13 @@ export async function POST(request: Request) {
     const phone = (payload.cellulare || payload.telefono || '').toString().trim() || null
 
     let existingId: string | null = null
-    const { data: listData } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000, page: 0 })
-    const existing = listData?.users?.find((u) => u.email?.toLowerCase() === preferredEmail.toLowerCase())
-    if (existing) existingId = existing.id
+    // Evita scan di tutti gli utenti (costoso e leak-friendly). Cerchiamo l'id dal profilo.
+    const { data: existingProfile } = await supabaseAdmin
+      .from('profiles')
+      .select('id')
+      .ilike('email', preferredEmail)
+      .single()
+    if (existingProfile?.id) existingId = existingProfile.id
 
     if (existingId) {
       await supabaseAdmin.auth.admin.updateUserById(existingId, { password })
@@ -90,9 +98,8 @@ export async function POST(request: Request) {
       })
 
       if (createError) {
-        console.error('Supabase createUser error:', createError)
         return NextResponse.json(
-          { error: createError.message || 'Errore creazione utente' },
+          { error: 'Errore creazione utente' },
           { status: 400 }
         )
       }
@@ -118,7 +125,7 @@ export async function POST(request: Request) {
   } catch (e) {
     console.error('logos-login error:', e)
     return NextResponse.json(
-      { error: e instanceof Error ? e.message : 'Errore durante l\'accesso' },
+      { error: 'Errore durante l\'accesso' },
       { status: 500 }
     )
   }

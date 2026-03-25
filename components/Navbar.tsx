@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from './AuthProvider'
-import { supabase } from '@/lib/supabase'
 import { Button } from './ui/Button'
 import {
   UserCircleIcon,
@@ -22,29 +21,15 @@ import { openFloatingChat } from './FloatingChat'
 import { useUnreadMessagesCount } from '@/hooks/useUnreadMessagesCount'
 import { HeaderSearch } from './HeaderSearch'
 import { NotificationsBell } from './NotificationsBell'
+import { useUserRole } from '@/hooks/useUserRole'
 
 export function Navbar() {
   const { user, loading, signOut } = useAuth()
   const unreadMessages = useUnreadMessagesCount(user?.id)
   const pathname = usePathname()
-  const [userRole, setUserRole] = useState<string | null>(null)
+  const { role: userRole } = useUserRole(user?.id)
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (user) {
-      supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single()
-        .then(({ data }: any) => {
-          setUserRole(data?.role || null)
-        })
-    } else {
-      setUserRole(null)
-    }
-  }, [user])
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {

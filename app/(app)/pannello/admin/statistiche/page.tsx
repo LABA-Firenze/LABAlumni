@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/components/AuthProvider'
-import { supabase } from '@/lib/supabase'
 import { Card } from '@/components/ui/Card'
 import Link from 'next/link'
 import {
@@ -16,7 +15,7 @@ import {
 export default function AdminStatistichePage() {
   const { user } = useAuth()
   const router = useRouter()
-  const [role, setRole] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const [stats, setStats] = useState<{
     students: number
     companies: number
@@ -33,65 +32,42 @@ export default function AdminStatistichePage() {
       router.push('/accedi')
       return
     }
-    supabase.from('profiles').select('role').eq('id', user.id).single().then(({ data }: any) => {
-      setRole(data?.role || null)
-      if (data?.role !== 'admin') router.replace('/pannello')
-    })
   }, [user, router])
 
   useEffect(() => {
-    if (role !== 'admin') return
+    if (!user) return
     const load = async () => {
-      const [
-        { count: students },
-        { count: companies },
-        { count: docenti },
-        { count: jobPosts },
-        { count: applications },
-        { data: apps },
-        { data: allApps },
-      ] = await Promise.all([
-        supabase.from('students').select('*', { count: 'exact', head: true }),
-        supabase.from('companies').select('*', { count: 'exact', head: true }),
-        supabase.from('docenti').select('*', { count: 'exact', head: true }),
-        supabase.from('job_posts').select('*', { count: 'exact', head: true }).eq('active', true),
-        supabase.from('applications').select('*', { count: 'exact', head: true }),
-        supabase.from('applications').select('job_post_id').eq('status', 'accepted'),
-        supabase.from('applications').select('job_post_id'),
-      ])
-      const applicationsAccepted = apps?.length || 0
-      const counts: Record<string, number> = {}
-      ;(allApps || []).forEach((a: { job_post_id: string }) => {
-        counts[a.job_post_id] = (counts[a.job_post_id] || 0) + 1
-      })
-      const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5)
-      let topJobs: { id: string; title: string; count: number }[] = []
-      if (sorted.length > 0) {
-        const { data: jobs } = await supabase
-          .from('job_posts')
-          .select('id, title')
-          .in('id', sorted.map(([id]) => id))
-        const jobMap = Object.fromEntries((jobs || []).map((j: { id: string; title: string }) => [j.id, j.title]))
-        topJobs = sorted.map(([id, count]) => ({ id, title: jobMap[id] || '—', count }))
+      setLoading(true)
+      setError(null)
+      try {
+        const res = await fetch('/api/admin/stats')
+        const data = await res.json().catch(() => ({}))
+        if (!res.ok) throw new Error(data.error || 'Errore caricamento statistiche')
+        setStats(data)
+      } catch (e: any) {
+        setError(e?.message || 'Errore caricamento statistiche')
+      } finally {
+        setLoading(false)
       }
-      setStats({
-        students: students || 0,
-        companies: companies || 0,
-        docenti: docenti || 0,
-        jobPosts: jobPosts || 0,
-        applications: applications || 0,
-        applicationsAccepted,
-        topJobs,
-      })
-      setLoading(false)
     }
     load()
-  }, [role])
+  }, [user])
 
-  if (role !== 'admin') {
+  if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-gray-900">Statistiche</h1>
+          <Link href="/pannello/admin" className="text-primary-600 hover:underline text-sm">
+            ← Torna al pannello
+          </Link>
+        </div>
+        <div className="p-4 rounded-xl bg-red-50 text-red-800 border border-red-200">
+          {error}
+          <button onClick={() => location.reload()} className="ml-2 underline">
+            Riprova
+          </button>
+        </div>
       </div>
     )
   }
