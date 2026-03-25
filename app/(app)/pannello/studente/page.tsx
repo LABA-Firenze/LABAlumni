@@ -114,42 +114,33 @@ export default function StudentDashboard() {
   const loadMyRequest = async () => {
     if (!user) return
     try {
+      // Evita join su portfolio_items: in alcuni ambienti può causare 400 (FK/naming/RLS).
+      // Carichiamo prima il post, poi (se serve) il portfolio item separatamente.
       let data: Post | null = null
       const res = await supabase
         .from('posts')
-        .select(`
-          *,
-          user:profiles!posts_user_id_fkey(id, full_name, avatar_url, role),
-          portfolio_item:portfolio_items!posts_portfolio_item_id_fkey(id, title, images)
-        `)
+        .select(`*, user:profiles!posts_user_id_fkey(id, full_name, avatar_url, role)`)
         .eq('user_id', user.id)
         .eq('type', 'collaboration_request')
         .eq('request_from', 'student')
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle()
-      if (res.error) {
-        const fallback = await supabase
-          .from('posts')
-          .select(`*, user:profiles!posts_user_id_fkey(id, full_name, avatar_url, role)`)
-          .eq('user_id', user.id)
-          .eq('type', 'collaboration_request')
-          .eq('request_from', 'student')
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .maybeSingle()
-        if (!fallback.error && fallback.data) {
-          const row = fallback.data as Post & { portfolio_item_id?: string }
-          if (row.portfolio_item_id) {
-            const { data: pi } = await supabase.from('portfolio_items').select('id, title, images').eq('id', row.portfolio_item_id).single()
-            data = { ...row, portfolio_item: pi || undefined } as Post
-          } else {
-            data = row as Post
-          }
+
+      if (!res.error && res.data) {
+        const row = res.data as Post & { portfolio_item_id?: string }
+        if (row.portfolio_item_id) {
+          const { data: pi } = await supabase
+            .from('portfolio_items')
+            .select('id, title, images')
+            .eq('id', row.portfolio_item_id)
+            .single()
+          data = { ...row, portfolio_item: pi || undefined } as Post
+        } else {
+          data = row as Post
         }
-      } else {
-        data = res.data as Post | null
       }
+
       if (data) {
         const { data: studentData } = await supabase
           .from('students')
