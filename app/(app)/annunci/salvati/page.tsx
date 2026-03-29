@@ -16,6 +16,15 @@ import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 
 type Row = { job_post_id: string; job_post: JobPost & { company: { company_name: string; logo_url?: string | null } } }
 
+type JobPostWithCompany = Row['job_post']
+
+function pickJobPost(raw: unknown): JobPostWithCompany | null {
+  if (!raw) return null
+  const one = Array.isArray(raw) ? raw[0] : raw
+  if (!one || typeof one !== 'object' || !('id' in one)) return null
+  return one as JobPostWithCompany
+}
+
 export default function SavedJobsPage() {
   const { user, loading: authLoading } = useAuth()
   const { role } = useUserRole(user?.id)
@@ -56,7 +65,13 @@ export default function SavedJobsPage() {
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      const list = (data || []).filter((r: any) => r.job_post) as Row[]
+      const list: Row[] = (data || [])
+        .map((r: { job_post_id: string; job_post?: unknown }) => {
+          const job_post = pickJobPost(r.job_post)
+          if (!job_post) return null
+          return { job_post_id: r.job_post_id, job_post }
+        })
+        .filter((r): r is Row => r !== null)
       setRows(list)
     } catch (e) {
       console.error(e)
