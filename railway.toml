@@ -1,5 +1,7 @@
 [build]
 builder = "NIXPACKS"
+# Esplicito per Next.js: evita che il servizio avvii senza `next build`.
+buildCommand = "npm run build"
 
 [deploy]
 startCommand = "npm start"

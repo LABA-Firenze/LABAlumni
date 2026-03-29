@@ -4,15 +4,16 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { Search, Building2, User, GraduationCap } from 'lucide-react'
+import { Search, Building2, User, GraduationCap, Briefcase } from 'lucide-react'
 import { getInitials } from '@/lib/avatar'
 import { COURSE_CONFIG, getProfileGradient, type CourseType } from '@/types/database'
 import { getStudentDisplayLabel } from '@/lib/staff-labels'
 
-type SearchResult = 
+type SearchResult =
   | { type: 'company'; id: string; company_name: string; logo_url: string | null }
   | { type: 'student'; id: string; full_name: string | null; avatar_url: string | null; course?: string; courseKey?: CourseType }
   | { type: 'docente'; id: string; full_name: string | null; avatar_url: string | null }
+  | { type: 'job'; id: string; title: string; company_name?: string }
 
 export function HeaderSearch() {
   const [query, setQuery] = useState('')
@@ -34,7 +35,7 @@ export function HeaderSearch() {
     try {
       const pattern = `%${term}%`
 
-      const [companiesRes, studentsRes, docentiRes] = await Promise.all([
+      const [companiesRes, studentsRes, docentiRes, jobsRes] = await Promise.all([
         supabase
           .from('companies')
           .select('id, company_name, logo_url')
@@ -51,6 +52,12 @@ export function HeaderSearch() {
           .select('id, full_name, avatar_url')
           .eq('role', 'docente')
           .or(`full_name.ilike.${pattern},email.ilike.${pattern}`)
+          .limit(5),
+        supabase
+          .from('job_posts')
+          .select('id, title, company:companies(company_name)')
+          .eq('active', true)
+          .ilike('title', pattern)
           .limit(5),
       ])
 
@@ -91,7 +98,14 @@ export function HeaderSearch() {
         avatar_url: p.avatar_url,
       }))
 
-      setResults([...companies, ...students, ...docenti])
+      const jobs: SearchResult[] = (jobsRes.data || []).map((j: any) => ({
+        type: 'job' as const,
+        id: j.id,
+        title: j.title,
+        company_name: j.company?.company_name,
+      }))
+
+      setResults([...jobs, ...companies, ...students, ...docenti])
     } catch (err) {
       console.error('Search error:', err)
       setResults([])
@@ -125,6 +139,8 @@ export function HeaderSearch() {
       router.push(`/azienda/${r.id}`)
     } else if (r.type === 'student' || r.type === 'docente') {
       router.push(`/profilo/${r.id}`)
+    } else if (r.type === 'job') {
+      router.push(`/annunci/${r.id}`)
     } else {
       router.push('/tesi')
     }
@@ -140,7 +156,7 @@ export function HeaderSearch() {
         <input
           ref={inputRef}
           type="text"
-          placeholder="Cerca aziende, docenti, utenti..."
+          placeholder="Cerca annunci, aziende, studenti, docenti..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setOpen(true)}
@@ -168,7 +184,19 @@ export function HeaderSearch() {
                     onClick={() => handleSelect(r)}
                     className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors"
                   >
-                    {r.type === 'company' ? (
+                    {r.type === 'job' ? (
+                      <>
+                        <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center shrink-0">
+                          <Briefcase className="w-5 h-5 text-primary-700" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-gray-900 truncate">{r.title}</p>
+                          <p className="text-xs text-gray-500 truncate">
+                            {r.company_name ? `${r.company_name} · ` : ''}Annuncio
+                          </p>
+                        </div>
+                      </>
+                    ) : r.type === 'company' ? (
                       <>
                         <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center shrink-0 overflow-hidden">
                           {r.logo_url ? (

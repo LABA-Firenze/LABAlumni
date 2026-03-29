@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
 import { Select } from '@/components/ui/Select'
-import { PlusIcon, PencilSquareIcon, TrashIcon, EyeIcon, EyeSlashIcon, BriefcaseIcon } from '@heroicons/react/24/solid'
+import { PlusIcon, PencilSquareIcon, TrashIcon, EyeIcon, EyeSlashIcon, BriefcaseIcon, DocumentDuplicateIcon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import type { JobPost, CourseType } from '@/types/database'
 import { COURSE_CONFIG } from '@/types/database'
@@ -107,6 +107,19 @@ export default function ManageJobsPage() {
     resetForm()
   }
 
+  const handleDuplicate = (job: JobPost & { deadline?: string | null }) => {
+    setEditingJob(null)
+    setTitle(`${job.title} (copia)`)
+    setDescription(job.description)
+    setType(job.type === 'stage' ? 'tirocinio' : job.type)
+    setCourses(job.courses?.length ? job.courses : [])
+    setLocation(job.location || '')
+    setDeadline(job.deadline ? String(job.deadline).slice(0, 10) : '')
+    setRemote(job.remote)
+    setActive(false)
+    setShowForm(true)
+  }
+
   const resetForm = () => {
     setTitle('')
     setDescription('')
@@ -193,12 +206,17 @@ export default function ManageJobsPage() {
             </h1>
             <p className="text-gray-600 mt-2">Crea e gestisci le tue offerte di tirocinio</p>
           </div>
-          {!showForm && (
-            <Button variant="primary" onClick={() => setShowForm(true)}>
-              <PlusIcon className="w-5 h-5 mr-2" />
-              Nuova Offerta
-            </Button>
-          )}
+          <div className="flex flex-wrap gap-2 justify-end">
+            <Link href="/candidature/gestisci">
+              <Button variant="outline">Pipeline candidature</Button>
+            </Link>
+            {!showForm && (
+              <Button variant="primary" onClick={() => setShowForm(true)}>
+                <PlusIcon className="w-5 h-5 mr-2" />
+                Nuova offerta
+              </Button>
+            )}
+          </div>
         </div>
 
         {showForm && (
@@ -359,6 +377,14 @@ export default function ManageJobsPage() {
                       ) : (
                         <EyeIcon className="w-4 h-4" />
                       )}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      title="Duplica"
+                      onClick={() => handleDuplicate(job)}
+                    >
+                      <DocumentDuplicateIcon className="w-4 h-4" />
                     </Button>
                     <Button
                       variant="ghost"

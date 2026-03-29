@@ -34,6 +34,7 @@ export default function NewCollaborationRequestPage() {
   const [error, setError] = useState('')
   const [checkingLimit, setCheckingLimit] = useState(true)
   const [studentYear, setStudentYear] = useState<number | null | 'loading'>('loading')
+  const [loadingLastDraft, setLoadingLastDraft] = useState(false)
 
   useEffect(() => {
     if (!user) {
@@ -68,6 +69,44 @@ export default function NewCollaborationRequestPage() {
       .eq('student_id', user.id)
       .order('created_at', { ascending: false })
     setPortfolioItems(data || [])
+  }
+
+  const loadLastRequestAsDraft = async () => {
+    if (!user) return
+    setLoadingLastDraft(true)
+    setError('')
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('posts')
+        .select('content, request_type, available_days, portfolio_item_id')
+        .eq('user_id', user.id)
+        .eq('type', 'collaboration_request')
+        .eq('request_from', 'student')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (fetchError) throw fetchError
+      if (!data) {
+        setError('Nessuna richiesta precedente da cui partire.')
+        return
+      }
+      if (data.request_type) setRequestType(data.request_type)
+      if (typeof data.content === 'string') setContent(data.content)
+      setSelectedPortfolioId(data.portfolio_item_id || '')
+      if (data.available_days && typeof data.available_days === 'string') {
+        const parts = data.available_days.split(',').map((s) => s.trim()).filter(Boolean)
+        setSelectedDays(parts)
+      } else {
+        setSelectedDays([])
+      }
+      setCurrentStep(1)
+    } catch (err) {
+      console.error(err)
+      setError('Impossibile caricare l’ultima richiesta.')
+    } finally {
+      setLoadingLastDraft(false)
+    }
   }
 
   const checkMonthlyLimit = async () => {
@@ -207,6 +246,27 @@ export default function NewCollaborationRequestPage() {
         <p className="text-gray-600 mt-1.5">
           Pubblica la tua disponibilità per tirocinio o lavoro.
         </p>
+        <div className="mt-4">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={loadingLastDraft}
+            onClick={() => void loadLastRequestAsDraft()}
+          >
+            {loadingLastDraft ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin shrink-0" />
+                Caricamento…
+              </>
+            ) : (
+              'Carica ultima richiesta (bozza)'
+            )}
+          </Button>
+          <p className="text-xs text-gray-500 mt-2 max-w-xl">
+            Copia tipo, testo, giorni e progetto dall’ultima richiesta pubblicata: potrai modificarli prima di inviare.
+          </p>
+        </div>
       </div>
 
       {!canPost && (

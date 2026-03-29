@@ -18,6 +18,9 @@ import {
   QuestionMarkCircleIcon,
   DocumentTextIcon,
   CalendarIcon,
+  Squares2X2Icon,
+  NewspaperIcon,
+  BookmarkIcon,
 } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import { getInitials } from '@/lib/avatar'
@@ -167,12 +170,26 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
                   </>
                 )}
                 {role === 'docente' && (
-                  <Link href="/tesi" className="block">
-                    <Button variant="primary" className="w-full justify-start" size="sm">
-                      <BookOpenIcon className="w-4 h-4 shrink-0" />
-                      Tesi di laurea
-                    </Button>
-                  </Link>
+                  <>
+                    <Link href="/pannello/docente" className="block">
+                      <Button variant="outline" className="w-full justify-start" size="sm">
+                        <Squares2X2Icon className="w-4 h-4 shrink-0" />
+                        Dashboard
+                      </Button>
+                    </Link>
+                    <Link href="/bacheca" className="block">
+                      <Button variant="outline" className="w-full justify-start" size="sm">
+                        <NewspaperIcon className="w-4 h-4 shrink-0" />
+                        Bacheca
+                      </Button>
+                    </Link>
+                    <Link href="/tesi" className="block">
+                      <Button variant="primary" className="w-full justify-start" size="sm">
+                        <BookOpenIcon className="w-4 h-4 shrink-0" />
+                        Tesi di laurea
+                      </Button>
+                    </Link>
+                  </>
                 )}
               </div>
               {(role === 'student' || role === 'company') && (
@@ -236,20 +253,34 @@ export function AppLayout({ children, rightSidebar }: AppLayoutProps) {
                       )}
                     </Link>
                   )}
+                  {role === 'docente' && (
+                    <Link href="/rete" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2" data-tour="rete">
+                      <UsersIcon className="w-5 h-5 shrink-0" />
+                      <span>Rete</span>
+                    </Link>
+                  )}
                   {role !== 'company' && (
                   <Link href="/tesi" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
                     <BookOpenIcon className="w-5 h-5 shrink-0" />
                     <span>Tesi di laurea</span>
                   </Link>
                   )}
+                  {role !== 'docente' && (
                   <Link href={role === 'company' ? '/annunci/gestisci' : '/annunci'} className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2" data-tour="annunci">
                     <BriefcaseIcon className="w-5 h-5 shrink-0" />
                     <span>Tirocini</span>
                   </Link>
+                  )}
                   {role === 'student' && (
                     <Link href="/candidature" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
                       <ArrowTrendingUpIcon className="w-5 h-5 shrink-0" />
                       <span>Le Tue Candidature</span>
+                    </Link>
+                  )}
+                  {role === 'student' && (
+                    <Link href="/annunci/salvati" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">
+                      <BookmarkIcon className="w-5 h-5 shrink-0" />
+                      <span>Annunci salvati</span>
                     </Link>
                   )}
                   <Link href="/guida" className="flex items-center gap-3 text-gray-700 hover:text-primary-600 transition-colors py-2">

@@ -7,23 +7,28 @@ import { supabase } from '@/lib/supabase'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Textarea } from '@/components/ui/Textarea'
-import { BriefcaseIcon, MapPinIcon, ClockIcon, BuildingOffice2Icon } from '@heroicons/react/24/solid'
+import { BriefcaseIcon, MapPinIcon, ClockIcon, BuildingOffice2Icon, BookmarkIcon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import { getJobTypeLabel } from '@/lib/job-type-labels'
 import type { JobPost } from '@/types/database'
 import { COURSE_CONFIG } from '@/types/database'
 import { SkeletonJobCard } from '@/components/ui/Skeleton'
 import { useMinimumLoading } from '@/hooks/useMinimumLoading'
+import { useUserRole } from '@/hooks/useUserRole'
+import { openFloatingChatWithUser } from '@/components/FloatingChat'
 
 export default function JobDetailPage() {
   const params = useParams()
   const router = useRouter()
   const { user } = useAuth()
-  const [job, setJob] = useState<(JobPost & { company: any }) | null>(null)
+  const { role: profileRole } = useUserRole(user?.id)
+  const [job, setJob] = useState<(JobPost & { company: { id: string; company_name: string; logo_url?: string | null; description?: string | null; website_url?: string | null } }) | null>(null)
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(true)
   const [applying, setApplying] = useState(false)
   const [hasApplied, setHasApplied] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [saveBusy, setSaveBusy] = useState(false)
   const showSkeleton = useMinimumLoading(loading)
 
   useEffect(() => {
@@ -32,6 +37,19 @@ export default function JobDetailPage() {
       checkApplication()
     }
   }, [params.id, user])
+
+  useEffect(() => {
+    if (!user || profileRole !== 'student' || !params.id) return
+    ;(async () => {
+      const { data } = await supabase
+        .from('saved_jobs')
+        .select('id')
+        .eq('student_id', user.id)
+        .eq('job_post_id', params.id as string)
+        .maybeSingle()
+      setSaved(!!data)
+    })()
+  }, [user, profileRole, params.id])
 
   const loadJob = async () => {
     const { data } = await supabase
@@ -77,11 +95,31 @@ export default function JobDetailPage() {
       if (error) throw error
 
       setHasApplied(true)
-      router.push('/pannello/studente')
-    } catch (error: any) {
-      alert(error.message || 'Errore durante la candidatura')
+      router.push('/candidature')
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'Errore durante la candidatura'
+      alert(msg)
     } finally {
       setApplying(false)
+    }
+  }
+
+  const toggleSave = async () => {
+    if (!user || profileRole !== 'student' || !job) return
+    setSaveBusy(true)
+    try {
+      if (saved) {
+        await supabase.from('saved_jobs').delete().eq('student_id', user.id).eq('job_post_id', job.id)
+        setSaved(false)
+      } else {
+        const { error } = await supabase.from('saved_jobs').insert({ student_id: user.id, job_post_id: job.id })
+        if (error) throw error
+        setSaved(true)
+      }
+    } catch (e: unknown) {
+      alert(e instanceof Error ? e.message : 'Errore')
+    } finally {
+      setSaveBusy(false)
     }
   }
 
@@ -142,10 +180,42 @@ export default function JobDetailPage() {
                   <span>{job.location}</span>
                 </div>
               )}
+              {job.deadline && (
+                <div className="flex items-center gap-2 text-amber-800">
+                  <ClockIcon className="w-5 h-5 shrink-0" />
+                  <span>
+                    Scadenza candidature:{' '}
+                    {new Date(job.deadline + 'T12:00:00').toLocaleDateString('it-IT', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    })}
+                  </span>
+                </div>
+              )}
               {job.remote && (
                 <span className="px-3 py-1 bg-green-100 text-green-700 text-sm rounded-full">
                   Remoto
                 </span>
+              )}
+            </div>
+
+            <div className="flex flex-wrap gap-2 mb-4">
+              {profileRole === 'student' && (
+                <>
+                  <Button type="button" variant={saved ? 'primary' : 'outline'} size="sm" disabled={saveBusy} onClick={() => void toggleSave()}>
+                    <BookmarkIcon className="w-4 h-4 mr-1.5 shrink-0" />
+                    {saved ? 'Salvato' : 'Salva annuncio'}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => openFloatingChatWithUser(job.company.id)}
+                  >
+                    Scrivi all&apos;azienda
+                  </Button>
+                </>
               )}
             </div>
 

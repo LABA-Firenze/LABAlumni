@@ -25,7 +25,7 @@ export default function Home() {
           const role = res.data?.role
           if (role === 'admin') router.replace('/pannello/admin')
           else if (role === 'company') router.replace('/pannello/azienda')
-          else if (role === 'docente') router.replace('/tesi')
+          else if (role === 'docente') router.replace('/pannello/docente')
           else router.replace('/pannello/studente')
         })
     }

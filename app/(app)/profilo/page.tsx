@@ -33,6 +33,7 @@ import { getStudentDisplayLabel, getProfileDisplayLabel } from '@/lib/staff-labe
 import { ProfilePill } from '@/components/ProfilePill'
 import { SkeletonProfileSidebar, SkeletonCard, SkeletonPortfolioItem } from '@/components/ui/Skeleton'
 import { useMinimumLoading } from '@/hooks/useMinimumLoading'
+import { ProfileReadinessCard } from '@/components/ProfileReadinessCard'
 
 const COURSES = Object.entries(COURSE_CONFIG).map(([value, config]) => ({
   value: value as CourseType,
@@ -335,6 +336,7 @@ export default function ProfilePage() {
 
             {/* Contenuto principale - profilo stile social */}
             <main className="lg:col-span-6 space-y-4">
+              <ProfileReadinessCard profile={profile} student={student} portfolioCount={portfolioCount} />
               {/* Cover + Avatar (stile Facebook) */}
               <Card variant="elevated" padding={false} className="overflow-hidden">
                 <div className={`h-32 sm:h-40 bg-gradient-to-r ${getProfileGradient('student', student?.course).cover}`} />

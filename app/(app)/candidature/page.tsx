@@ -6,9 +6,10 @@ import { useAuth } from '@/components/AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { BriefcaseIcon } from '@heroicons/react/24/solid'
+import { BriefcaseIcon, ClockIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import { APPLICATION_STATUS_CONFIG } from '@/lib/application-status'
+import { openFloatingChatWithUser } from '@/components/FloatingChat'
 import { SkeletonApplicationCard } from '@/components/ui/Skeleton'
 import { useMinimumLoading } from '@/hooks/useMinimumLoading'
 import type { Application, JobPost } from '@/types/database'
@@ -16,7 +17,9 @@ import type { Application, JobPost } from '@/types/database'
 export default function ApplicationsPage() {
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
-  const [applications, setApplications] = useState<(Application & { job_post: JobPost & { company: any } })[]>([])
+  const [applications, setApplications] = useState<
+    (Application & { job_post: JobPost & { company: { id: string; company_name: string; logo_url?: string | null } } })[]
+  >([])
   const [loading, setLoading] = useState(true)
   const showSkeleton = useMinimumLoading(loading)
 
@@ -73,9 +76,16 @@ export default function ApplicationsPage() {
 
   return (
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Le Tue Candidature</h1>
-          <p className="text-gray-600 mt-2">Tutte le posizioni per cui ti sei candidato</p>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Le tue candidature</h1>
+            <p className="text-gray-600 mt-2">Stato delle candidature e scadenze annuncio</p>
+          </div>
+          <Link href="/annunci/salvati">
+            <Button variant="outline" size="sm">
+              Annunci salvati
+            </Button>
+          </Link>
         </div>
 
         {applications.length === 0 ? (
@@ -115,21 +125,42 @@ export default function ApplicationsPage() {
                         </div>
                       )}
 
-                      <div className="flex items-center gap-4 text-sm text-gray-500">
-                        <span>
-                          Candidato il {new Date(app.created_at).toLocaleDateString('it-IT')}
-                        </span>
+                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                        <span>Candidato il {new Date(app.created_at).toLocaleDateString('it-IT')}</span>
                         {app.updated_at !== app.created_at && (
-                          <span>
-                            Aggiornato il {new Date(app.updated_at).toLocaleDateString('it-IT')}
+                          <span>Aggiornato il {new Date(app.updated_at).toLocaleDateString('it-IT')}</span>
+                        )}
+                        {app.job_post.deadline && (
+                          <span className="inline-flex items-center gap-1 text-amber-800">
+                            <ClockIcon className="w-4 h-4 shrink-0" />
+                            Scadenza annuncio:{' '}
+                            {new Date(app.job_post.deadline + 'T12:00:00').toLocaleDateString('it-IT', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                            })}
                           </span>
                         )}
                       </div>
                     </div>
 
-                    <Link href={`/annunci/${app.job_post.id}`}>
-                      <Button variant="outline" size="sm">Vedi Offerta</Button>
-                    </Link>
+                    <div className="flex flex-col gap-2 shrink-0">
+                      <Link href={`/annunci/${app.job_post.id}`}>
+                        <Button variant="outline" size="sm" className="w-full sm:w-auto">
+                          Vedi offerta
+                        </Button>
+                      </Link>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="w-full sm:w-auto"
+                        onClick={() => openFloatingChatWithUser(app.job_post.company.id)}
+                      >
+                        <ChatBubbleLeftRightIcon className="w-4 h-4 mr-1.5 shrink-0" />
+                        Scrivi all&apos;azienda
+                      </Button>
+                    </div>
                   </div>
                 </Card>
               )

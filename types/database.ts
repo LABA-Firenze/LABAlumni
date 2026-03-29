@@ -79,6 +79,8 @@ export interface JobPost {
   location: string | null
   remote: boolean
   active: boolean
+  /** Scadenza candidature (YYYY-MM-DD) */
+  deadline?: string | null
   created_at: string
   updated_at: string
 }

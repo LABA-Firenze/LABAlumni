@@ -14,7 +14,7 @@ export default function DashboardRedirect() {
     if (!loading && user) {
       if (role === 'admin') router.push('/pannello/admin')
       else if (role === 'company') router.push('/pannello/azienda')
-      else if (role === 'docente') router.push('/tesi')
+      else if (role === 'docente') router.push('/pannello/docente')
       else if (role) router.push('/pannello/studente')
     } else if (!loading && !user) {
       router.push('/accedi')

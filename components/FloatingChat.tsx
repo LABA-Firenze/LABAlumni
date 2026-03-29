@@ -11,9 +11,16 @@ import { isStaffEmail } from '@/lib/staff-labels'
 import { useMessagesRealtime } from '@/hooks/useMessagesRealtime'
 
 const OPEN_CHAT_EVENT = 'floating-chat-open'
+const OPEN_CHAT_WITH_USER_EVENT = 'floating-chat-open-user'
 
 export function openFloatingChat() {
   window.dispatchEvent(new CustomEvent(OPEN_CHAT_EVENT))
+}
+
+/** Apre la chat con un utente specifico (es. profilo azienda = stesso id di `companies`). */
+export function openFloatingChatWithUser(userId: string) {
+  if (!userId || typeof window === 'undefined') return
+  window.dispatchEvent(new CustomEvent(OPEN_CHAT_WITH_USER_EVENT, { detail: { userId } }))
 }
 
 export function FloatingChat() {
@@ -33,6 +40,8 @@ export function FloatingChat() {
   const [newMessage, setNewMessage] = useState({ recipient_id: '', content: '' })
   const [conversationMessage, setConversationMessage] = useState({ content: '' })
   const [showConversationDetails, setShowConversationDetails] = useState(false)
+  const [externalRecipientProfile, setExternalRecipientProfile] = useState<Profile | null>(null)
+  const [pendingOpenUserId, setPendingOpenUserId] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const recipientPickerRef = useRef<HTMLDivElement>(null)
 
@@ -41,6 +50,30 @@ export function FloatingChat() {
     window.addEventListener(OPEN_CHAT_EVENT, handler)
     return () => window.removeEventListener(OPEN_CHAT_EVENT, handler)
   }, [])
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const ce = e as CustomEvent<{ userId?: string }>
+      const uid = ce.detail?.userId?.trim()
+      if (!uid) return
+      setPendingOpenUserId(uid)
+      setOpen(true)
+    }
+    window.addEventListener(OPEN_CHAT_WITH_USER_EVENT, handler)
+    return () => window.removeEventListener(OPEN_CHAT_WITH_USER_EVENT, handler)
+  }, [])
+
+  useEffect(() => {
+    if (!open || !pendingOpenUserId || !user) return
+    const uid = pendingOpenUserId
+    setPendingOpenUserId(null)
+    ;(async () => {
+      const { data: prof } = await supabase.from('profiles').select('*').eq('id', uid).single()
+      setExternalRecipientProfile(prof || null)
+      setSelectedConversation(uid)
+      setView('chat')
+    })()
+  }, [open, pendingOpenUserId, user])
 
   useEffect(() => {
     if (open && user) {
@@ -171,6 +204,7 @@ export function FloatingChat() {
         content: conversationMessage.content,
       })
       setConversationMessage({ content: '' })
+      setExternalRecipientProfile(null)
       loadData()
     } catch (err: any) {
       alert(err.message || 'Errore invio')
@@ -206,12 +240,14 @@ export function FloatingChat() {
   }
 
   const selectConv = (id: string) => {
+    setExternalRecipientProfile(null)
     setSelectedConversation(id)
     setView('chat')
   }
 
   const backToList = () => {
     setSelectedConversation(null)
+    setExternalRecipientProfile(null)
     setView('list')
     setShowConversationDetails(false)
   }
@@ -234,7 +270,7 @@ export function FloatingChat() {
     : null
 
   const selectedConversationUser = selectedConversation
-    ? conversations.get(selectedConversation)?.user || null
+    ? conversations.get(selectedConversation)?.user || externalRecipientProfile
     : null
 
   const conversationAttachments = selectedMessages.length

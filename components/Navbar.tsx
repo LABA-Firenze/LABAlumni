@@ -41,15 +41,23 @@ export function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const dashboardHref = userRole === 'admin' ? '/pannello/admin' : userRole === 'company' ? '/pannello/azienda' : userRole === 'docente' ? '/tesi' : '/pannello/studente'
+  const dashboardHref =
+    userRole === 'admin'
+      ? '/pannello/admin'
+      : userRole === 'company'
+        ? '/pannello/azienda'
+        : userRole === 'docente'
+          ? '/pannello/docente'
+          : '/pannello/studente'
   const annunciHref = userRole === 'company' ? '/annunci/gestisci' : '/annunci'
+  const isDocente = userRole === 'docente'
 
-  const isActive = (href: string) => {
-    if (href === '/pannello/studente' || href === '/pannello/azienda') {
-      return pathname?.startsWith('/pannello')
-    }
-    return pathname?.startsWith(href)
-  }
+  const dashboardActive = (() => {
+    const p = pathname || ''
+    if (dashboardHref === '/pannello/admin') return p.startsWith('/pannello/admin')
+    if (dashboardHref === '/pannello/azienda') return p.startsWith('/pannello/azienda')
+    return p === dashboardHref
+  })()
 
   return (
     <nav className="bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50 shadow-sm rounded-b-2xl">
@@ -66,7 +74,7 @@ export function Navbar() {
               <Link
                 href={dashboardHref}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive(dashboardHref)
+                  dashboardActive
                     ? 'bg-primary-50 text-primary-700'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
@@ -85,17 +93,31 @@ export function Navbar() {
                 <NewspaperIcon className="w-5 h-5 shrink-0" />
                 Bacheca
               </Link>
-              <Link
-                href={annunciHref}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  pathname?.startsWith('/annunci')
-                    ? 'bg-primary-50 text-primary-700'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                <BriefcaseIcon className="w-5 h-5 shrink-0" />
-                Tirocini
-              </Link>
+              {isDocente ? (
+                <Link
+                  href="/rete"
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    pathname?.startsWith('/rete')
+                      ? 'bg-primary-50 text-primary-700'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <UsersIcon className="w-5 h-5 shrink-0" />
+                  Rete
+                </Link>
+              ) : (
+                <Link
+                  href={annunciHref}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    pathname?.startsWith('/annunci')
+                      ? 'bg-primary-50 text-primary-700'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <BriefcaseIcon className="w-5 h-5 shrink-0" />
+                  Tirocini
+                </Link>
+              )}
               {userRole !== 'company' && (
               <Link
                 href="/tesi"
@@ -139,14 +161,26 @@ export function Navbar() {
                           <Cog6ToothIcon className="w-5 h-5 shrink-0 text-gray-500" />
                           <span>Impostazioni</span>
                         </Link>
-                        <Link
-                          href="/rete"
-                          onClick={() => setMenuOpen(false)}
-                          className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50"
-                        >
-                          <UsersIcon className="w-5 h-5 shrink-0 text-gray-500" />
-                          <span>Rete</span>
-                        </Link>
+                        {!isDocente && (
+                          <Link
+                            href="/rete"
+                            onClick={() => setMenuOpen(false)}
+                            className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50"
+                          >
+                            <UsersIcon className="w-5 h-5 shrink-0 text-gray-500" />
+                            <span>Rete</span>
+                          </Link>
+                        )}
+                        {isDocente && (
+                          <Link
+                            href={annunciHref}
+                            onClick={() => setMenuOpen(false)}
+                            className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50"
+                          >
+                            <BriefcaseIcon className="w-5 h-5 shrink-0 text-gray-500" />
+                            <span>Tirocini</span>
+                          </Link>
+                        )}
                         <button
                           onClick={() => {
                             setMenuOpen(false)

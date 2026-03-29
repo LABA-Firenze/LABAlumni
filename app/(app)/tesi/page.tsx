@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/components/AuthProvider'
 import { supabase } from '@/lib/supabase'
@@ -28,6 +28,7 @@ export default function ThesisPage() {
   const [role, setRole] = useState<string | null>(null)
   const [studentYear, setStudentYear] = useState<number | null>(null)
   const [hasActiveProposal, setHasActiveProposal] = useState(false)
+  const [docenteMineProposals, setDocenteMineProposals] = useState<Pick<ThesisProposal, 'status'>[]>([])
   const showSkeleton = useMinimumLoading(loading)
 
   useEffect(() => {
@@ -64,6 +65,29 @@ export default function ThesisPage() {
       .maybeSingle()
       .then(({ data }) => setHasActiveProposal(!!data))
   }, [user?.id, role])
+
+  useEffect(() => {
+    if (!user || role !== 'docente') {
+      setDocenteMineProposals([])
+      return
+    }
+    supabase
+      .from('thesis_proposals')
+      .select('status')
+      .or(`relatore_id.eq.${user.id},corelatore_id.eq.${user.id}`)
+      .then(({ data }) => setDocenteMineProposals(data || []))
+  }, [user?.id, role])
+
+  const docenteStats = useMemo(() => {
+    const rows = docenteMineProposals
+    return {
+      total: rows.length,
+      open: rows.filter((r) => r.status === 'open').length,
+      in_progress: rows.filter((r) => r.status === 'in_progress').length,
+      completed: rows.filter((r) => r.status === 'completed').length,
+      cancelled: rows.filter((r) => r.status === 'cancelled').length,
+    }
+  }, [docenteMineProposals])
 
   const loadThesisProposals = async () => {
     if (!user) return
@@ -167,6 +191,34 @@ export default function ThesisPage() {
             )}
           </div>
         </Card>
+
+        {role === 'docente' && (
+          <Card variant="elevated" className="p-5 border-primary-100/60">
+            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Le tue tesi (relatore / corelatore)</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+              <div className="rounded-xl bg-gray-50 border border-gray-100 px-3 py-2.5">
+                <p className="text-2xl font-bold text-gray-900">{docenteStats.total}</p>
+                <p className="text-xs text-gray-600">Totali</p>
+              </div>
+              <div className="rounded-xl bg-green-50 border border-green-100 px-3 py-2.5">
+                <p className="text-2xl font-bold text-green-800">{docenteStats.open}</p>
+                <p className="text-xs text-green-700">Aperte</p>
+              </div>
+              <div className="rounded-xl bg-blue-50 border border-blue-100 px-3 py-2.5">
+                <p className="text-2xl font-bold text-blue-800">{docenteStats.in_progress}</p>
+                <p className="text-xs text-blue-700">In elaborazione</p>
+              </div>
+              <div className="rounded-xl bg-gray-100 border border-gray-200 px-3 py-2.5">
+                <p className="text-2xl font-bold text-gray-800">{docenteStats.completed}</p>
+                <p className="text-xs text-gray-600">Completate</p>
+              </div>
+              <div className="rounded-xl bg-red-50 border border-red-100 px-3 py-2.5 col-span-2 sm:col-span-1">
+                <p className="text-2xl font-bold text-red-800">{docenteStats.cancelled}</p>
+                <p className="text-xs text-red-700">Annullate</p>
+              </div>
+            </div>
+          </Card>
+        )}
 
         {/* Status Filters + Scope on right */}
         <Card variant="elevated" className="p-4 mb-6">
