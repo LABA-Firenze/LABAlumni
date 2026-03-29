@@ -27,6 +27,7 @@ export default function ThesisPage() {
   const [filterStatus, setFilterStatus] = useState<string>('open')
   const [role, setRole] = useState<string | null>(null)
   const [studentYear, setStudentYear] = useState<number | null>(null)
+  const [studentYearReady, setStudentYearReady] = useState(false)
   const [hasActiveProposal, setHasActiveProposal] = useState(false)
   const [docenteMineProposals, setDocenteMineProposals] = useState<Pick<ThesisProposal, 'status'>[]>([])
   const showSkeleton = useMinimumLoading(loading)
@@ -53,9 +54,23 @@ export default function ThesisPage() {
     if (!user || role !== 'student') {
       setHasActiveProposal(false)
       setStudentYear(null)
+      setStudentYearReady(false)
       return
     }
-    supabase.from('students').select('year').eq('id', user.id).single().then(({ data }) => setStudentYear(data?.year ?? null))
+    setStudentYearReady(false)
+    supabase
+      .from('students')
+      .select('year')
+      .eq('id', user.id)
+      .single()
+      .then(({ data }) => {
+        setStudentYear(data?.year ?? null)
+        setStudentYearReady(true)
+      })
+      .catch(() => {
+        setStudentYear(null)
+        setStudentYearReady(true)
+      })
     supabase
       .from('thesis_proposals')
       .select('id')
@@ -140,6 +155,13 @@ export default function ThesisPage() {
     cancelled: 'bg-red-100 text-red-700 border-red-200',
   }
 
+  const canStudentCreateThesis =
+    role === 'student' &&
+    studentYearReady &&
+    !hasActiveProposal &&
+    studentYear !== null &&
+    studentYear >= 3
+
   if (showSkeleton || authLoading) {
     return (
       <div className="space-y-6">
@@ -181,7 +203,7 @@ export default function ThesisPage() {
                 {role === 'student' ? 'Pubblica la tua tesi di laurea o esplora quelle esistenti' : 'Esplora le tesi di laurea aperte e candidati come relatore'}
               </p>
             </div>
-            {role === 'student' && !hasActiveProposal && studentYear !== null && studentYear >= 3 && (
+            {canStudentCreateThesis && (
               <Link href="/tesi/nuova">
                 <Button variant="primary">
                   <PlusCircleIcon className="w-5 h-5 mr-2" />
@@ -281,13 +303,39 @@ export default function ThesisPage() {
             </h3>
             <p className="text-gray-600 mb-6">
               {filterScope === 'mine'
-                ? (role === 'student' ? 'Pubblica la tua prima tesi di laurea.' : 'Nessuna tesi di laurea in cui sei relatore o corelatore.')
+                ? role === 'student'
+                  ? !studentYearReady
+                    ? 'Caricamento…'
+                    : hasActiveProposal
+                      ? 'Hai già una proposta attiva: gestiscila dalla bacheca tesi o dal dettaglio.'
+                      : studentYear === null
+                        ? 'Per creare una proposta serve l’anno di corso nel profilo. Le proposte sono abilitate dal 3° anno.'
+                        : studentYear < 3
+                          ? `Le proposte di tesi sono disponibili dal 3° anno. Nel profilo risulti al ${studentYear}° anno.`
+                          : 'Pubblica la tua prima proposta di tesi di laurea.'
+                  : 'Nessuna tesi di laurea in cui sei relatore o corelatore.'
                 : role === 'student'
                   ? (filterStatus === 'open' ? 'Sii il primo a pubblicare una tesi di laurea!' : 'Prova a cambiare filtro o pubblica una nuova tesi di laurea')
                   : 'Nessuna tesi di laurea al momento. Potrai candidarti come relatore quando gli studenti ne pubblicheranno.'
               }
             </p>
-            {(filterStatus === 'open' || filterScope === 'mine') && role === 'student' && !hasActiveProposal && studentYear !== null && studentYear >= 3 && (
+            {filterScope === 'mine' &&
+              role === 'student' &&
+              studentYearReady &&
+              !hasActiveProposal &&
+              (studentYear === null || studentYear < 3) && (
+              <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                <Link href="/profilo">
+                  <Button variant="outline">Vai al profilo (anno di corso)</Button>
+                </Link>
+                {studentYear !== null && studentYear < 3 && (
+                  <p className="text-sm text-gray-500 max-w-md text-center sm:text-left">
+                    Se l’anno non è corretto, aggiornalo dal profilo o chiedi alla segreteria.
+                  </p>
+                )}
+              </div>
+            )}
+            {(filterStatus === 'open' || filterScope === 'mine') && canStudentCreateThesis && (
               <Link href="/tesi/nuova">
                 <Button variant="primary">Pubblica la Prima Tesi di laurea</Button>
               </Link>
