@@ -58,19 +58,17 @@ export default function ThesisPage() {
       return
     }
     setStudentYearReady(false)
-    supabase
-      .from('students')
-      .select('year')
-      .eq('id', user.id)
-      .single()
-      .then(({ data }) => {
-        setStudentYear(data?.year ?? null)
-        setStudentYearReady(true)
-      })
-      .catch(() => {
+    void (async () => {
+      try {
+        const { data, error } = await supabase.from('students').select('year').eq('id', user.id).single()
+        if (error) setStudentYear(null)
+        else setStudentYear(data?.year ?? null)
+      } catch {
         setStudentYear(null)
+      } finally {
         setStudentYearReady(true)
-      })
+      }
+    })()
     supabase
       .from('thesis_proposals')
       .select('id')
